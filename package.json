@@ -1,0 +1,24 @@
+{
+  "name": "inventa",
+  "version": "1.0.0",
+  "description": "Got it ✅ — you want me to **design the full user flow (step by step journey of how a user will interact with the desktop app)** for this inventory + sales management system.",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aminumuhammad000/inventa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aminumuhammad000/inventa/issues"
+  },
+  "homepage": "https://github.com/aminumuhammad000/inventa#readme",
+  "devDependencies": {
+    "electron": "^38.0.0"
+  }
+}
