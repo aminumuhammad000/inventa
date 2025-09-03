@@ -1,11 +1,5 @@
 # inventa
 
-Got it ✅ — you want me to **design the full user flow (step by step journey of how a user will interact with the desktop app)** for this inventory + sales management system.
-
-I’ll break it down into **modules** (features) and then the **user flow** for each.
-
----
-
 # 🖥️ Desktop App User Flow Design
 
 ## 1. **Authentication & Setup**
@@ -122,8 +116,3 @@ Navigation sidebar: **Inventory | Sales | Customers | Reports | Settings**
 3. **Customer returns 2 units** → Cashier processes return → stock increases.
 4. **Another customer buys on credit** → Cashier records sale under credit → due date in 7 days.
 5. **End of day** → Manager checks report → sees total cash sales, credit sales, and profit.
-
----
-
-👉 This flow is complete enough to guide **UI/UX design** and **software architecture**.
-Would you like me to **turn this into a wireframe (screen design sketches)** so you can see how each step looks visually, or keep it at functional flow level?

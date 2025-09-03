@@ -2,7 +2,7 @@
   "name": "inventa",
   "version": "1.0.0",
   "description": "Got it ✅ — you want me to **design the full user flow (step by step journey of how a user will interact with the desktop app)** for this inventory + sales management system.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
