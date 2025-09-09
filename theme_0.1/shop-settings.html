@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa - Shop Settings</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🏗️</div>
+                    <div class="logo-text">Inventa</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons-round">menu</i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="index.html" class="nav-item">
+                        <i class="material-icons-round">dashboard</i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="inventory.html" class="nav-item">
+                        <i class="material-icons-round">inventory_2</i>
+                        <span>Inventory</span>
+                    </a>
+                    <a href="sales.html" class="nav-item">
+                        <i class="material-icons-round">point_of_sale</i>
+                        <span>Sales</span>
+                    </a>
+                    <a href="credit.html" class="nav-item">
+                        <i class="material-icons-round">credit_card</i>
+                        <span>Credit Sales</span>
+                    </a>
+                    <a href="customers.html" class="nav-item">
+                        <i class="material-icons-round">people</i>
+                        <span>Customers</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <a href="reports.html" class="nav-item">
+                        <i class="material-icons-round">assessment</i>
+                        <span>Reports</span>
+                    </a>
+                    <a href="profit.html" class="nav-item">
+                        <i class="material-icons-round">trending_up</i>
+                        <span>Profit</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Settings</div>
+                    <a href="shop-settings.html" class="nav-item active">
+                        <i class="material-icons-round">settings</i>
+                        <span>Shop Settings</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title">Shop Settings</h1>
+                    <p class="page-subtitle">Configure your shop preferences and settings</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar">JD</div>
+                        <div class="user-details">
+                            <span class="user-name">John Doe</span>
+                            <span class="user-role">Shop Manager</span>
+                        </div>
+                        <div class="user-dropdown">
+                            <button class="dropdown-toggle" onclick="toggleUserDropdown()">
+                                <i class="material-icons-round">keyboard_arrow_down</i>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <div class="dropdown-header">
+                                    <div class="shop-info">
+                                        <div class="shop-name">ABC Construction Supplies</div>
+                                        <div class="shop-location">Lagos, Nigeria</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openShopSettings()">
+                                    <i class="material-icons-round">settings</i>
+                                    <span>Shop Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openProfileSettings()">
+                                    <i class="material-icons-round">person</i>
+                                    <span>Profile Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openNotifications()">
+                                    <i class="material-icons-round">notifications</i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openBackup()">
+                                    <i class="material-icons-round">backup</i>
+                                    <span>Backup & Restore</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openHelp()">
+                                    <i class="material-icons-round">help</i>
+                                    <span>Help & Support</span>
+                                </a>
+                                <a href="#" class="dropdown-item logout" onclick="logout()">
+                                    <i class="material-icons-round">logout</i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Settings Sections -->
+                <div class="settings-sections">
+                    <!-- General Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>General Settings</h3>
+                            <p>Basic shop information and preferences</p>
+                        </div>
+                        <div class="settings-content">
+                            <div class="setting-item">
+                                <label for="shopName">Shop Name</label>
+                                <input type="text" id="shopName" value="ABC Construction Supplies" placeholder="Enter shop name">
+                            </div>
+                            <div class="setting-item">
+                                <label for="shopAddress">Shop Address</label>
+                                <textarea id="shopAddress" placeholder="Enter shop address">123 Construction Street, Lagos, Nigeria</textarea>
+                            </div>
+                            <div class="setting-item">
+                                <label for="shopPhone">Phone Number</label>
+                                <input type="tel" id="shopPhone" value="+234-800-000-0000" placeholder="Enter phone number">
+                            </div>
+                            <div class="setting-item">
+                                <label for="shopEmail">Email Address</label>
+                                <input type="email" id="shopEmail" value="info@abcconstruction.com" placeholder="Enter email address">
+                            </div>
+                            <div class="setting-item">
+                                <label for="currency">Currency</label>
+                                <select id="currency">
+                                    <option value="NGN" selected>Nigerian Naira (₦)</option>
+                                    <option value="USD">US Dollar ($)</option>
+                                    <option value="EUR">Euro (€)</option>
+                                    <option value="GBP">British Pound (£)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>Business Settings</h3>
+                            <p>Business hours and operational preferences</p>
+                        </div>
+                        <div class="settings-content">
+                            <div class="setting-item">
+                                <label for="businessHours">Business Hours</label>
+                                <div class="hours-input">
+                                    <input type="time" id="openTime" value="08:00">
+                                    <span>to</span>
+                                    <input type="time" id="closeTime" value="18:00">
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <label for="workingDays">Working Days</label>
+                                <div class="days-checkboxes">
+                                    <label><input type="checkbox" checked> Monday</label>
+                                    <label><input type="checkbox" checked> Tuesday</label>
+                                    <label><input type="checkbox" checked> Wednesday</label>
+                                    <label><input type="checkbox" checked> Thursday</label>
+                                    <label><input type="checkbox" checked> Friday</label>
+                                    <label><input type="checkbox" checked> Saturday</label>
+                                    <label><input type="checkbox"> Sunday</label>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <label for="taxRate">Tax Rate (%)</label>
+                                <input type="number" id="taxRate" value="7.5" min="0" max="100" step="0.1" placeholder="Enter tax rate">
+                            </div>
+                            <div class="setting-item">
+                                <label for="lowStockThreshold">Low Stock Alert Threshold</label>
+                                <input type="number" id="lowStockThreshold" value="10" min="1" max="100" placeholder="Enter threshold">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Receipt Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>Receipt Settings</h3>
+                            <p>Customize receipt and invoice appearance</p>
+                        </div>
+                        <div class="settings-content">
+                            <div class="setting-item">
+                                <label for="receiptHeader">Receipt Header</label>
+                                <textarea id="receiptHeader" placeholder="Enter receipt header text">ABC Construction Supplies
+123 Construction Street, Lagos, Nigeria
+Phone: +234-800-000-0000
+Email: info@abcconstruction.com</textarea>
+                            </div>
+                            <div class="setting-item">
+                                <label for="receiptFooter">Receipt Footer</label>
+                                <textarea id="receiptFooter" placeholder="Enter receipt footer text">Thank you for your business!
+Visit us again soon.</textarea>
+                            </div>
+                            <div class="setting-item">
+                                <label for="autoPrint">Auto Print Receipts</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="autoPrint" checked>
+                                    <label for="autoPrint"></label>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <label for="receiptSize">Receipt Size</label>
+                                <select id="receiptSize">
+                                    <option value="58mm" selected>58mm (Standard)</option>
+                                    <option value="80mm">80mm (Wide)</option>
+                                    <option value="A4">A4 (Full Page)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup Settings -->
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h3>Backup Settings</h3>
+                            <p>Configure automatic backup preferences</p>
+                        </div>
+                        <div class="settings-content">
+                            <div class="setting-item">
+                                <label for="autoBackup">Automatic Backup</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="autoBackup" checked>
+                                    <label for="autoBackup"></label>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <label for="backupFrequency">Backup Frequency</label>
+                                <select id="backupFrequency">
+                                    <option value="daily" selected>Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label for="backupTime">Backup Time</label>
+                                <input type="time" id="backupTime" value="02:00">
+                            </div>
+                            <div class="setting-item">
+                                <label for="retentionDays">Data Retention (Days)</label>
+                                <input type="number" id="retentionDays" value="365" min="30" max="3650" placeholder="Enter retention period">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="settings-actions">
+                    <button class="btn-secondary" onclick="resetSettings()">
+                        <i class="material-icons-round">refresh</i>
+                        Reset to Default
+                    </button>
+                    <button class="btn-primary" onclick="saveSettings()">
+                        <i class="material-icons-round">save</i>
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/shop-settings.js"></script>
+</body>
+</html>

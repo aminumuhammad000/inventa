@@ -5,6 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "dev:watch": "nodemon --exec \"NODE_ENV=development electron .\" --watch theme_0.1 --ext html,css,js",
+    "build": "electron-builder",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +22,8 @@
   },
   "homepage": "https://github.com/aminumuhammad000/inventa#readme",
   "devDependencies": {
-    "electron": "^38.0.0"
+    "electron": "^38.0.0",
+    "electron-reload": "2.0.0-alpha.1",
+    "nodemon": "^3.1.10"
   }
 }

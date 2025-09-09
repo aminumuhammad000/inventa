@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa - Sign Up</title>
+    <link rel="stylesheet" href="css/login-styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Column - Welcome Section -->
+        <div class="welcome-section">
+            <!-- Background Pattern -->
+            <div class="background-pattern">
+                <div class="grid-lines"></div>
+                <div class="wave-shapes">
+                    <div class="wave wave-1"></div>
+                    <div class="wave wave-2"></div>
+                    <div class="wave wave-3"></div>
+                </div>
+                <div class="circles">
+                    <div class="circle circle-1"></div>
+                    <div class="circle circle-2"></div>
+                    <div class="circle circle-3"></div>
+                    <div class="circle circle-4"></div>
+                </div>
+                <div class="network-dots">
+                    <div class="dot dot-1"></div>
+                    <div class="dot dot-2"></div>
+                    <div class="dot dot-3"></div>
+                    <div class="dot dot-4"></div>
+                    <div class="dot dot-5"></div>
+                </div>
+            </div>
+
+            <!-- Company Logo -->
+            <div class="company-logo">
+                <div class="logo-icon">
+                    <i class="material-icons-round">target</i>
+                </div>
+                <span class="company-name">INVENTA</span>
+            </div>
+
+            <!-- Welcome Content -->
+            <div class="welcome-content">
+                <h1 class="welcome-title">Setup your shop system</h1>
+                <h2 class="welcome-subtitle">SHOP SETUP</h2>
+                <div class="separator"></div>
+                <p class="welcome-description">
+                    Set up your shop details, create your account, and start managing inventory, sales, and customers offline on your desktop.
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Column - Signup Form -->
+        <div class="login-section">
+            <div class="login-form-container signup-form-container">
+                <div class="form-header">
+                    <div class="header-top">
+                        <button type="button" class="back-to-login-btn" onclick="goToLogin()">
+                            <i class="material-icons-round">arrow_back</i>
+                            <span>Back to Login</span>
+                        </button>
+                    </div>
+                    <h2>Shop Setup</h2>
+                    <p>Enter your shop details and create your account to start managing business offline on your computer.</p>
+                </div>
+
+                <form id="signupForm" class="form signup-form">
+                    <!-- Scrollable Inputs Container -->
+                    <div class="signup-inputs-container">
+                        <div class="input-group">
+                            <input type="text" id="fullName" class="form-input" placeholder="Full Name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="email" id="email" class="form-input" placeholder="Email ID" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="tel" id="phone" class="form-input" placeholder="Phone Number" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="businessName" class="form-input" placeholder="Shop Name" required>
+                        </div>
+
+                        <!-- Shop Logo Upload -->
+                        <div class="input-group logo-upload-group">
+                            <label class="logo-upload-label">Shop Logo</label>
+                            <div class="logo-upload-container">
+                                <input type="file" id="shopLogo" class="logo-upload-input" accept="image/*" onchange="handleLogoUpload(event)">
+                                <div class="logo-upload-area" onclick="document.getElementById('shopLogo').click()">
+                                    <div class="logo-upload-icon">
+                                        <i class="material-icons-round">cloud_upload</i>
+                                    </div>
+                                    <div class="logo-upload-text">
+                                        <span class="logo-upload-title">Upload Shop Logo</span>
+                                        <span class="logo-upload-subtitle">Click to browse or drag & drop</span>
+                                        <span class="logo-upload-formats">PNG, JPG, SVG up to 5MB</span>
+                                    </div>
+                                </div>
+                                <div class="logo-preview" id="logoPreview" style="display: none;">
+                                    <img id="previewImage" src="" alt="Logo Preview">
+                                    <button type="button" class="logo-remove-btn" onclick="removeLogo()">
+                                        <i class="material-icons-round">close</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" id="password" class="form-input" placeholder="Password" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm Password" required>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">I agree to the <a href="#" class="terms-link">Terms of Service</a></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Fixed Button Container -->
+                    <div class="signup-button-container">
+                        <button type="submit" class="login-btn">
+                            SETUP SHOP
+                        </button>
+                    </div>
+                </form>
+
+                <div class="signup-link">
+                    <p>Already setup your shop? <a href="login.html" class="member-link">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="material-icons-round toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+        <button class="toast-close" onclick="hideToast()">
+            <i class="material-icons-round">close</i>
+        </button>
+    </div>
+
+    <script src="js/signup.js"></script>
+</body>
+</html>

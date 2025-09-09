@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa - Profit Analysis</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🏗️</div>
+                    <div class="logo-text">Inventa</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons-round">menu</i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Home</div>
+                    <a href="index.html" class="nav-item">
+                        <i class="material-icons-round">home</i>
+                        <span>Home</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Your Shop</div>
+                    <a href="inventory.html" class="nav-item">
+                        <i class="material-icons-round">inventory_2</i>
+                        <span>Stock Items</span>
+                    </a>
+                    <a href="sales.html" class="nav-item">
+                        <i class="material-icons-round">point_of_sale</i>
+                        <span>Sell Items</span>
+                    </a>
+                    <a href="credit.html" class="nav-item">
+                        <i class="material-icons-round">credit_card</i>
+                        <span>Sell on Credit</span>
+                    </a>
+                    <a href="customers.html" class="nav-item">
+                        <i class="material-icons-round">people</i>
+                        <span>Customer List</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Reports</div>
+                    <a href="reports.html" class="nav-item">
+                        <i class="material-icons-round">assessment</i>
+                        <span>View Reports</span>
+                    </a>
+                    <a href="profit.html" class="nav-item active">
+                        <i class="material-icons-round">trending_up</i>
+                        <span>Check Profit</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title">Your Shop's Profit</h1>
+                    <p class="page-subtitle">See how much money your shop is making</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar">JD</div>
+                        <div class="user-details">
+                            <span class="user-name">John Doe</span>
+                            <span class="user-role">Shop Manager</span>
+                        </div>
+                        <div class="user-dropdown">
+                            <button class="dropdown-toggle" onclick="toggleUserDropdown()">
+                                <i class="material-icons-round">keyboard_arrow_down</i>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <div class="dropdown-header">
+                                    <div class="shop-info">
+                                        <div class="shop-name">ABC Construction Supplies</div>
+                                        <div class="shop-location">Lagos, Nigeria</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openShopSettings()">
+                                    <i class="material-icons-round">settings</i>
+                                    <span>Shop Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openProfileSettings()">
+                                    <i class="material-icons-round">person</i>
+                                    <span>Profile Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openNotifications()">
+                                    <i class="material-icons-round">notifications</i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openBackup()">
+                                    <i class="material-icons-round">backup</i>
+                                    <span>Backup & Restore</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openHelp()">
+                                    <i class="material-icons-round">help</i>
+                                    <span>Help & Support</span>
+                                </a>
+                                <a href="#" class="dropdown-item logout" onclick="logout()">
+                                    <i class="material-icons-round">logout</i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Simple Profit Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">account_balance_wallet</i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="totalProfit">₦0</h3>
+                            <p class="stat-label">Total Profit This Month</p>
+                            <div class="stat-change positive">
+                                <i class="material-icons-round">trending_up</i>
+                                <span id="profitChange">+0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">point_of_sale</i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="totalRevenue">₦0</h3>
+                            <p class="stat-label">Money Received</p>
+                            <div class="stat-change positive">
+                                <i class="material-icons-round">trending_up</i>
+                                <span id="revenueChange">+0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">shopping_cart</i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="totalCosts">₦0</h3>
+                            <p class="stat-label">Money Spent</p>
+                            <div class="stat-change negative">
+                                <i class="material-icons-round">trending_down</i>
+                                <span id="costChange">+0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">percent</i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value" id="profitPercentage">0%</h3>
+                            <p class="stat-label">Profit Percentage</p>
+                            <div class="stat-change positive">
+                                <i class="material-icons-round">trending_up</i>
+                                <span id="percentageChange">+0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simple Money Summary -->
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="material-icons-round">money</i>
+                                Money Coming In
+                            </h2>
+                            <div class="period-selector">
+                                <select id="periodSelect" onchange="updateProfitData()">
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month" selected>This Month</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="summary-stats">
+                                <div class="summary-item">
+                                    <div class="summary-label">Cash Sales</div>
+                                    <div class="summary-value" id="cashSales">₦0</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Credit Sales</div>
+                                    <div class="summary-value" id="creditSales">₦0</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Total Money In</div>
+                                    <div class="summary-value" id="totalMoneyIn">₦0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="material-icons-round">shopping_cart</i>
+                                Money Going Out
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="summary-stats">
+                                <div class="summary-item">
+                                    <div class="summary-label">Buying Stock</div>
+                                    <div class="summary-value" id="stockCosts">₦0</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Shop Expenses</div>
+                                    <div class="summary-value" id="shopExpenses">₦0</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Total Money Out</div>
+                                    <div class="summary-value" id="totalMoneyOut">₦0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simple Profit Summary -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="material-icons-round">assessment</i>
+                            Simple Profit Summary
+                        </h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="summary-stats">
+                            <div class="summary-item">
+                                <div class="summary-label">Money In</div>
+                                <div class="summary-value" id="moneyIn">₦0</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Money Out</div>
+                                <div class="summary-value" id="moneyOut">₦0</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Your Profit</div>
+                                <div class="summary-value" id="yourProfit">₦0</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Profit %</div>
+                                <div class="summary-value" id="profitPercent">0%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profit-explanation">
+                            <h4>What this means:</h4>
+                            <p><strong>Money In:</strong> Total sales from your shop</p>
+                            <p><strong>Money Out:</strong> What you spent on stock and expenses</p>
+                            <p><strong>Your Profit:</strong> Money In - Money Out = Your profit</p>
+                            <p><strong>Profit %:</strong> How much profit you made compared to sales</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/profit.js"></script>
+</body>
+</html>

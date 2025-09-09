@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa - Customer Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🏗️</div>
+                    <div class="logo-text">Inventa</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons-round">menu</i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="index.html" class="nav-item">
+                        <i class="material-icons-round">dashboard</i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="inventory.html" class="nav-item">
+                        <i class="material-icons-round">inventory_2</i>
+                        <span>Inventory</span>
+                    </a>
+                    <a href="sales.html" class="nav-item">
+                        <i class="material-icons-round">point_of_sale</i>
+                        <span>Sales</span>
+                    </a>
+                    <a href="credit.html" class="nav-item">
+                        <i class="material-icons-round">credit_card</i>
+                        <span>Credit Sales</span>
+                    </a>
+                    <a href="customers.html" class="nav-item active">
+                        <i class="material-icons-round">people</i>
+                        <span>Customers</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <a href="reports.html" class="nav-item">
+                        <i class="material-icons-round">assessment</i>
+                        <span>Reports</span>
+                    </a>
+                    <a href="profit.html" class="nav-item">
+                        <i class="material-icons-round">trending_up</i>
+                        <span>Profit</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title">Customer Management</h1>
+                    <p class="page-subtitle">Manage customer profiles, credit limits, and payment history</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar">JD</div>
+                        <div class="user-details">
+                            <span class="user-name">John Doe</span>
+                            <span class="user-role">Shop Manager</span>
+                        </div>
+                        <div class="user-dropdown">
+                            <button class="dropdown-toggle" onclick="toggleUserDropdown()">
+                                <i class="material-icons-round">keyboard_arrow_down</i>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <div class="dropdown-header">
+                                    <div class="shop-info">
+                                        <div class="shop-name">ABC Construction Supplies</div>
+                                        <div class="shop-location">Lagos, Nigeria</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openShopSettings()">
+                                    <i class="material-icons-round">settings</i>
+                                    <span>Shop Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openProfileSettings()">
+                                    <i class="material-icons-round">person</i>
+                                    <span>Profile Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openNotifications()">
+                                    <i class="material-icons-round">notifications</i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openBackup()">
+                                    <i class="material-icons-round">backup</i>
+                                    <span>Backup & Restore</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openHelp()">
+                                    <i class="material-icons-round">help</i>
+                                    <span>Help & Support</span>
+                                </a>
+                                <a href="#" class="dropdown-item logout" onclick="logout()">
+                                    <i class="material-icons-round">logout</i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Actions -->
+                <div class="actions-bar">
+                    <button class="btn-primary" onclick="openAddCustomerModal()">
+                        <i class="material-icons-round">person_add</i>
+                        Add Customer
+                    </button>
+                    <button class="btn-secondary" onclick="exportCustomers()">
+                        <i class="material-icons-round">download</i>
+                        Export Customers
+                    </button>
+                </div>
+
+                <!-- Customer Stats -->
+                <div class="customer-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">people</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalCustomers">0</div>
+                            <div class="stat-label">Total Customers</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">credit_card</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="creditCustomers">0</div>
+                            <div class="stat-label">Credit Customers</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">warning</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="overdueCustomers">0</div>
+                            <div class="stat-label">Overdue Payments</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">account_balance_wallet</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalOutstanding">₦0</div>
+                            <div class="stat-label">Total Outstanding</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer List -->
+                <div class="customer-list">
+                    <div class="list-header">
+                        <h3>Customer List</h3>
+                        <div class="list-controls">
+                            <div class="search-box">
+                                <i class="material-icons-round">search</i>
+                                <input type="text" id="customerSearch" placeholder="Search customers..." onkeyup="searchCustomers()">
+                            </div>
+                            <select id="customerFilter" onchange="filterCustomers()">
+                                <option value="all">All Customers</option>
+                                <option value="credit">Credit Customers</option>
+                                <option value="overdue">Overdue Payments</option>
+                                <option value="active">Active</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="customer-table-container">
+                        <table class="customer-table" id="customerTable">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Credit Limit</th>
+                                    <th>Outstanding</th>
+                                    <th>Status</th>
+                                    <th>Last Purchase</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customerTableBody">
+                                <!-- Customer data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal" id="addCustomerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Customer</h3>
+                <button class="modal-close" onclick="closeAddCustomerModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addCustomerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerName">Customer Name *</label>
+                            <input type="text" id="customerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number *</label>
+                            <input type="tel" id="customerPhone" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerEmail">Email Address</label>
+                            <input type="email" id="customerEmail">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress">Address</label>
+                            <input type="text" id="customerAddress">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="creditLimit">Credit Limit (₦)</label>
+                            <input type="number" id="creditLimit" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerType">Customer Type</label>
+                            <select id="customerType">
+                                <option value="individual">Individual</option>
+                                <option value="company">Company</option>
+                                <option value="contractor">Contractor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerNotes">Notes</label>
+                        <textarea id="customerNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeAddCustomerModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveCustomer()">Save Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal" id="customerDetailsModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="customerDetailsTitle">Customer Details</h3>
+                <button class="modal-close" onclick="closeCustomerDetailsModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-details-tabs">
+                    <button class="tab-button active" onclick="switchCustomerTab('profile')">Profile</button>
+                    <button class="tab-button" onclick="switchCustomerTab('purchases')">Purchase History</button>
+                    <button class="tab-button" onclick="switchCustomerTab('payments')">Payment History</button>
+                    <button class="tab-button" onclick="switchCustomerTab('credit')">Credit Summary</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div id="profileTab" class="tab-panel active">
+                        <div class="customer-profile">
+                            <div class="profile-info">
+                                <h4 id="profileName"></h4>
+                                <p id="profilePhone"></p>
+                                <p id="profileEmail"></p>
+                                <p id="profileAddress"></p>
+                            </div>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Credit Limit</span>
+                                    <span class="stat-value" id="profileCreditLimit"></span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Outstanding</span>
+                                    <span class="stat-value" id="profileOutstanding"></span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Purchases</span>
+                                    <span class="stat-value" id="profileTotalPurchases"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="purchasesTab" class="tab-panel">
+                        <div class="purchase-history" id="purchaseHistory">
+                            <!-- Purchase history will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="paymentsTab" class="tab-panel">
+                        <div class="payment-history" id="paymentHistory">
+                            <!-- Payment history will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="creditTab" class="tab-panel">
+                        <div class="credit-summary" id="creditSummary">
+                            <!-- Credit summary will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeCustomerDetailsModal()">Close</button>
+                <button class="btn-primary" onclick="recordPayment()">Record Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Payment Modal -->
+    <div class="modal" id="recordPaymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Record Payment</h3>
+                <button class="modal-close" onclick="closeRecordPaymentModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="recordPaymentForm">
+                    <div class="form-group">
+                        <label for="paymentAmount">Payment Amount (₦) *</label>
+                        <input type="number" id="paymentAmount" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method *</label>
+                        <select id="paymentMethod" required>
+                            <option value="cash">Cash</option>
+                            <option value="transfer">Bank Transfer</option>
+                            <option value="check">Check</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentDate">Payment Date *</label>
+                        <input type="date" id="paymentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentNotes">Notes</label>
+                        <textarea id="paymentNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeRecordPaymentModal()">Cancel</button>
+                <button class="btn-primary" onclick="savePayment()">Record Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/customers.js"></script>
+</body>
+</html>

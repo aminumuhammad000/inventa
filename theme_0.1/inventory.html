@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa - Inventory Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🏗️</div>
+                    <div class="logo-text">Inventa</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons-round">menu</i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="index.html" class="nav-item">
+                        <i class="material-icons-round">dashboard</i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="inventory.html" class="nav-item active">
+                        <i class="material-icons-round">inventory_2</i>
+                        <span>Inventory</span>
+                    </a>
+                    <a href="sales.html" class="nav-item">
+                        <i class="material-icons-round">point_of_sale</i>
+                        <span>Sales</span>
+                    </a>
+                    <a href="credit.html" class="nav-item">
+                        <i class="material-icons-round">credit_card</i>
+                        <span>Credit Sales</span>
+                    </a>
+                    <a href="customers.html" class="nav-item">
+                        <i class="material-icons-round">people</i>
+                        <span>Customers</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <a href="reports.html" class="nav-item">
+                        <i class="material-icons-round">assessment</i>
+                        <span>Reports</span>
+                    </a>
+                    <a href="profit.html" class="nav-item">
+                        <i class="material-icons-round">trending_up</i>
+                        <span>Profit</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title">Inventory Management</h1>
+                    <p class="page-subtitle">Manage your construction materials inventory</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar">JD</div>
+                        <div class="user-details">
+                            <span class="user-name">John Doe</span>
+                            <span class="user-role">Shop Manager</span>
+                        </div>
+                        <div class="user-dropdown">
+                            <button class="dropdown-toggle" onclick="toggleUserDropdown()">
+                                <i class="material-icons-round">keyboard_arrow_down</i>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <div class="dropdown-header">
+                                    <div class="shop-info">
+                                        <div class="shop-name">ABC Construction Supplies</div>
+                                        <div class="shop-location">Lagos, Nigeria</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openShopSettings()">
+                                    <i class="material-icons-round">settings</i>
+                                    <span>Shop Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openProfileSettings()">
+                                    <i class="material-icons-round">person</i>
+                                    <span>Profile Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openNotifications()">
+                                    <i class="material-icons-round">notifications</i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openBackup()">
+                                    <i class="material-icons-round">backup</i>
+                                    <span>Backup & Restore</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openHelp()">
+                                    <i class="material-icons-round">help</i>
+                                    <span>Help & Support</span>
+                                </a>
+                                <a href="#" class="dropdown-item logout" onclick="logout()">
+                                    <i class="material-icons-round">logout</i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Actions -->
+                <div class="actions-bar">
+                    <button class="btn-primary" onclick="openAddPurchaseModal()">
+                        <i class="material-icons-round">add_box</i>
+                        Add Purchase
+                    </button>
+                    <button class="btn-secondary" onclick="openStockAdjustmentModal()">
+                        <i class="material-icons-round">edit</i>
+                        Stock Adjustment
+                    </button>
+                    <button class="btn-secondary" onclick="exportInventory()">
+                        <i class="material-icons-round">download</i>
+                        Export Data
+                    </button>
+                    <button class="btn-secondary" onclick="openImportModal()">
+                        <i class="material-icons-round">upload</i>
+                        Import CSV
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label>Category:</label>
+                        <select id="categoryFilter" onchange="filterInventory()">
+                            <option value="">All Categories</option>
+                            <option value="Construction Materials">Construction Materials</option>
+                            <option value="Finishing Materials">Finishing Materials</option>
+                            <option value="Fasteners">Fasteners</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Plumbing">Plumbing</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Stock Status:</label>
+                        <select id="stockFilter" onchange="filterInventory()">
+                            <option value="">All Items</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                            <option value="normal">Normal Stock</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="searchInput" placeholder="Search items..." onkeyup="searchInventory()">
+                        <i class="material-icons-round">search</i>
+                    </div>
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="table-container">
+                    <table class="data-table" id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>SKU</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Unit</th>
+                                <th>Cost Price</th>
+                                <th>Selling Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Purchase Modal -->
+    <div class="modal" id="addPurchaseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Purchase</h2>
+                <button class="modal-close" onclick="closeModal('addPurchaseModal')">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addPurchaseForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="supplier">Supplier</label>
+                            <select id="supplier" required>
+                                <option value="">Select Supplier</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchaseDate">Purchase Date</label>
+                            <input type="date" id="purchaseDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Items</label>
+                        <div class="items-container" id="purchaseItems">
+                            <div class="item-row">
+                                <select class="item-select" required>
+                                    <option value="">Select Item</option>
+                                </select>
+                                <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
+                                <input type="number" class="cost-input" placeholder="Unit Cost" step="0.01" min="0" required>
+                                <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                                    <i class="material-icons-round">remove</i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-add-item" onclick="addItemRow()">
+                            <i class="material-icons-round">add</i>
+                            Add Item
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" rows="3" placeholder="Additional notes..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('addPurchaseModal')">Cancel</button>
+                <button class="btn-primary" onclick="savePurchase()">Save Purchase</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Adjustment Modal -->
+    <div class="modal" id="stockAdjustmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Stock Adjustment</h2>
+                <button class="modal-close" onclick="closeModal('stockAdjustmentModal')">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="stockAdjustmentForm">
+                    <div class="form-group">
+                        <label for="adjustmentItem">Item</label>
+                        <select id="adjustmentItem" required>
+                            <option value="">Select Item</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adjustmentType">Adjustment Type</label>
+                            <select id="adjustmentType" required>
+                                <option value="">Select Type</option>
+                                <option value="increase">Increase Stock</option>
+                                <option value="decrease">Decrease Stock</option>
+                                <option value="set">Set Stock Level</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adjustmentQuantity">Quantity</label>
+                            <input type="number" id="adjustmentQuantity" placeholder="Quantity" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adjustmentReason">Reason</label>
+                        <textarea id="adjustmentReason" rows="3" placeholder="Reason for adjustment..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('stockAdjustmentModal')">Cancel</button>
+                <button class="btn-primary" onclick="saveStockAdjustment()">Save Adjustment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSV Import Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Import Inventory from CSV</h3>
+                <button class="modal-close" onclick="closeImportModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="import-instructions">
+                    <h4>CSV Format Requirements:</h4>
+                    <p>Your CSV file should have the following columns in this order:</p>
+                    <ul>
+                        <li><strong>Name</strong> - Item name (required)</li>
+                        <li><strong>SKU</strong> - Stock keeping unit (required)</li>
+                        <li><strong>Category</strong> - Item category (required)</li>
+                        <li><strong>Current Stock</strong> - Current quantity (required)</li>
+                        <li><strong>Unit</strong> - Unit of measurement (required)</li>
+                        <li><strong>Cost Price</strong> - Purchase price (required)</li>
+                        <li><strong>Selling Price</strong> - Sale price (required)</li>
+                        <li><strong>Min Stock Level</strong> - Minimum stock alert (required)</li>
+                    </ul>
+                    <p><strong>Note:</strong> The first row should contain headers. Existing items with the same SKU will be updated.</p>
+                </div>
+                
+                <div class="import-section">
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div class="upload-icon">
+                            <i class="material-icons-round">cloud_upload</i>
+                        </div>
+                        <div class="upload-text">
+                            <h4>Drop CSV file here or click to browse</h4>
+                            <p>Supported format: .csv files only</p>
+                        </div>
+                        <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleFileSelect(event)">
+                    </div>
+                    
+                    <div class="import-preview" id="importPreview" style="display: none;">
+                        <h4>Preview Data</h4>
+                        <div class="preview-table-container">
+                            <table class="preview-table" id="previewTable">
+                                <thead id="previewTableHead"></thead>
+                                <tbody id="previewTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="import-summary" id="importSummary"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeImportModal()">Cancel</button>
+                <button class="btn-primary" id="importBtn" onclick="importCSVData()" disabled>Import Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/inventory.js"></script>
+</body>
+</html>
