@@ -59,12 +59,16 @@
                         <i class="material-icons-round">assessment</i>
                         <span>View Reports</span>
                     </a>
-                    <a href="profit.html" class="nav-item">
-                        <i class="material-icons-round">trending_up</i>
-                        <span>Check Profit</span>
-                    </a>
                 </div>
             </nav>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <div class="powered-by">
+                    <span>Powered By</span>
+                    <span class="company-name">PioneerICT</span>
+                </div>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -101,19 +105,6 @@
                                 <a href="#" class="dropdown-item" onclick="openProfileSettings()">
                                     <i class="material-icons-round">person</i>
                                     <span>Change My Info</span>
-                                </a>
-                                <a href="#" class="dropdown-item" onclick="openNotifications()">
-                                    <i class="material-icons-round">notifications</i>
-                                    <span>Shop Alerts</span>
-                                </a>
-                                <a href="#" class="dropdown-item" onclick="openBackup()">
-                                    <i class="material-icons-round">backup</i>
-                                    <span>Save My Data</span>
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item" onclick="openHelp()">
-                                    <i class="material-icons-round">help</i>
-                                    <span>Need Help?</span>
                                 </a>
                                 <a href="#" class="dropdown-item logout" onclick="logout()">
                                     <i class="material-icons-round">logout</i>
@@ -288,73 +279,13 @@
                         </div>
                     </div>
 
-                    <!-- Today's Sales & Profit Summary -->
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h2 class="card-title">
-                                <i class="material-icons-round">trending_up</i>
-                                Today's Money Summary
-                            </h2>
-                            <button class="card-action">
-                                <i class="material-icons-round">more_vert</i>
-                            </button>
-                        </div>
-                        <div class="card-content">
-                            <div class="summary-stats">
-                                <div class="summary-item">
-                                    <div class="summary-label">Money Received</div>
-                                    <div class="summary-value">₦45,230</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="summary-label">Profit Made</div>
-                                    <div class="summary-value">₦12,450</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="summary-label">Profit Percentage</div>
-                                    <div class="summary-value">27.5%</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="summary-label">Sales Today</div>
-                                    <div class="summary-value">23</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Quick Actions -->
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h2 class="card-title">
-                                <i class="material-icons-round">flash_on</i>
-                                Quick Things to Do
-                            </h2>
-                        </div>
-                        <div class="card-content">
-                            <div class="quick-actions">
-                                <button class="quick-action-btn" onclick="location.href='inventory.html'">
-                                    <i class="material-icons-round">add_box</i>
-                                    <span>Add New Items</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="location.href='sales.html'">
-                                    <i class="material-icons-round">point_of_sale</i>
-                                    <span>Sell Items</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="location.href='credit.html'">
-                                    <i class="material-icons-round">credit_card</i>
-                                    <span>Sell on Credit</span>
-                                </button>
-                                <button class="quick-action-btn" onclick="location.href='reports.html'">
-                                    <i class="material-icons-round">assessment</i>
-                                    <span>See Reports</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="js/theme-manager.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa - Employee Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body class="employee-dashboard">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🏗️</div>
+                    <div class="logo-text">Inventa</div>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons-round">menu</i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Employee Menu</div>
+                    <a href="employee-dashboard.html" class="nav-item active" onclick="showDashboard()">
+                        <i class="material-icons-round">home</i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="showProducts()">
+                        <i class="material-icons-round">inventory_2</i>
+                        <span>Products</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="showSales()">
+                        <i class="material-icons-round">point_of_sale</i>
+                        <span>Sales</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <div class="powered-by">
+                    <span>Powered By</span>
+                    <span class="company-name">PioneerICT</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title">Employee Dashboard</h1>
+                    <p class="page-subtitle">Welcome! Here's your work overview for today.</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar" id="employeeAvatar">EM</div>
+                        <div class="user-details">
+                            <span class="user-name" id="employeeName">Employee</span>
+                            <span class="user-role">Cashier</span>
+                        </div>
+                        <div class="user-dropdown">
+                            <button class="dropdown-toggle" onclick="toggleUserDropdown()">
+                                <i class="material-icons-round">keyboard_arrow_down</i>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <div class="dropdown-header">
+                                    <div class="user-info-header">
+                                        <div class="user-avatar-small">
+                                            <i class="material-icons-round">person</i>
+                                        </div>
+                                        <div class="user-details-small">
+                                            <div class="user-name-small" id="dropdownUserName">Jane Smith</div>
+                                            <div class="user-role-small" id="dropdownUserRole">Cashier</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" onclick="openEmployeeSettings()">
+                                    <i class="material-icons-round">settings</i>
+                                    <span>Settings</span>
+                                </a>
+                                <a href="#" class="dropdown-item" onclick="openEmployeeProfile()">
+                                    <i class="material-icons-round">person</i>
+                                    <span>My Profile</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item logout" onclick="logoutEmployee()">
+                                    <i class="material-icons-round">logout</i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="content-section active">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="mySalesToday">0</h3>
+                                <p class="stat-label">My Sales Today</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="myRevenueToday">₦0</h3>
+                                <p class="stat-label">Revenue Generated</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalStockItems">0</h3>
+                                <p class="stat-label">Items in Stock</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="lowStockCount">0</h3>
+                                <p class="stat-label">Low Stock Items</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Sales -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="material-icons-round">history</i>
+                                Recent Sales Today
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="recent-sales" id="recentSalesList">
+                                <div class="no-data">
+                                    <i class="material-icons-round">receipt</i>
+                                    <p>No sales recorded today</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Section -->
+                <div id="productsSection" class="content-section">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="material-icons-round">inventory_2</i>
+                                Product Inventory
+                            </h2>
+                            <div class="header-actions">
+                                <div class="search-box">
+                                    <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProducts()">
+                                    <i class="material-icons-round">search</i>
+                                </div>
+                                <div class="cart-info">
+                                    <span class="cart-count" id="cartCount">0</span>
+                                    <button class="mark-sold-btn" onclick="openCartModal()" id="markSoldBtn" disabled>
+                                        <i class="material-icons-round">shopping_cart</i>
+                                        Mark as Sold
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="products-table-container">
+                                <table class="products-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Category</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                            <th>Add to Cart</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTableBody">
+                                        <!-- Products will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Section -->
+                <div id="salesSection" class="content-section">
+                    <!-- Sales Statistics -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalSalesCount">0</h3>
+                                <p class="stat-label">Total Sales</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalSalesAmount">₦0</h3>
+                                <p class="stat-label">Total Revenue</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="averageSaleAmount">₦0</h3>
+                                <p class="stat-label">Average Sale</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="todaySalesCount">0</h3>
+                                <p class="stat-label">Today's Sales</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Table -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="material-icons-round">receipt_long</i>
+                                My Sales History
+                            </h2>
+                            <div class="header-actions">
+                                <div class="search-box">
+                                    <input type="text" id="salesSearch" placeholder="Search sales..." onkeyup="filterSales()">
+                                    <i class="material-icons-round">search</i>
+                                </div>
+                                <div class="filter-actions">
+                                    <select id="salesFilter" onchange="filterSales()">
+                                        <option value="all">All Sales</option>
+                                        <option value="today">Today</option>
+                                        <option value="week">This Week</option>
+                                        <option value="month">This Month</option>
+                                        <option value="cash">Cash Sales</option>
+                                        <option value="credit">Credit Sales</option>
+                                    </select>
+                                    <button class="export-btn" onclick="exportSalesToCSV()">
+                                        <i class="material-icons-round">download</i>
+                                        Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="sales-table-container">
+                                <table class="sales-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sale ID</th>
+                                            <th>Date & Time</th>
+                                            <th>Customer</th>
+                                            <th>Items</th>
+                                            <th>Payment</th>
+                                            <th>Total</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="salesTableBody">
+                                        <!-- Sales will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settingsSection" class="content-section">
+                    <div class="settings-container">
+                        <!-- Settings Header -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h2 class="card-title">
+                                    <i class="material-icons-round">settings</i>
+                                    Settings
+                                </h2>
+                                <button class="back-btn" onclick="showDashboard()">
+                                    <i class="material-icons-round">arrow_back</i>
+                                    Back to Dashboard
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Theme Settings -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="material-icons-round">palette</i>
+                                    Theme Colors
+                                </h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="theme-settings">
+                                    <div class="theme-preview">
+                                        <h4>Preview</h4>
+                                        <div class="preview-card" id="themePreview">
+                                            <div class="preview-header">
+                                                <div class="preview-avatar"></div>
+                                                <div class="preview-text">
+                                                    <div class="preview-title">Sample Title</div>
+                                                    <div class="preview-subtitle">Sample Subtitle</div>
+                                                </div>
+                                            </div>
+                                            <div class="preview-content">
+                                                <div class="preview-button">Sample Button</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="theme-colors">
+                                        <h4>Choose Theme Color</h4>
+                                        <div class="color-options">
+                                            <div class="color-option" data-theme="green" onclick="selectTheme('green')">
+                                                <div class="color-preview green"></div>
+                                                <span>Green</span>
+                                            </div>
+                                            <div class="color-option" data-theme="blue" onclick="selectTheme('blue')">
+                                                <div class="color-preview blue"></div>
+                                                <span>Blue</span>
+                                            </div>
+                                            <div class="color-option" data-theme="purple" onclick="selectTheme('purple')">
+                                                <div class="color-preview purple"></div>
+                                                <span>Purple</span>
+                                            </div>
+                                            <div class="color-option" data-theme="red" onclick="selectTheme('red')">
+                                                <div class="color-preview red"></div>
+                                                <span>Red</span>
+                                            </div>
+                                            <div class="color-option" data-theme="orange" onclick="selectTheme('orange')">
+                                                <div class="color-preview orange"></div>
+                                                <span>Orange</span>
+                                            </div>
+                                            <div class="color-option" data-theme="teal" onclick="selectTheme('teal')">
+                                                <div class="color-preview teal"></div>
+                                                <span>Teal</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Work Settings -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="material-icons-round">work</i>
+                                    Work Settings
+                                </h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="settings-group">
+                                    <div class="setting-item">
+                                        <div class="setting-info">
+                                            <h4>Auto-logout</h4>
+                                            <p>Automatically logout after inactivity</p>
+                                        </div>
+                                        <select class="setting-control">
+                                            <option value="15">15 minutes</option>
+                                            <option value="30">30 minutes</option>
+                                            <option value="60">1 hour</option>
+                                            <option value="0">Never</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <div class="setting-info">
+                                            <h4>Default Payment Method</h4>
+                                            <p>Set default payment method for sales</p>
+                                        </div>
+                                        <select class="setting-control">
+                                            <option value="cash">Cash</option>
+                                            <option value="credit">Credit</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Profile Section -->
+                <div id="profileSection" class="content-section">
+                    <div class="profile-container">
+                        <!-- Profile Header -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h2 class="card-title">
+                                    <i class="material-icons-round">person</i>
+                                    My Profile
+                                </h2>
+                                <button class="back-btn" onclick="showDashboard()">
+                                    <i class="material-icons-round">arrow_back</i>
+                                    Back to Dashboard
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Profile Information -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="material-icons-round">info</i>
+                                    Personal Information
+                                </h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="profile-info">
+                                    <div class="profile-avatar-large">
+                                        <i class="material-icons-round">person</i>
+                                    </div>
+                                    <div class="profile-details">
+                                        <h3 id="profileName">Jane Smith</h3>
+                                        <p id="profileRole">Cashier</p>
+                                        <p id="profileEmail">jane.smith@company.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Shopping Cart</h3>
+                <button class="modal-close" onclick="closeCartModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="cart-items" id="cartItems">
+                    <!-- Cart items will be loaded here -->
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-item">
+                        <span>Total Items:</span>
+                        <span id="totalItemsCount">0</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total Amount:</span>
+                        <span id="totalAmountDisplay">₦0</span>
+                    </div>
+                </div>
+                
+                <form id="cartForm" onsubmit="processCartSale(event)">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name:</label>
+                        <input type="text" id="customerName" placeholder="Enter customer name (optional)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method:</label>
+                        <select id="paymentMethod" required>
+                            <option value="cash">Cash</option>
+                            <option value="credit">Credit</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeCartModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Complete Sale</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/employee-data.js"></script>
+    <script src="js/theme-manager.js"></script>
+    <script src="js/employee-dashboard.js"></script>
+</body>
+</html>

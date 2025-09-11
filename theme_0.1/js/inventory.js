@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize inventory data
     initializeInventory();
     
+    // Initialize theme
+    initializeTheme();
+    
     // Set default date
     document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
 });
@@ -1014,3 +1017,25 @@ window.openNotifications = openNotifications;
 window.openBackup = openBackup;
 window.openHelp = openHelp;
 window.logout = logout;
+
+// Theme initialization function
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('globalTheme') || localStorage.getItem('ownerTheme') || 'green';
+    applyTheme(savedTheme);
+}
+
+function applyTheme(themeName) {
+    // Remove existing theme classes from both body and html
+    const body = document.body;
+    const html = document.documentElement;
+    const existingThemes = ['green', 'blue', 'purple', 'red', 'orange', 'teal'];
+    
+    existingThemes.forEach(theme => {
+        body.classList.remove(`theme-${theme}`);
+        html.classList.remove(`theme-${theme}`);
+    });
+    
+    // Add new theme class to both body and html for better coverage
+    body.classList.add(`theme-${themeName}`);
+    html.classList.add(`theme-${themeName}`);
+}

@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update user info
     updateUserInfo();
+    
+    // Initialize theme settings
+    initializeThemeSettings();
 });
 
 // Check authentication
@@ -220,6 +223,13 @@ function saveSettings() {
         // Save to localStorage
         settingsData = newSettings;
         localStorage.setItem('shopSettings', JSON.stringify(settingsData));
+        
+        // Apply selected theme if one was selected
+        if (window.selectedTheme) {
+            applyThemeToAllPages(window.selectedTheme);
+            localStorage.setItem('ownerTheme', window.selectedTheme);
+            localStorage.setItem('globalTheme', window.selectedTheme);
+        }
         
         // Update shop info in dropdown
         updateShopInfo();
@@ -439,3 +449,72 @@ window.openNotifications = openNotifications;
 window.openBackup = openBackup;
 window.openHelp = openHelp;
 window.logout = logout;
+
+// Theme Settings Functions
+function initializeThemeSettings() {
+    const savedTheme = localStorage.getItem('ownerTheme') || 'green';
+    selectTheme(savedTheme, false);
+}
+
+function selectTheme(themeName, save = true) {
+    // Update color options UI
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('selected');
+        if (option.dataset.theme === themeName) {
+            option.classList.add('selected');
+        }
+    });
+    
+    // Update preview
+    updateThemePreview(themeName);
+    
+    // Store selected theme temporarily (don't apply yet)
+    window.selectedTheme = themeName;
+    
+    // Only apply and save if save is true (when Save Settings is clicked)
+    if (save) {
+        applyThemeToAllPages(themeName);
+        localStorage.setItem('ownerTheme', themeName);
+        showToast(`Theme changed to ${themeName.charAt(0).toUpperCase() + themeName.slice(1)}`, 'success');
+    }
+}
+
+function updateThemePreview(themeName) {
+    const preview = document.getElementById('themePreview');
+    const themeColors = {
+        green: { primary: '#10b981', secondary: '#059669' },
+        blue: { primary: '#3b82f6', secondary: '#1d4ed8' },
+        purple: { primary: '#8b5cf6', secondary: '#7c3aed' },
+        red: { primary: '#ef4444', secondary: '#dc2626' },
+        orange: { primary: '#f97316', secondary: '#ea580c' },
+        teal: { primary: '#14b8a6', secondary: '#0d9488' }
+    };
+    
+    const colors = themeColors[themeName] || themeColors.green;
+    
+    // Update preview card styles
+    preview.style.setProperty('--theme-primary', colors.primary);
+    preview.style.setProperty('--theme-secondary', colors.secondary);
+}
+
+function applyThemeToAllPages(themeName) {
+    // Apply theme to current page
+    const body = document.body;
+    const html = document.documentElement;
+    const existingThemes = ['green', 'blue', 'purple', 'red', 'orange', 'teal'];
+    
+    existingThemes.forEach(theme => {
+        body.classList.remove(`theme-${theme}`);
+        html.classList.remove(`theme-${theme}`);
+    });
+    
+    // Add new theme class to both body and html for better coverage
+    body.classList.add(`theme-${themeName}`);
+    html.classList.add(`theme-${themeName}`);
+    
+    // Also save to a global theme variable for other pages
+    localStorage.setItem('globalTheme', themeName);
+}
+
+// Make functions globally available
+window.selectTheme = selectTheme;

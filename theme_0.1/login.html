@@ -84,6 +84,27 @@
                         LOGIN
                     </button>
                 </form>
+
+                <!-- Demo Login Options -->
+                <div class="demo-login-section">
+                    <div class="demo-divider">
+                        <span>Demo Accounts</span>
+                    </div>
+                    
+                    <div class="demo-buttons">
+                        <button class="demo-btn owner-btn" onclick="demoLogin()">
+                            <i class="material-icons-round">person</i>
+                            <span>Owner Login</span>
+                            <small>demo@inventa.com</small>
+                        </button>
+                        
+                        <button class="demo-btn employee-btn" onclick="employeeLogin()">
+                            <i class="material-icons-round">badge</i>
+                            <span>Employee Login</span>
+                            <small>employee@inventa.com</small>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -99,6 +120,7 @@
         </button>
     </div>
 
+    <script src="js/theme-manager.js"></script>
     <script src="js/login.js"></script>
 </body>
 </html>

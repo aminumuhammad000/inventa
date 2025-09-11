@@ -18,10 +18,26 @@ document.addEventListener('DOMContentLoaded', function() {
         rememberMe: !!rememberMe
     });
 
-    // Demo credentials
+    // Demo credentials with roles
     const demoCredentials = {
-        email: 'demo@inventa.com',
-        password: 'demo123'
+        'demo@inventa.com': {
+            password: 'demo123',
+            role: 'owner',
+            name: 'John Doe',
+            shopName: 'My Construction Shop'
+        },
+        'employee@inventa.com': {
+            password: 'employee123',
+            role: 'employee',
+            name: 'Jane Smith',
+            shopName: 'My Construction Shop'
+        },
+        'cashier@inventa.com': {
+            password: 'cashier123',
+            role: 'employee',
+            name: 'Mike Johnson',
+            shopName: 'My Construction Shop'
+        }
     };
 
     // Check if user is already logged in
@@ -49,8 +65,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Demo login function
     window.demoLogin = function() {
-        emailInput.value = demoCredentials.email;
-        passwordInput.value = demoCredentials.password;
+        emailInput.value = 'demo@inventa.com';
+        passwordInput.value = 'demo123';
+        handleLogin();
+    };
+
+    // Employee demo login function
+    window.employeeLogin = function() {
+        emailInput.value = 'employee@inventa.com';
+        passwordInput.value = 'employee123';
         handleLogin();
     };
 
@@ -100,10 +123,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Simulate login process
         setTimeout(() => {
             console.log('Checking credentials...'); // Debug log
-            if (email === demoCredentials.email && password === demoCredentials.password) {
+            const userCreds = demoCredentials[email];
+            
+            if (userCreds && userCreds.password === password) {
                 console.log('Login successful!'); // Debug log
                 // Successful login
-                showToast('Login successful! Redirecting...', 'success');
+                showToast(`Login successful! Welcome ${userCreds.name}`, 'success');
                 
                 // Save login state
                 if (rememberMe.checked) {
@@ -113,20 +138,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('currentUser', email);
+                localStorage.setItem('userRole', userCreds.role);
+                localStorage.setItem('userId', email.replace('@', '_').replace('.', '_'));
+                localStorage.setItem('userName', userCreds.name);
+                localStorage.setItem('shopName', userCreds.shopName);
                 localStorage.setItem('userData', JSON.stringify({
                     email: email,
+                    role: userCreds.role,
+                    name: userCreds.name,
+                    shopName: userCreds.shopName,
                     loginTime: new Date().toISOString()
                 }));
 
                 console.log('Login successful! Redirecting to dashboard...'); // Debug log
-                // Redirect after short delay
+                // Redirect based on role
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    if (userCreds.role === 'employee') {
+                        window.location.href = 'employee-dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
                 }, 1500);
             } else {
                 console.log('Login failed - invalid credentials'); // Debug log
                 // Failed login
-                showToast('Invalid email or password. Use: demo@inventa.com / demo123', 'error');
+                showToast('Invalid email or password. Try: demo@inventa.com / demo123 or employee@inventa.com / employee123', 'error');
                 setLoadingState(false);
                 loginForm.classList.add('error-shake');
                 setTimeout(() => {
@@ -192,9 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
         toast.classList.remove('show');
     };
 
-    // Redirect to dashboard
+    // Redirect to dashboard based on role
     function redirectToDashboard() {
-        window.location.href = 'index.html';
+        const userRole = localStorage.getItem('userRole') || 'owner';
+        if (userRole === 'employee') {
+            window.location.href = 'employee-dashboard.html';
+        } else {
+            window.location.href = 'index.html';
+        }
     }
 
     // Input animations
