@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'employee@inventa.com': {
             password: 'employee123',
             role: 'employee',
-            name: 'Jane Smith',
+            name: 'Usman Umar',
             shopName: 'My Construction Shop'
         },
         'cashier@inventa.com': {

@@ -382,19 +382,102 @@ function switchTab(tabName) {
 }
 
 // Modal functions
-function openNewCreditSaleModal() {
-    document.getElementById('newCreditSaleModal').classList.add('show');
+// New Credit Sale form functions
+function toggleNewCreditSaleForm() {
+    const formSection = document.getElementById('newCreditSaleSection');
+    if (formSection.style.display === 'none') {
+        openNewCreditSaleForm();
+    } else {
+        closeNewCreditSaleForm();
+    }
+}
+
+function openNewCreditSaleForm() {
+    const formSection = document.getElementById('newCreditSaleSection');
+    formSection.style.display = 'block';
+    populateDropdowns();
+    updateCreditSaleSummary();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeNewCreditSaleForm() {
+    const formSection = document.getElementById('newCreditSaleSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('newCreditSaleForm').reset();
+    
+    // Reset to single item row
+    const itemsContainer = document.getElementById('creditSaleItems');
+    itemsContainer.innerHTML = `
+        <div class="item-row">
+            <select class="item-select" required>
+                <option value="">Select Item</option>
+            </select>
+            <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
+            <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
+            <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                <i class="material-icons-round">remove</i>
+            </button>
+        </div>
+    `;
     populateDropdowns();
     updateCreditSaleSummary();
 }
 
-function openPaymentModal() {
-    document.getElementById('paymentModal').classList.add('show');
-    populateDropdowns();
+// Payment form functions
+function togglePaymentForm() {
+    const formSection = document.getElementById('recordPaymentSection');
+    if (formSection.style.display === 'none') {
+        openPaymentForm();
+    } else {
+        closePaymentForm();
+    }
 }
 
-function openCustomerModal() {
-    document.getElementById('customerModal').classList.add('show');
+function openPaymentForm() {
+    const formSection = document.getElementById('recordPaymentSection');
+    formSection.style.display = 'block';
+    populateDropdowns();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closePaymentForm() {
+    const formSection = document.getElementById('recordPaymentSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('paymentForm').reset();
+}
+
+// Customer form functions
+function toggleCustomerForm() {
+    const formSection = document.getElementById('addCustomerSection');
+    if (formSection.style.display === 'none') {
+        openCustomerForm();
+    } else {
+        closeCustomerForm();
+    }
+}
+
+function openCustomerForm() {
+    const formSection = document.getElementById('addCustomerSection');
+    formSection.style.display = 'block';
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeCustomerForm() {
+    const formSection = document.getElementById('addCustomerSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('customerForm').reset();
 }
 
 function closeModal(modalId) {
@@ -550,7 +633,7 @@ async function saveCreditSale() {
         localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
         
         showToast('Credit sale created successfully!', 'success');
-        closeModal('newCreditSaleModal');
+        closeNewCreditSaleForm();
         
         // Reload data
         await loadCreditSalesData();
@@ -624,7 +707,7 @@ async function savePayment() {
         }
         
         showToast('Payment recorded successfully!', 'success');
-        closeModal('paymentModal');
+        closePaymentForm();
         
         // Reload data
         await loadCreditSalesData();
@@ -670,7 +753,7 @@ async function saveCustomer() {
         localStorage.setItem('customersData', JSON.stringify(customers));
         
         showToast('Customer added successfully!', 'success');
-        closeModal('customerModal');
+        closeCustomerForm();
         
         // Reload data
         await loadCustomers();
@@ -752,7 +835,120 @@ function renderFilteredCreditSalesTable(data) {
 
 // Placeholder functions
 function viewCreditSaleDetails(saleId) {
-    showToast('Credit sale details functionality coming soon!', 'info');
+    const sale = creditSalesData.find(s => s.id === saleId);
+    if (!sale) {
+        showToast('Credit sale not found!', 'error');
+        return;
+    }
+    
+    const customer = customersData.find(c => c.id === sale.customerId);
+    
+    // Populate sale information
+    document.getElementById('detailsSaleId').textContent = `#${sale.id}`;
+    document.getElementById('detailsCustomer').textContent = customer ? customer.name : 'Unknown Customer';
+    document.getElementById('detailsSaleDate').textContent = sale.saleDate;
+    document.getElementById('detailsDueDate').textContent = sale.dueDate;
+    document.getElementById('detailsTotalAmount').textContent = `₦${parseFloat(sale.totalAmount).toFixed(2)}`;
+    document.getElementById('detailsPaidAmount').textContent = `₦${parseFloat(sale.paidAmount).toFixed(2)}`;
+    
+    const outstanding = parseFloat(sale.totalAmount) - parseFloat(sale.paidAmount);
+    document.getElementById('detailsOutstanding').textContent = `₦${outstanding.toFixed(2)}`;
+    
+    // Status
+    const status = getCreditSaleStatus(sale);
+    document.getElementById('detailsStatus').innerHTML = `<span class="status-badge ${status.class}">${status.text}</span>`;
+    
+    // Populate items sold
+    populateItemsTable(sale.items || []);
+    
+    // Populate payment history
+    populatePaymentsTable(saleId);
+    
+    // Populate customer information
+    if (customer) {
+        document.getElementById('detailsCustomerName').textContent = customer.name;
+        document.getElementById('detailsCustomerPhone').textContent = customer.phone || '-';
+        document.getElementById('detailsCustomerEmail').textContent = customer.email || '-';
+        document.getElementById('detailsCustomerAddress').textContent = customer.address || '-';
+        document.getElementById('detailsCustomerCreditLimit').textContent = `₦${parseFloat(customer.creditLimit || 0).toFixed(2)}`;
+    } else {
+        document.getElementById('detailsCustomerName').textContent = '-';
+        document.getElementById('detailsCustomerPhone').textContent = '-';
+        document.getElementById('detailsCustomerEmail').textContent = '-';
+        document.getElementById('detailsCustomerAddress').textContent = '-';
+        document.getElementById('detailsCustomerCreditLimit').textContent = '-';
+    }
+    
+    // Show details form
+    openCreditSaleDetailsForm();
+}
+
+// Open credit sale details form
+function openCreditSaleDetailsForm() {
+    const formSection = document.getElementById('creditSaleDetailsSection');
+    formSection.style.display = 'block';
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close credit sale details form
+function closeCreditSaleDetailsForm() {
+    const formSection = document.getElementById('creditSaleDetailsSection');
+    formSection.style.display = 'none';
+}
+
+// Populate items table
+function populateItemsTable(items) {
+    const tbody = document.getElementById('detailsItemsTableBody');
+    tbody.innerHTML = '';
+    
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280;">No items found</td></tr>';
+        return;
+    }
+    
+    items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>₦${parseFloat(item.price).toFixed(2)}</td>
+            <td>₦${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Populate payments table
+function populatePaymentsTable(saleId) {
+    const tbody = document.getElementById('detailsPaymentsTableBody');
+    tbody.innerHTML = '';
+    
+    const payments = paymentsData.filter(p => p.creditSaleId === saleId);
+    
+    if (payments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280;">No payments recorded</td></tr>';
+        return;
+    }
+    
+    payments.forEach(payment => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${payment.paymentDate}</td>
+            <td>₦${parseFloat(payment.amount).toFixed(2)}</td>
+            <td>${payment.method}</td>
+            <td>${payment.notes || '-'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Record payment from details
+function recordPaymentFromDetails() {
+    const saleId = document.getElementById('detailsSaleId').textContent.replace('#', '');
+    recordPayment(parseInt(saleId));
+    closeCreditSaleDetailsForm();
 }
 
 function recordPayment(saleId) {
@@ -960,9 +1156,15 @@ function closeUserDropdown() {
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
 window.switchTab = switchTab;
-window.openNewCreditSaleModal = openNewCreditSaleModal;
-window.openPaymentModal = openPaymentModal;
-window.openCustomerModal = openCustomerModal;
+window.toggleNewCreditSaleForm = toggleNewCreditSaleForm;
+window.openNewCreditSaleForm = openNewCreditSaleForm;
+window.closeNewCreditSaleForm = closeNewCreditSaleForm;
+window.togglePaymentForm = togglePaymentForm;
+window.openPaymentForm = openPaymentForm;
+window.closePaymentForm = closePaymentForm;
+window.toggleCustomerForm = toggleCustomerForm;
+window.openCustomerForm = openCustomerForm;
+window.closeCustomerForm = closeCustomerForm;
 window.closeModal = closeModal;
 window.addItemRow = addItemRow;
 window.removeItemRow = removeItemRow;
@@ -975,6 +1177,11 @@ window.saveCustomer = saveCustomer;
 window.filterCreditSales = filterCreditSales;
 window.searchCreditSales = searchCreditSales;
 window.viewCreditSaleDetails = viewCreditSaleDetails;
+window.openCreditSaleDetailsForm = openCreditSaleDetailsForm;
+window.closeCreditSaleDetailsForm = closeCreditSaleDetailsForm;
+window.populateItemsTable = populateItemsTable;
+window.populatePaymentsTable = populatePaymentsTable;
+window.recordPaymentFromDetails = recordPaymentFromDetails;
 window.toggleUserDropdown = toggleUserDropdown;
 window.openShopSettings = openShopSettings;
 window.openProfileSettings = openProfileSettings;

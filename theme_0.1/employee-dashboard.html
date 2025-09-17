@@ -60,12 +60,12 @@
                     <p class="page-subtitle">Welcome! Here's your work overview for today.</p>
                 </div>
                 <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar" id="employeeAvatar">EM</div>
-                        <div class="user-details">
-                            <span class="user-name" id="employeeName">Employee</span>
-                            <span class="user-role">Cashier</span>
-                        </div>
+                        <div class="user-info">
+                            <div class="user-avatar" id="employeeAvatar">UU</div>
+                            <div class="user-details">
+                                <span class="user-name" id="employeeName">Usman Umar</span>
+                                <span class="user-role">Cashier</span>
+                            </div>
                         <div class="user-dropdown">
                             <button class="dropdown-toggle" onclick="toggleUserDropdown()">
                                 <i class="material-icons-round">keyboard_arrow_down</i>
@@ -77,7 +77,7 @@
                                             <i class="material-icons-round">person</i>
                                         </div>
                                         <div class="user-details-small">
-                                            <div class="user-name-small" id="dropdownUserName">Jane Smith</div>
+                                            <div class="user-name-small" id="dropdownUserName">Usman Umar</div>
                                             <div class="user-role-small" id="dropdownUserRole">Cashier</div>
                                         </div>
                                     </div>
@@ -169,7 +169,23 @@
                                     <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProducts()">
                                     <i class="material-icons-round">search</i>
                                 </div>
+                                <div class="filter-actions">
+                                    <select id="brandFilter" onchange="filterProducts()">
+                                        <option value="all">All Brands</option>
+                                        <option value="Dangote">Dangote</option>
+                                        <option value="Lafarge">Lafarge</option>
+                                        <option value="Steel Works">Steel Works</option>
+                                        <option value="Dulux">Dulux</option>
+                                        <option value="Berger">Berger</option>
+                                        <option value="Premium Sand">Premium Sand</option>
+                                        <option value="Hardware Pro">Hardware Pro</option>
+                                        <option value="AquaFlow">AquaFlow</option>
+                                    </select>
+                                </div>
                                 <div class="cart-info">
+                                    <button class="refresh-btn" onclick="refreshData()" title="Refresh Data">
+                                        <i class="material-icons-round">refresh</i>
+                                    </button>
                                     <span class="cart-count" id="cartCount">0</span>
                                     <button class="mark-sold-btn" onclick="openCartModal()" id="markSoldBtn" disabled>
                                         <i class="material-icons-round">shopping_cart</i>
@@ -183,13 +199,16 @@
                                 <table class="products-table">
                                     <thead>
                                         <tr>
+                                            <th>Image</th>
                                             <th>Product Name</th>
+                                            <th>Brand</th>
                                             <th>Category</th>
-                                            <th>Quantity</th>
+                                            <th>Stock</th>
                                             <th>Unit</th>
                                             <th>Price</th>
                                             <th>Status</th>
-                                            <th>Add to Cart</th>
+                                            <th>Sales Qty</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="productsTableBody">
@@ -267,7 +286,7 @@
                                             <th>Sale ID</th>
                                             <th>Date & Time</th>
                                             <th>Customer</th>
-                                            <th>Items</th>
+                                            <th>Products</th>
                                             <th>Payment</th>
                                             <th>Total</th>
                                             <th>Actions</th>
@@ -353,6 +372,32 @@
                                                 <span>Teal</span>
                                             </div>
                                         </div>
+                                        <div class="theme-actions">
+                                            <button class="save-theme-btn" onclick="saveGlobalTheme()" id="saveThemeBtn">
+                                                <i class="material-icons-round">save</i>
+                                                Save Theme
+                                            </button>
+                                            <button class="debug-theme-btn" onclick="debugThemeSelection()" title="Debug Theme Selection">
+                                                <i class="material-icons-round">bug_report</i>
+                                                Debug
+                                            </button>
+                                            <button class="test-theme-btn" onclick="testThemeSave()" title="Test Theme Save">
+                                                <i class="material-icons-round">science</i>
+                                                Test
+                                            </button>
+                                            <div class="manual-theme-buttons">
+                                                <button class="manual-theme-btn green" onclick="saveGreenTheme()" title="Save Green Theme">Green</button>
+                                                <button class="manual-theme-btn blue" onclick="saveBlueTheme()" title="Save Blue Theme">Blue</button>
+                                                <button class="manual-theme-btn purple" onclick="savePurpleTheme()" title="Save Purple Theme">Purple</button>
+                                                <button class="manual-theme-btn red" onclick="saveRedTheme()" title="Save Red Theme">Red</button>
+                                                <button class="manual-theme-btn orange" onclick="saveOrangeTheme()" title="Save Orange Theme">Orange</button>
+                                                <button class="manual-theme-btn teal" onclick="saveTealTheme()" title="Save Teal Theme">Teal</button>
+                                            </div>
+                                            <div class="theme-status" id="themeStatus">
+                                                <i class="material-icons-round">info</i>
+                                                <span>Select a theme and click Save to apply globally</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -427,9 +472,9 @@
                                         <i class="material-icons-round">person</i>
                                     </div>
                                     <div class="profile-details">
-                                        <h3 id="profileName">Jane Smith</h3>
+                                        <h3 id="profileName">Usman Umar</h3>
                                         <p id="profileRole">Cashier</p>
-                                        <p id="profileEmail">jane.smith@company.com</p>
+                                        <p id="profileEmail">usman.umar@company.com</p>
                                     </div>
                                 </div>
                             </div>
@@ -489,6 +534,27 @@
         </div>
     </div>
 
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content image-modal-content">
+            <div class="modal-header">
+                <h3 id="imageModalTitle">Product Image</h3>
+                <button class="modal-close" onclick="closeImageModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="image-preview-container">
+                    <img id="imagePreview" src="" alt="Product Image" class="product-image-preview">
+                    <div class="image-info" id="imageInfo">
+                        <!-- Product info will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/global-theme-manager.js"></script>
     <script src="js/employee-data.js"></script>
     <script src="js/theme-manager.js"></script>
     <script src="js/employee-dashboard.js"></script>

@@ -277,14 +277,91 @@ function populateDropdowns() {
 }
 
 // Modal functions
-function openRecordSaleModal() {
-    document.getElementById('recordSaleModal').classList.add('show');
+// Record Sale form functions
+function toggleRecordSaleForm() {
+    const formSection = document.getElementById('recordSaleSection');
+    if (formSection.style.display === 'none') {
+        openRecordSaleForm();
+    } else {
+        closeRecordSaleForm();
+    }
+}
+
+function openRecordSaleForm() {
+    const formSection = document.getElementById('recordSaleSection');
+    formSection.style.display = 'block';
+    populateDropdowns();
+    updateSaleSummary();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeRecordSaleForm() {
+    const formSection = document.getElementById('recordSaleSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('recordSaleForm').reset();
+    
+    // Reset to single item row
+    const itemsContainer = document.getElementById('saleItems');
+    itemsContainer.innerHTML = `
+        <div class="item-row">
+            <select class="item-select" required>
+                <option value="">Select Item</option>
+            </select>
+            <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
+            <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
+            <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                <i class="material-icons-round">remove</i>
+            </button>
+        </div>
+    `;
     populateDropdowns();
     updateSaleSummary();
 }
 
-function openReturnModal() {
-    document.getElementById('returnModal').classList.add('show');
+// Return form functions
+function toggleReturnForm() {
+    const formSection = document.getElementById('processReturnSection');
+    if (formSection.style.display === 'none') {
+        openReturnForm();
+    } else {
+        closeReturnForm();
+    }
+}
+
+function openReturnForm() {
+    const formSection = document.getElementById('processReturnSection');
+    formSection.style.display = 'block';
+    populateDropdowns();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeReturnForm() {
+    const formSection = document.getElementById('processReturnSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('returnForm').reset();
+    
+    // Reset to single item row
+    const itemsContainer = document.getElementById('returnItems');
+    itemsContainer.innerHTML = `
+        <div class="item-row">
+            <select class="item-select" required>
+                <option value="">Select Item</option>
+            </select>
+            <input type="number" class="quantity-input" placeholder="Return Qty" min="1" required>
+            <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
+            <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                <i class="material-icons-round">remove</i>
+            </button>
+        </div>
+    `;
     populateDropdowns();
 }
 
@@ -457,7 +534,7 @@ async function saveSale() {
         localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
         
         showToast('Sale recorded successfully!', 'success');
-        closeModal('recordSaleModal');
+        closeRecordSaleForm();
         
         // Reload data
         await loadSalesData();
@@ -545,7 +622,7 @@ async function processReturn() {
         localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
         
         showToast('Return processed successfully!', 'success');
-        closeModal('returnModal');
+        closeReturnForm();
         
         // Reload data
         await loadInventoryData();
@@ -804,7 +881,93 @@ function renderFilteredReturnsTable(data) {
 
 // View return details
 function viewReturnDetails(returnId) {
-    showToast('Return details functionality coming soon!', 'info');
+    const returnRecord = returnsData.find(r => r.id === returnId);
+    if (!returnRecord) {
+        showToast('Return record not found!', 'error');
+        return;
+    }
+    
+    // Populate return information
+    document.getElementById('detailsReturnId').textContent = `#${returnRecord.id}`;
+    document.getElementById('detailsOriginalSaleId').textContent = `#${returnRecord.originalSaleId}`;
+    document.getElementById('detailsReturnDate').textContent = returnRecord.date;
+    document.getElementById('detailsReturnTime').textContent = returnRecord.time || '-';
+    document.getElementById('detailsProcessedBy').textContent = returnRecord.processedBy || 'Staff';
+    document.getElementById('detailsRefundMethod').textContent = returnRecord.refundMethod || 'Cash';
+    document.getElementById('detailsRefundAmount').textContent = `₦${parseFloat(returnRecord.refundAmount).toFixed(2)}`;
+    
+    // Status
+    const status = returnRecord.status || 'completed';
+    document.getElementById('detailsReturnStatus').innerHTML = `<span class="status-badge ${status}">${status}</span>`;
+    
+    // Return reason
+    document.getElementById('detailsReturnReason').textContent = returnRecord.reason || 'No reason provided';
+    
+    // Populate items returned
+    populateReturnItemsTable(returnRecord.items || []);
+    
+    // Populate return summary
+    populateReturnSummary(returnRecord);
+    
+    // Show details form
+    openReturnDetailsForm();
+}
+
+// Open return details form
+function openReturnDetailsForm() {
+    const formSection = document.getElementById('returnDetailsSection');
+    formSection.style.display = 'block';
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close return details form
+function closeReturnDetailsForm() {
+    const formSection = document.getElementById('returnDetailsSection');
+    formSection.style.display = 'none';
+}
+
+// Populate return items table
+function populateReturnItemsTable(items) {
+    const tbody = document.getElementById('detailsReturnItemsTableBody');
+    tbody.innerHTML = '';
+    
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280;">No items found</td></tr>';
+        return;
+    }
+    
+    items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>₦${parseFloat(item.price).toFixed(2)}</td>
+            <td>₦${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Populate return summary
+function populateReturnSummary(returnRecord) {
+    const items = returnRecord.items || [];
+    const totalItems = items.length;
+    const totalQuantity = items.reduce((sum, item) => sum + parseInt(item.quantity), 0);
+    const refundAmount = parseFloat(returnRecord.refundAmount);
+    const status = returnRecord.status || 'completed';
+    
+    document.getElementById('detailsReturnTotalItems').textContent = totalItems;
+    document.getElementById('detailsReturnTotalQuantity').textContent = totalQuantity;
+    document.getElementById('detailsReturnRefundTotal').textContent = `₦${refundAmount.toFixed(2)}`;
+    document.getElementById('detailsReturnProcessingStatus').innerHTML = `<span class="status-badge ${status}">${status}</span>`;
+}
+
+// Print return receipt from details
+function printReturnReceiptFromDetails() {
+    const returnId = document.getElementById('detailsReturnId').textContent.replace('#', '');
+    printReturnReceipt(parseInt(returnId));
 }
 
 // Print return receipt
@@ -812,9 +975,103 @@ function printReturnReceipt(returnId) {
     showToast('Return receipt printing coming soon!', 'info');
 }
 
-// View sale details (placeholder)
+// View sale details
 function viewSaleDetails(saleId) {
-    showToast('Sale details functionality coming soon!', 'info');
+    const sale = salesData.find(s => s.id === saleId);
+    if (!sale) {
+        showToast('Sale not found!', 'error');
+        return;
+    }
+    
+    // Populate sale information
+    document.getElementById('detailsSaleId').textContent = `#${sale.id}`;
+    document.getElementById('detailsSaleDate').textContent = sale.date;
+    document.getElementById('detailsSaleTime').textContent = sale.time || '-';
+    document.getElementById('detailsCustomer').textContent = sale.customer || 'Walk-in Customer';
+    document.getElementById('detailsCashier').textContent = sale.cashier || 'Cashier';
+    document.getElementById('detailsPaymentMethod').textContent = sale.paymentMethod || 'Cash';
+    document.getElementById('detailsSubtotal').textContent = `₦${parseFloat(sale.subtotal || sale.totalAmount).toFixed(2)}`;
+    document.getElementById('detailsDiscount').textContent = `₦${parseFloat(sale.discount || 0).toFixed(2)}`;
+    document.getElementById('detailsTotalAmount').textContent = `₦${parseFloat(sale.totalAmount).toFixed(2)}`;
+    
+    // Status
+    const status = sale.status || 'completed';
+    document.getElementById('detailsStatus').innerHTML = `<span class="status-badge ${status}">${status}</span>`;
+    
+    // Populate items sold
+    populateSaleItemsTable(sale.items || []);
+    
+    // Populate sale summary
+    populateSaleSummary(sale);
+    
+    // Show details form
+    openSaleDetailsForm();
+}
+
+// Open sale details form
+function openSaleDetailsForm() {
+    const formSection = document.getElementById('saleDetailsSection');
+    formSection.style.display = 'block';
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close sale details form
+function closeSaleDetailsForm() {
+    const formSection = document.getElementById('saleDetailsSection');
+    formSection.style.display = 'none';
+}
+
+// Populate sale items table
+function populateSaleItemsTable(items) {
+    const tbody = document.getElementById('detailsItemsTableBody');
+    tbody.innerHTML = '';
+    
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280;">No items found</td></tr>';
+        return;
+    }
+    
+    items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>₦${parseFloat(item.price).toFixed(2)}</td>
+            <td>₦${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Populate sale summary
+function populateSaleSummary(sale) {
+    const items = sale.items || [];
+    const totalItems = items.length;
+    const totalQuantity = items.reduce((sum, item) => sum + parseInt(item.quantity), 0);
+    const discount = parseFloat(sale.discount || 0);
+    const totalAmount = parseFloat(sale.totalAmount);
+    
+    document.getElementById('detailsTotalItems').textContent = totalItems;
+    document.getElementById('detailsTotalQuantity').textContent = totalQuantity;
+    document.getElementById('detailsDiscountApplied').textContent = discount > 0 ? `₦${discount.toFixed(2)}` : 'No discount';
+    document.getElementById('detailsFinalTotal').textContent = `₦${totalAmount.toFixed(2)}`;
+}
+
+// Print receipt from details
+function printReceiptFromDetails() {
+    const saleId = document.getElementById('detailsSaleId').textContent.replace('#', '');
+    printReceipt(parseInt(saleId));
+}
+
+// Show receipt from details
+function showReceiptFromDetails() {
+    const saleId = document.getElementById('detailsSaleId').textContent.replace('#', '');
+    const sale = salesData.find(s => s.id === parseInt(saleId));
+    if (sale) {
+        showReceipt(sale);
+    }
 }
 
 // Receipt generation functions
@@ -1376,8 +1633,12 @@ function closeUserDropdown() {
 
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
-window.openRecordSaleModal = openRecordSaleModal;
-window.openReturnModal = openReturnModal;
+window.toggleRecordSaleForm = toggleRecordSaleForm;
+window.openRecordSaleForm = openRecordSaleForm;
+window.closeRecordSaleForm = closeRecordSaleForm;
+window.toggleReturnForm = toggleReturnForm;
+window.openReturnForm = openReturnForm;
+window.closeReturnForm = closeReturnForm;
 window.closeModal = closeModal;
 window.addItemRow = addItemRow;
 window.addReturnItemRow = addReturnItemRow;
@@ -1394,6 +1655,11 @@ window.renderReturnsTable = renderReturnsTable;
 window.searchReturns = searchReturns;
 window.filterReturns = filterReturns;
 window.viewReturnDetails = viewReturnDetails;
+window.openReturnDetailsForm = openReturnDetailsForm;
+window.closeReturnDetailsForm = closeReturnDetailsForm;
+window.populateReturnItemsTable = populateReturnItemsTable;
+window.populateReturnSummary = populateReturnSummary;
+window.printReturnReceiptFromDetails = printReturnReceiptFromDetails;
 window.printReturnReceipt = printReturnReceipt;
 window.toggleUserDropdown = toggleUserDropdown;
 window.openShopSettings = openShopSettings;
@@ -1403,6 +1669,12 @@ window.openBackup = openBackup;
 window.openHelp = openHelp;
 window.logout = logout;
 window.viewSaleDetails = viewSaleDetails;
+window.openSaleDetailsForm = openSaleDetailsForm;
+window.closeSaleDetailsForm = closeSaleDetailsForm;
+window.populateSaleItemsTable = populateSaleItemsTable;
+window.populateSaleSummary = populateSaleSummary;
+window.printReceiptFromDetails = printReceiptFromDetails;
+window.showReceiptFromDetails = showReceiptFromDetails;
 window.printReceipt = printReceipt;
 window.showReceipt = showReceipt;
 window.closeReceiptModal = closeReceiptModal;

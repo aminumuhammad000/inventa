@@ -92,25 +92,7 @@ function openShopSettings() {
     window.location.href = 'shop-settings.html';
 }
 
-function openProfileSettings() {
-    showToast('Profile Settings - Coming Soon!', 'info');
-    closeUserDropdown();
-}
 
-function openNotifications() {
-    showToast('Notifications - Coming Soon!', 'info');
-    closeUserDropdown();
-}
-
-function openBackup() {
-    showToast('Backup & Restore - Coming Soon!', 'info');
-    closeUserDropdown();
-}
-
-function openHelp() {
-    showToast('Help & Support - Coming Soon!', 'info');
-    closeUserDropdown();
-}
 
 function logout() {
     // Clear authentication data
@@ -410,10 +392,6 @@ function updateSalesSummary() {
     `;
 }
 
-// Reorder item function
-function reorderItem(itemId) {
-    showToast('Reorder functionality coming soon!', 'info');
-}
 
 // Show toast notification
 function showToast(message, type = 'success') {
@@ -628,8 +606,4 @@ window.toggleSidebar = toggleSidebar;
 window.reorderItem = reorderItem;
 window.toggleUserDropdown = toggleUserDropdown;
 window.openShopSettings = openShopSettings;
-window.openProfileSettings = openProfileSettings;
-window.openNotifications = openNotifications;
-window.openBackup = openBackup;
-window.openHelp = openHelp;
 window.logout = logout;

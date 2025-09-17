@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventa Store - Dashboard Style</title>
+    <link rel="stylesheet" href="css/storefront-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body class="dashboard-storefront">
+    <!-- Simple Header -->
+    <header class="simple-header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+      
+                </div>
+                <div class="logo-text">Inventa Store</div>
+            </div>
+            
+            <div class="search-box">
+                <i class="material-icons-round">search</i>
+                <input type="text" placeholder="Search products..." id="searchInput" onkeyup="applyFilters()">
+            </div>
+            
+            <div class="header-actions">
+                <button class="login-btn" onclick="window.location.href='login.html'">
+                    <i class="material-icons-round">login</i>
+                    <span>Login</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="main-layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar sidebar-left">
+            <div class="sidebar-content">
+                <h3 class="sidebar-title">Store Overview</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">inventory_2</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalProducts">103</div>
+                            <div class="stat-label">Total Products</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">category</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalCategories">8</div>
+                            <div class="stat-label">Categories</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">business</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalBrands"></div>
+                            <div class="stat-label">Brands</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Categories Section -->
+    <section class="categories-section">
+        <div class="categories-container">
+            <h2>Categories</h2>
+            <div class="categories-grid">
+                <button class="category-btn active" onclick="filterByCategory('all')">
+                    <i class="material-icons-round">inventory_2</i>
+                    <span>All Products</span>
+                </button>
+                <button class="category-btn" onclick="filterByCategory('sneakers')">
+                    <i class="material-icons-round">sports_soccer</i>
+                    <span>Sneakers</span>
+                </button>
+                <button class="category-btn" onclick="filterByCategory('athletic')">
+                    <i class="material-icons-round">fitness_center</i>
+                    <span>Athletic</span>
+                </button>
+                <button class="category-btn" onclick="filterByCategory('boots')">
+                    <i class="material-icons-round">hiking</i>
+                    <span>Boots</span>
+                </button>
+                <button class="category-btn" onclick="filterByCategory('sandals')">
+                    <i class="material-icons-round">beach_access</i>
+                    <span>Sandals</span>
+                </button>
+                <button class="category-btn" onclick="filterByCategory('dress-shoes')">
+                    <i class="material-icons-round">business</i>
+                    <span>Dress Shoes</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="products-container" id="productsContainer">
+            <!-- Sample Products -->
+            <div class="product-card" onclick="window.location.href='product-details.html?id=1'">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&auto=format" alt="Air Max 270" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Air Max 270</div>
+                    <div class="product-price">₦225,000</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Nike</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Sneakers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=2'">
+                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop&auto=format" alt="Classic Chuck Taylor" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Classic Chuck Taylor</div>
+                    <div class="product-price">₦97,500</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Converse</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Sneakers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=3'">
+                <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=300&fit=crop&auto=format" alt="Ultraboost 22" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Ultraboost 22</div>
+                    <div class="product-price">₦270,000</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Adidas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Athletic</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=4'">
+                <img src="https://images.unsplash.com/photo-1544966503-7cc4ac81b4d4?w=400&h=300&fit=crop&auto=format" alt="Classic Boots" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Classic Boots</div>
+                    <div class="product-price">₦180,000</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Timberland</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Boots</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=5'">
+                <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=300&fit=crop&auto=format" alt="Summer Sandals" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Summer Sandals</div>
+                    <div class="product-price">₦120,000</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Birkenstock</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Sandals</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=6'">
+                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop&auto=format" alt="Oxford Dress Shoes" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Oxford Dress Shoes</div>
+                    <div class="product-price">₦300,000</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Cole Haan</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Dress Shoes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=7'">
+                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=300&fit=crop&auto=format" alt="Running Shoes" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Running Shoes</div>
+                    <div class="product-price">₦142,500</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">New Balance</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Athletic</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=8'">
+                <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&h=300&fit=crop&auto=format" alt="Canvas Sneakers" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Canvas Sneakers</div>
+                    <div class="product-price">₦112,500</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Vans</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Sneakers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=9'">
+                <img src="https://images.unsplash.com/photo-1544966503-7cc4ac81b4d4?w=400&h=300&fit=crop&auto=format" alt="Hiking Boots" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Hiking Boots</div>
+                    <div class="product-price">₦210,000</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Merrell</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Boots</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" onclick="window.location.href='product-details.html?id=10'">
+                <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=300&fit=crop&auto=format" alt="Flip Flops" class="product-image">
+                <div class="product-info">
+                    <div class="product-name">Flip Flops</div>
+                    <div class="product-price">₦37,500</div>
+                    <div class="product-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Brand</span>
+                            <span class="stat-value">Havaianas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Category</span>
+                            <span class="stat-value">Sandals</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">In Stock</span>
+                            <span class="stat-value">Yes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar sidebar-right">
+            <div class="sidebar-content">
+                <h3 class="sidebar-title">Stock Status</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">check_circle</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="inStockProducts">20</div>
+                            <div class="stat-label">In Stock</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">warning</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="lowStockProducts">2</div>
+                            <div class="stat-label">Low Stock</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="material-icons-round">trending_up</i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="avgPrice">₦70000</div>
+                            <div class="stat-label">Avg Price</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div class="product-modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalProductName">Product Details</h3>
+                <button class="close-modal" onclick="closeProductModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail-content">
+                    <div class="product-images">
+                        <img id="modalProductImage" src="" alt="Product Image" class="main-image">
+                        <div class="image-thumbnails" id="imageThumbnails">
+                            <!-- Thumbnail images will be loaded dynamically -->
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-brand" id="modalProductBrand">Brand</div>
+                        <div class="product-title" id="modalProductTitle">Product Name</div>
+                        <div class="product-price-section">
+                            <span class="current-price" id="modalProductPrice">₦0</span>
+                            <span class="original-price" id="modalOriginalPrice" style="display: none;">₦0</span>
+                            <span class="discount-badge" id="modalDiscount" style="display: none;">0% OFF</span>
+                        </div>
+                        <div class="product-description" id="modalProductDescription">
+                            Product description will be loaded here.
+                        </div>
+                        
+                        <!-- Enhanced Product Details -->
+                        <div class="product-details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">SKU:</span>
+                                <span class="detail-value" id="modalSKU">SKU-001</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Weight:</span>
+                                <span class="detail-value" id="modalWeight">320g</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Material:</span>
+                                <span class="detail-value" id="modalMaterial">Premium Materials</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Origin:</span>
+                                <span class="detail-value" id="modalOrigin">Nigeria</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Warranty:</span>
+                                <span class="detail-value" id="modalWarranty">1 Year</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Shipping:</span>
+                                <span class="detail-value" id="modalShipping">Free Delivery</span>
+                            </div>
+                        </div>
+
+                        <div class="product-specs">
+                            <h4>Specifications</h4>
+                            <div class="specs-list" id="modalProductSpecs">
+                                <!-- Specifications will be loaded dynamically -->
+                            </div>
+                        </div>
+                        <div class="product-variants">
+                            <div class="size-section">
+                                <h4>Available Sizes</h4>
+                                <div class="size-options" id="modalSizes">
+                                    <!-- Size options will be loaded dynamically -->
+                                </div>
+                            </div>
+                            <div class="color-section">
+                                <h4>Available Colors</h4>
+                                <div class="color-options" id="modalColors">
+                                    <!-- Color options will be loaded dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enhanced Actions -->
+                        <div class="product-actions">
+                            <button class="btn btn-primary" id="modalAddToCart">
+                                <i class="material-icons-round">shopping_cart</i>
+                                Add to Cart
+                            </button>
+                            <button class="btn btn-secondary" id="modalAddToWishlist">
+                                <i class="material-icons-round">favorite_border</i>
+                                Add to Wishlist
+                            </button>
+                            <button class="btn btn-outline" onclick="shareProduct()">
+                                <i class="material-icons-round">share</i>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Toast Notifications -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="material-icons-round">info</i>
+        </div>
+        <div class="toast-message">Product information loaded</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/global-theme-manager.js"></script>
+    <script src="js/storefront-data.js"></script>
+    <script src="js/storefront.js"></script>
+</body>
+</html>

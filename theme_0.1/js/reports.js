@@ -159,6 +159,11 @@ async function loadCreditSalesData() {
 
 // Generate report function
 function generateReport(reportType) {
+    if (reportType === 'custom') {
+        showDateRangeSelector();
+        return;
+    }
+    
     showToast(`Generating ${reportType} report...`, 'info');
     
     // Simulate report generation
@@ -208,6 +213,20 @@ function getReportData(reportType) {
                 inventory: inventoryData,
                 summary: {
                     totalSales: salesData.filter(sale => sale.saleDate >= monthAgo).reduce((sum, sale) => sum + parseFloat(sale.totalAmount), 0),
+                    totalItems: inventoryData.length,
+                    lowStockItems: inventoryData.filter(item => parseInt(item.current_stock) <= parseInt(item.min_stock_level)).length
+                }
+            };
+        case 'custom':
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            return {
+                type: 'Custom Report',
+                period: `${startDate} to ${endDate}`,
+                sales: salesData.filter(sale => sale.saleDate >= startDate && sale.saleDate <= endDate),
+                inventory: inventoryData,
+                summary: {
+                    totalSales: salesData.filter(sale => sale.saleDate >= startDate && sale.saleDate <= endDate).reduce((sum, sale) => sum + parseFloat(sale.totalAmount), 0),
                     totalItems: inventoryData.length,
                     lowStockItems: inventoryData.filter(item => parseInt(item.current_stock) <= parseInt(item.min_stock_level)).length
                 }
@@ -475,9 +494,64 @@ function getSampleCreditSalesData() {
     ];
 }
 
+// Show date range selector
+function showDateRangeSelector() {
+    const selector = document.getElementById('dateRangeSelector');
+    if (selector) {
+        selector.style.display = 'block';
+        
+        // Set default dates (last 30 days)
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        
+        document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+        document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        
+        // Scroll to selector
+        selector.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Hide date range selector
+function hideDateRangeSelector() {
+    const selector = document.getElementById('dateRangeSelector');
+    if (selector) {
+        selector.style.display = 'none';
+    }
+}
+
+// Generate custom report
+function generateCustomReport() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    if (!startDate || !endDate) {
+        showToast('Please select both start and end dates', 'error');
+        return;
+    }
+    
+    if (startDate > endDate) {
+        showToast('Start date cannot be after end date', 'error');
+        return;
+    }
+    
+    showToast('Generating custom report...', 'info');
+    hideDateRangeSelector();
+    
+    // Simulate report generation
+    setTimeout(() => {
+        const reportData = getReportData('custom');
+        displayReport(reportData);
+        showToast('Custom report generated successfully!', 'success');
+    }, 1500);
+}
+
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
 window.generateReport = generateReport;
+window.showDateRangeSelector = showDateRangeSelector;
+window.hideDateRangeSelector = hideDateRangeSelector;
+window.generateCustomReport = generateCustomReport;
 window.exportReport = exportReport;
 window.printReport = printReport;
 window.toggleUserDropdown = toggleUserDropdown;

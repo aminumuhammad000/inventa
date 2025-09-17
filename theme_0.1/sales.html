@@ -120,11 +120,11 @@
             <div class="content">
                 <!-- Actions -->
                 <div class="actions-bar">
-                    <button class="btn-primary" onclick="openRecordSaleModal()">
+                    <button class="btn-primary" onclick="toggleRecordSaleForm()">
                         <i class="material-icons-round">point_of_sale</i>
                         Record Sale
                     </button>
-                    <button class="btn-secondary" onclick="openReturnModal()">
+                    <button class="btn-secondary" onclick="toggleReturnForm()">
                         <i class="material-icons-round">undo</i>
                         Process Return
                     </button>
@@ -132,6 +132,378 @@
                         <i class="material-icons-round">download</i>
                         Export Sales
                     </button>
+                </div>
+
+                <!-- Record Sale Form (Inline) -->
+                <div class="record-sale-section" id="recordSaleSection" style="display: none;">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h3>Record Sale</h3>
+                            <button class="btn-close" onclick="closeRecordSaleForm()">
+                                <i class="material-icons-round">close</i>
+                            </button>
+                        </div>
+                        <form id="recordSaleForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="saleDate">Sale Date</label>
+                                    <input type="date" id="saleDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer">Customer</label>
+                                    <select id="customer" required>
+                                        <option value="">Walk-in Customer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Sale Items</label>
+                                <div class="items-container" id="saleItems">
+                                    <div class="item-row">
+                                        <select class="item-select" required>
+                                            <option value="">Select Item</option>
+                                        </select>
+                                        <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
+                                        <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
+                                        <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                                            <i class="material-icons-round">remove</i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-add-item" onclick="addItemRow()">
+                                    <i class="material-icons-round">add</i>
+                                    Add Item
+                                </button>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="paymentMethod">Payment Method</label>
+                                    <select id="paymentMethod" required>
+                                        <option value="cash">Cash</option>
+                                        <option value="card">Card</option>
+                                        <option value="transfer">Transfer</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="discount">Discount (%)</label>
+                                    <input type="number" id="discount" placeholder="0" min="0" max="100" step="0.01">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="notes">Notes</label>
+                                <textarea id="notes" rows="3" placeholder="Additional notes..."></textarea>
+                            </div>
+                            
+                            <div class="sale-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span id="subtotal">₦0.00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Discount:</span>
+                                    <span id="discountAmount">₦0.00</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total:</span>
+                                    <span id="totalAmount">₦0.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="closeRecordSaleForm()">Cancel</button>
+                                <button type="button" class="btn-primary" onclick="saveSale()">Complete Sale</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Process Return Form (Inline) -->
+                <div class="process-return-section" id="processReturnSection" style="display: none;">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h3>Process Return</h3>
+                            <button class="btn-close" onclick="closeReturnForm()">
+                                <i class="material-icons-round">close</i>
+                            </button>
+                        </div>
+                        <form id="returnForm">
+                            <div class="form-group">
+                                <label for="returnSaleId">Original Sale ID</label>
+                                <input type="text" id="returnSaleId" placeholder="Enter sale ID" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Return Items</label>
+                                <div class="items-container" id="returnItems">
+                                    <div class="item-row">
+                                        <select class="item-select" required>
+                                            <option value="">Select Item</option>
+                                        </select>
+                                        <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
+                                        <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
+                                        <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                                            <i class="material-icons-round">remove</i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-add-item" onclick="addReturnItemRow()">
+                                    <i class="material-icons-round">add</i>
+                                    Add Item
+                                </button>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="returnReason">Return Reason</label>
+                                <select id="returnReason" required>
+                                    <option value="">Select Reason</option>
+                                    <option value="defective">Defective Product</option>
+                                    <option value="wrong_item">Wrong Item</option>
+                                    <option value="customer_change">Customer Changed Mind</option>
+                                    <option value="damaged">Damaged in Transit</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="returnNotes">Notes</label>
+                                <textarea id="returnNotes" rows="3" placeholder="Additional notes..."></textarea>
+                            </div>
+                            
+                            <div class="return-summary">
+                                <div class="summary-row">
+                                    <span>Refund Amount:</span>
+                                    <span id="refundAmount">₦0.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="closeReturnForm()">Cancel</button>
+                                <button type="button" class="btn-primary" onclick="processReturn()">Process Return</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Sale Details Form (Inline) -->
+                <div class="sale-details-section" id="saleDetailsSection" style="display: none;">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h3>Sale Details</h3>
+                            <button class="btn-close" onclick="closeSaleDetailsForm()">
+                                <i class="material-icons-round">close</i>
+                            </button>
+                        </div>
+                        <div class="sale-details-content">
+                            <!-- Sale Information -->
+                            <div class="details-section">
+                                <h4>Sale Information</h4>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <label>Sale ID:</label>
+                                        <span id="detailsSaleId">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Date:</label>
+                                        <span id="detailsSaleDate">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Time:</label>
+                                        <span id="detailsSaleTime">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Customer:</label>
+                                        <span id="detailsCustomer">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Cashier:</label>
+                                        <span id="detailsCashier">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Payment Method:</label>
+                                        <span id="detailsPaymentMethod">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Subtotal:</label>
+                                        <span id="detailsSubtotal">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Discount:</label>
+                                        <span id="detailsDiscount">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Total Amount:</label>
+                                        <span id="detailsTotalAmount">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Status:</label>
+                                        <span id="detailsStatus">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Items Sold -->
+                            <div class="details-section">
+                                <h4>Items Sold</h4>
+                                <div class="items-table-container">
+                                    <table class="items-table" id="detailsItemsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Price</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detailsItemsTableBody">
+                                            <!-- Items will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Sale Summary -->
+                            <div class="details-section">
+                                <h4>Sale Summary</h4>
+                                <div class="summary-grid">
+                                    <div class="summary-item">
+                                        <label>Total Items:</label>
+                                        <span id="detailsTotalItems">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <label>Total Quantity:</label>
+                                        <span id="detailsTotalQuantity">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <label>Discount Applied:</label>
+                                        <span id="detailsDiscountApplied">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <label>Final Total:</label>
+                                        <span id="detailsFinalTotal">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="details-actions">
+                                <button type="button" class="btn-secondary" onclick="closeSaleDetailsForm()">Close</button>
+                                <button type="button" class="btn-primary" onclick="printReceiptFromDetails()">Print Receipt</button>
+                                <button type="button" class="btn-primary" onclick="showReceiptFromDetails()">View Receipt</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Return Details Form (Inline) -->
+                <div class="return-details-section" id="returnDetailsSection" style="display: none;">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h3>Return Details</h3>
+                            <button class="btn-close" onclick="closeReturnDetailsForm()">
+                                <i class="material-icons-round">close</i>
+                            </button>
+                        </div>
+                        <div class="return-details-content">
+                            <!-- Return Information -->
+                            <div class="details-section">
+                                <h4>Return Information</h4>
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <label>Return ID:</label>
+                                        <span id="detailsReturnId">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Original Sale ID:</label>
+                                        <span id="detailsOriginalSaleId">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Return Date:</label>
+                                        <span id="detailsReturnDate">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Return Time:</label>
+                                        <span id="detailsReturnTime">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Processed By:</label>
+                                        <span id="detailsProcessedBy">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Refund Method:</label>
+                                        <span id="detailsRefundMethod">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Refund Amount:</label>
+                                        <span id="detailsRefundAmount">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Status:</label>
+                                        <span id="detailsReturnStatus">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Return Reason -->
+                            <div class="details-section">
+                                <h4>Return Reason</h4>
+                                <div class="reason-display">
+                                    <span id="detailsReturnReason">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Items Returned -->
+                            <div class="details-section">
+                                <h4>Items Returned</h4>
+                                <div class="items-table-container">
+                                    <table class="items-table" id="detailsReturnItemsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Price</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detailsReturnItemsTableBody">
+                                            <!-- Items will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Return Summary -->
+                            <div class="details-section">
+                                <h4>Return Summary</h4>
+                                <div class="summary-grid">
+                                    <div class="summary-item">
+                                        <label>Total Items:</label>
+                                        <span id="detailsReturnTotalItems">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <label>Total Quantity:</label>
+                                        <span id="detailsReturnTotalQuantity">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <label>Refund Amount:</label>
+                                        <span id="detailsReturnRefundTotal">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <label>Processing Status:</label>
+                                        <span id="detailsReturnProcessingStatus">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="details-actions">
+                                <button type="button" class="btn-secondary" onclick="closeReturnDetailsForm()">Close</button>
+                                <button type="button" class="btn-primary" onclick="printReturnReceiptFromDetails()">Print Return Receipt</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sales Stats -->
@@ -149,6 +521,7 @@
                             </div>
                         </div>
                     </div>
+                    
 
                     <div class="stat-card">
                         <div class="stat-icon">
@@ -281,148 +654,6 @@
         </main>
     </div>
 
-    <!-- Record Sale Modal -->
-    <div class="modal" id="recordSaleModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Record Sale</h2>
-                <button class="modal-close" onclick="closeModal('recordSaleModal')">
-                    <i class="material-icons-round">close</i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="recordSaleForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="saleDate">Sale Date</label>
-                            <input type="date" id="saleDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="customer">Customer</label>
-                            <select id="customer" required>
-                                <option value="">Walk-in Customer</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Sale Items</label>
-                        <div class="items-container" id="saleItems">
-                            <div class="item-row">
-                                <select class="item-select" required>
-                                    <option value="">Select Item</option>
-                                </select>
-                                <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
-                                <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
-                                <button type="button" class="btn-remove" onclick="removeItemRow(this)">
-                                    <i class="material-icons-round">remove</i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-add-item" onclick="addItemRow()">
-                            <i class="material-icons-round">add</i>
-                            Add Item
-                        </button>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="paymentMethod">Payment Method</label>
-                            <select id="paymentMethod" required>
-                                <option value="cash">Cash</option>
-                                <option value="card">Card</option>
-                                <option value="transfer">Transfer</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="discount">Discount (%)</label>
-                            <input type="number" id="discount" placeholder="0" min="0" max="100" step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" rows="3" placeholder="Additional notes..."></textarea>
-                    </div>
-                    
-                    <div class="sale-summary">
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span id="subtotal">₦0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Discount:</span>
-                            <span id="discountAmount">₦0.00</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total:</span>
-                            <span id="totalAmount">₦0.00</span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModal('recordSaleModal')">Cancel</button>
-                <button class="btn-primary" onclick="saveSale()">Complete Sale</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Return Modal -->
-    <div class="modal" id="returnModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Process Return</h2>
-                <button class="modal-close" onclick="closeModal('returnModal')">
-                    <i class="material-icons-round">close</i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="returnForm">
-                    <div class="form-group">
-                        <label for="returnSaleId">Original Sale ID</label>
-                        <input type="text" id="returnSaleId" placeholder="Enter sale ID" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Return Items</label>
-                        <div class="items-container" id="returnItems">
-                            <div class="item-row">
-                                <select class="item-select" required>
-                                    <option value="">Select Item</option>
-                                </select>
-                                <input type="number" class="quantity-input" placeholder="Return Qty" min="1" required>
-                                <input type="number" class="price-input" placeholder="Unit Price" step="0.01" min="0" required>
-                                <button type="button" class="btn-remove" onclick="removeItemRow(this)">
-                                    <i class="material-icons-round">remove</i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-add-item" onclick="addReturnItemRow()">
-                            <i class="material-icons-round">add</i>
-                            Add Item
-                        </button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="returnReason">Return Reason</label>
-                        <textarea id="returnReason" rows="3" placeholder="Reason for return..." required></textarea>
-                    </div>
-                    
-                    <div class="sale-summary">
-                        <div class="summary-row total">
-                            <span>Refund Amount:</span>
-                            <span id="refundAmount">₦0.00</span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeModal('returnModal')">Cancel</button>
-                <button class="btn-primary" onclick="processReturn()">Process Return</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Receipt Modal -->
     <div class="modal" id="receiptModal">

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Inventa Store</title>
+    <link rel="stylesheet" href="css/storefront-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body class="dashboard-storefront">
+    <!-- Simple Header -->
+    <header class="simple-header">
+        <div class="header-container">
+            <div class="logo" onclick="window.location.href='storefront.html'">
+                <div class="logo-icon">
+            
+                </div>
+                <div class="logo-text">Inventa Store</div>
+            </div>
+            
+            <div class="search-box">
+                <i class="material-icons-round">search</i>
+                <input type="text" placeholder="Search products..." id="searchInput">
+            </div>
+            
+            <div class="header-actions">
+                <button class="login-btn" onclick="window.location.href='login.html'">
+                    <i class="material-icons-round">login</i>
+                    <span>Login</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-section">
+        <div class="breadcrumb-container">
+            <a href="storefront.html" class="breadcrumb-link">
+                <i class="material-icons-round">home</i>
+                <span>Store</span>
+            </a>
+            <i class="material-icons-round">chevron_right</i>
+            <span class="breadcrumb-current" id="breadcrumbCategory">Products</span>
+            <i class="material-icons-round">chevron_right</i>
+            <span class="breadcrumb-current" id="breadcrumbProduct">Product Details</span>
+        </div>
+    </nav>
+
+    <!-- Product Details Section -->
+    <section class="product-details-section">
+        <div class="product-details-container">
+            <!-- Product Image -->
+            <div class="product-image-section">
+                <div class="single-image-container">
+                    <img id="productMainImage" src="" alt="Product Image" class="main-product-image">
+                    <div class="image-overlay">
+                        
+                        
+                    </div>
+                    <div class="image-shine-effect"></div>
+                </div>
+            </div>
+
+            <!-- Product Information -->
+            <div class="product-info-section">
+                <div class="product-header">
+                    <div class="product-brand" id="productBrand">Brand</div>
+                    <div class="product-title" id="productTitle">Product Name</div>
+                </div>
+
+                <div class="product-price-section">
+                    <div class="current-price" id="productPrice">₦0</div>
+                </div>
+
+                <div class="product-description" id="productDescription">
+                    Product description will be loaded here.
+                </div>
+
+                
+
+               
+
+                <!-- Product Details Grid -->
+                <div class="product-details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">SKU:</span>
+                        <span class="detail-value" id="productSKU">SKU-001</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Weight:</span>
+                        <span class="detail-value" id="productWeight">320g</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Material:</span>
+                        <span class="detail-value" id="productMaterial">Premium Materials</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Origin:</span>
+                        <span class="detail-value" id="productOrigin">Nigeria</span>
+                    </div>
+                    
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <!-- Scripts -->
+    <script src="js/global-theme-manager.js"></script>
+    <script src="js/product-details.js"></script>
+</body>
+</html>

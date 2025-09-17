@@ -97,7 +97,15 @@ function loadSettings() {
         if (savedSettings) {
             settingsData = JSON.parse(savedSettings);
         } else {
-            settingsData = getDefaultSettings();
+            settingsData = {
+                general: {
+                    shopName: 'My Shop',
+                    shopAddress: 'Your Address',
+                    shopPhone: '+234-000-000-0000',
+                    shopEmail: 'info@myshop.com',
+                    currency: 'NGN'
+                }
+            };
             localStorage.setItem('shopSettings', JSON.stringify(settingsData));
         }
         
@@ -107,78 +115,29 @@ function loadSettings() {
         
     } catch (error) {
         console.error('Error loading settings:', error);
-        settingsData = getDefaultSettings();
+        settingsData = {
+            general: {
+                shopName: 'My Shop',
+                shopAddress: 'Your Address',
+                shopPhone: '+234-000-000-0000',
+                shopEmail: 'info@myshop.com',
+                currency: 'NGN'
+            }
+        };
         populateSettingsForm();
         showToast('Failed to load settings, using defaults', 'error');
     }
 }
 
-// Get default settings
-function getDefaultSettings() {
-    return {
-        general: {
-            shopName: 'ABC Construction Supplies',
-            shopAddress: '123 Construction Street, Lagos, Nigeria',
-            shopPhone: '+234-800-000-0000',
-            shopEmail: 'info@abcconstruction.com',
-            currency: 'NGN'
-        },
-        business: {
-            openTime: '08:00',
-            closeTime: '18:00',
-            workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-            taxRate: 7.5,
-            lowStockThreshold: 10
-        },
-        receipt: {
-            header: 'ABC Construction Supplies\n123 Construction Street, Lagos, Nigeria\nPhone: +234-800-000-0000\nEmail: info@abcconstruction.com',
-            footer: 'Thank you for your business!\nVisit us again soon.',
-            autoPrint: true,
-            size: '58mm'
-        },
-        backup: {
-            autoBackup: true,
-            frequency: 'daily',
-            time: '02:00',
-            retentionDays: 365
-        }
-    };
-}
 
 // Populate settings form
 function populateSettingsForm() {
-    // General settings
+    // General settings only
     document.getElementById('shopName').value = settingsData.general.shopName;
     document.getElementById('shopAddress').value = settingsData.general.shopAddress;
     document.getElementById('shopPhone').value = settingsData.general.shopPhone;
     document.getElementById('shopEmail').value = settingsData.general.shopEmail;
     document.getElementById('currency').value = settingsData.general.currency;
-    
-    // Business settings
-    document.getElementById('openTime').value = settingsData.business.openTime;
-    document.getElementById('closeTime').value = settingsData.business.closeTime;
-    document.getElementById('taxRate').value = settingsData.business.taxRate;
-    document.getElementById('lowStockThreshold').value = settingsData.business.lowStockThreshold;
-    
-    // Working days
-    const workingDays = settingsData.business.workingDays;
-    const dayCheckboxes = document.querySelectorAll('.days-checkboxes input[type="checkbox"]');
-    dayCheckboxes.forEach(checkbox => {
-        const dayName = checkbox.parentElement.textContent.trim().toLowerCase();
-        checkbox.checked = workingDays.includes(dayName);
-    });
-    
-    // Receipt settings
-    document.getElementById('receiptHeader').value = settingsData.receipt.header;
-    document.getElementById('receiptFooter').value = settingsData.receipt.footer;
-    document.getElementById('autoPrint').checked = settingsData.receipt.autoPrint;
-    document.getElementById('receiptSize').value = settingsData.receipt.size;
-    
-    // Backup settings
-    document.getElementById('autoBackup').checked = settingsData.backup.autoBackup;
-    document.getElementById('backupFrequency').value = settingsData.backup.frequency;
-    document.getElementById('backupTime').value = settingsData.backup.time;
-    document.getElementById('retentionDays').value = settingsData.backup.retentionDays;
 }
 
 // Save settings
@@ -192,26 +151,6 @@ function saveSettings() {
                 shopPhone: document.getElementById('shopPhone').value,
                 shopEmail: document.getElementById('shopEmail').value,
                 currency: document.getElementById('currency').value
-            },
-            business: {
-                openTime: document.getElementById('openTime').value,
-                closeTime: document.getElementById('closeTime').value,
-                workingDays: Array.from(document.querySelectorAll('.days-checkboxes input[type="checkbox"]:checked'))
-                    .map(checkbox => checkbox.parentElement.textContent.trim().toLowerCase()),
-                taxRate: parseFloat(document.getElementById('taxRate').value),
-                lowStockThreshold: parseInt(document.getElementById('lowStockThreshold').value)
-            },
-            receipt: {
-                header: document.getElementById('receiptHeader').value,
-                footer: document.getElementById('receiptFooter').value,
-                autoPrint: document.getElementById('autoPrint').checked,
-                size: document.getElementById('receiptSize').value
-            },
-            backup: {
-                autoBackup: document.getElementById('autoBackup').checked,
-                frequency: document.getElementById('backupFrequency').value,
-                time: document.getElementById('backupTime').value,
-                retentionDays: parseInt(document.getElementById('retentionDays').value)
             }
         };
         
@@ -251,55 +190,23 @@ function validateSettings(settings) {
         return false;
     }
     
-    if (!settings.general.shopEmail.trim()) {
-        showToast('Email address is required', 'error');
-        return false;
-    }
-    
-    if (!settings.general.shopPhone.trim()) {
-        showToast('Phone number is required', 'error');
-        return false;
-    }
-    
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(settings.general.shopEmail)) {
-        showToast('Please enter a valid email address', 'error');
-        return false;
-    }
-    
-    // Validate phone format
-    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-    if (!phoneRegex.test(settings.general.shopPhone)) {
-        showToast('Please enter a valid phone number', 'error');
-        return false;
-    }
-    
-    // Validate tax rate
-    if (settings.business.taxRate < 0 || settings.business.taxRate > 100) {
-        showToast('Tax rate must be between 0 and 100', 'error');
-        return false;
-    }
-    
-    // Validate low stock threshold
-    if (settings.business.lowStockThreshold < 1 || settings.business.lowStockThreshold > 100) {
-        showToast('Low stock threshold must be between 1 and 100', 'error');
-        return false;
-    }
-    
-    // Validate retention days
-    if (settings.backup.retentionDays < 30 || settings.backup.retentionDays > 3650) {
-        showToast('Data retention must be between 30 and 3650 days', 'error');
-        return false;
-    }
     
     return true;
 }
 
 // Reset settings to default
 function resetSettings() {
-    if (confirm('Are you sure you want to reset all settings to default? This action cannot be undone.')) {
-        settingsData = getDefaultSettings();
+    if (confirm('Are you sure you want to reset settings to default?')) {
+        // Reset to basic defaults
+        settingsData = {
+            general: {
+                shopName: 'My Shop',
+                shopAddress: 'Your Address',
+                shopPhone: '+234-000-000-0000',
+                shopEmail: 'info@myshop.com',
+                currency: 'NGN'
+            }
+        };
         localStorage.setItem('shopSettings', JSON.stringify(settingsData));
         populateSettingsForm();
         showToast('Settings reset to default', 'success');

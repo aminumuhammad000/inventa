@@ -199,6 +199,9 @@ function renderInventoryTable() {
                 <button class="btn-icon" onclick="viewItemHistory(${item.id})" title="History">
                     <i class="material-icons-round">history</i>
                 </button>
+                <button class="btn-icon" onclick="reorderItem(${item.id})" title="Reorder">
+                    <i class="material-icons-round">shopping_cart</i>
+                </button>
             </td>
         `;
         tbody.appendChild(row);
@@ -340,21 +343,83 @@ function renderFilteredTable(data) {
                 <button class="btn-icon" onclick="viewItemHistory(${item.id})" title="History">
                     <i class="material-icons-round">history</i>
                 </button>
+                <button class="btn-icon" onclick="reorderItem(${item.id})" title="Reorder">
+                    <i class="material-icons-round">shopping_cart</i>
+                </button>
             </td>
         `;
         tbody.appendChild(row);
     });
 }
 
-// Modal functions
-function openAddPurchaseModal() {
-    document.getElementById('addPurchaseModal').classList.add('show');
+// Purchase form functions
+function togglePurchaseForm() {
+    const formSection = document.getElementById('purchaseFormSection');
+    if (formSection.style.display === 'none') {
+        openPurchaseForm();
+    } else {
+        closePurchaseForm();
+    }
+}
+
+function openPurchaseForm() {
+    const formSection = document.getElementById('purchaseFormSection');
+    formSection.style.display = 'block';
+    populateDropdowns();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closePurchaseForm() {
+    const formSection = document.getElementById('purchaseFormSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('addPurchaseForm').reset();
+    
+    // Reset to single item row
+    const itemsContainer = document.getElementById('purchaseItems');
+    itemsContainer.innerHTML = `
+        <div class="item-row">
+            <select class="item-select" required>
+                <option value="">Select Item</option>
+            </select>
+            <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
+            <input type="number" class="cost-input" placeholder="Unit Cost" step="0.01" min="0" required>
+            <button type="button" class="btn-remove" onclick="removeItemRow(this)">
+                <i class="material-icons-round">remove</i>
+            </button>
+        </div>
+    `;
     populateDropdowns();
 }
 
-function openStockAdjustmentModal() {
-    document.getElementById('stockAdjustmentModal').classList.add('show');
+// Stock Adjustment form functions
+function toggleStockAdjustmentForm() {
+    const formSection = document.getElementById('stockAdjustmentSection');
+    if (formSection.style.display === 'none') {
+        openStockAdjustmentForm();
+    } else {
+        closeStockAdjustmentForm();
+    }
+}
+
+function openStockAdjustmentForm() {
+    const formSection = document.getElementById('stockAdjustmentSection');
+    formSection.style.display = 'block';
     populateDropdowns();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeStockAdjustmentForm() {
+    const formSection = document.getElementById('stockAdjustmentSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('stockAdjustmentForm').reset();
 }
 
 function closeModal(modalId) {
@@ -446,7 +511,7 @@ async function savePurchase() {
         localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
         
         showToast('Purchase saved successfully!', 'success');
-        closeModal('addPurchaseModal');
+        closePurchaseForm();
         
         // Reload inventory data
         await loadInventoryData();
@@ -509,7 +574,7 @@ async function saveStockAdjustment() {
         }
         
         showToast('Stock adjustment saved successfully!', 'success');
-        closeModal('stockAdjustmentModal');
+        closeStockAdjustmentForm();
         
         // Reload inventory data
         await loadInventoryData();
@@ -560,14 +625,338 @@ function generateInventoryCSV() {
     return [headers, ...rows].map(row => row.join(',')).join('\n');
 }
 
-// Edit item (placeholder)
+// Edit item
 function editItem(itemId) {
-    showToast('Edit item functionality coming soon!', 'info');
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) {
+        showToast('Item not found!', 'error');
+        return;
+    }
+    
+    // Populate edit form with item data
+    document.getElementById('editItemId').value = item.id;
+    document.getElementById('editItemName').value = item.name;
+    document.getElementById('editItemSku').value = item.sku;
+    document.getElementById('editItemCategory').value = item.category;
+    document.getElementById('editItemUnit').value = item.unit;
+    document.getElementById('editItemCostPrice').value = item.cost_price;
+    document.getElementById('editItemSellingPrice').value = item.selling_price;
+    document.getElementById('editItemCurrentStock').value = item.current_stock;
+    document.getElementById('editItemMinStock').value = item.min_stock_level;
+    document.getElementById('editItemDescription').value = item.description || '';
+    document.getElementById('editItemImage').value = item.image || '';
+    
+    // Show edit form
+    openEditItemForm();
 }
 
-// View item history (placeholder)
+// Open edit item form
+function openEditItemForm() {
+    const formSection = document.getElementById('editItemSection');
+    formSection.style.display = 'block';
+    
+    // Focus on first input
+    document.getElementById('editItemName').focus();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close edit item form
+function closeEditItemForm() {
+    const formSection = document.getElementById('editItemSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('editItemForm').reset();
+}
+
+// Update item
+function updateItem() {
+    const form = document.getElementById('editItemForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const itemId = parseInt(document.getElementById('editItemId').value);
+    const itemIndex = inventoryData.findIndex(i => i.id === itemId);
+    
+    if (itemIndex === -1) {
+        showToast('Item not found!', 'error');
+        return;
+    }
+    
+    // Check if SKU is unique (excluding current item)
+    const newSku = document.getElementById('editItemSku').value;
+    const existingItem = inventoryData.find(i => i.sku === newSku && i.id !== itemId);
+    if (existingItem) {
+        showToast('SKU already exists! Please use a different SKU.', 'error');
+        return;
+    }
+    
+    // Update item data
+    inventoryData[itemIndex] = {
+        ...inventoryData[itemIndex],
+        name: document.getElementById('editItemName').value,
+        sku: document.getElementById('editItemSku').value,
+        category: document.getElementById('editItemCategory').value,
+        unit: document.getElementById('editItemUnit').value,
+        cost_price: parseFloat(document.getElementById('editItemCostPrice').value),
+        selling_price: parseFloat(document.getElementById('editItemSellingPrice').value),
+        current_stock: parseInt(document.getElementById('editItemCurrentStock').value),
+        min_stock_level: parseInt(document.getElementById('editItemMinStock').value),
+        description: document.getElementById('editItemDescription').value,
+        image: document.getElementById('editItemImage').value,
+        updated_at: new Date().toISOString()
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
+    
+    // Update displays
+    updateInventoryStats();
+    renderInventoryTable();
+    closeEditItemForm();
+    showToast('Item updated successfully!', 'success');
+}
+
+// View item history
 function viewItemHistory(itemId) {
-    showToast('Item history functionality coming soon!', 'info');
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) {
+        showToast('Item not found!', 'error');
+        return;
+    }
+    
+    // Populate item information
+    document.getElementById('historyItemName').textContent = item.name;
+    document.getElementById('historyItemSku').textContent = item.sku;
+    document.getElementById('historyItemCategory').textContent = item.category;
+    document.getElementById('historyItemCurrentStock').textContent = `${item.current_stock} ${item.unit}`;
+    
+    // Load stock movement history
+    loadStockMovementHistory(itemId);
+    
+    // Load price history
+    loadPriceHistory(itemId);
+    
+    // Calculate and display statistics
+    calculateItemStatistics(itemId);
+    
+    // Show history form
+    openItemHistoryForm();
+}
+
+// Open item history form
+function openItemHistoryForm() {
+    const formSection = document.getElementById('itemHistorySection');
+    formSection.style.display = 'block';
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close item history form
+function closeItemHistoryForm() {
+    const formSection = document.getElementById('itemHistorySection');
+    formSection.style.display = 'none';
+}
+
+// Load stock movement history
+function loadStockMovementHistory(itemId) {
+    const tbody = document.getElementById('stockHistoryTableBody');
+    tbody.innerHTML = '';
+    
+    // Get stock movements from localStorage or create sample data
+    const stockMovements = JSON.parse(localStorage.getItem('stockMovements') || '[]');
+    const itemMovements = stockMovements.filter(movement => movement.itemId === itemId);
+    
+    if (itemMovements.length === 0) {
+        // Create sample data for demonstration
+        const sampleMovements = [
+            {
+                id: 1,
+                itemId: itemId,
+                date: new Date().toISOString().split('T')[0],
+                type: 'Purchase',
+                quantity: 50,
+                previousStock: 0,
+                newStock: 50,
+                reason: 'Initial stock purchase',
+                user: 'Admin'
+            },
+            {
+                id: 2,
+                itemId: itemId,
+                date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+                type: 'Sale',
+                quantity: 5,
+                previousStock: 50,
+                newStock: 45,
+                reason: 'Customer purchase',
+                user: 'Cashier'
+            },
+            {
+                id: 3,
+                itemId: itemId,
+                date: new Date(Date.now() - 172800000).toISOString().split('T')[0],
+                type: 'Adjustment',
+                quantity: -2,
+                previousStock: 45,
+                newStock: 43,
+                reason: 'Damaged items',
+                user: 'Manager'
+            }
+        ];
+        
+        sampleMovements.forEach(movement => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${movement.date}</td>
+                <td><span class="movement-type ${movement.type.toLowerCase()}">${movement.type}</span></td>
+                <td>${movement.quantity > 0 ? '+' : ''}${movement.quantity}</td>
+                <td>${movement.previousStock}</td>
+                <td>${movement.newStock}</td>
+                <td>${movement.reason}</td>
+                <td>${movement.user}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } else {
+        itemMovements.forEach(movement => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${movement.date}</td>
+                <td><span class="movement-type ${movement.type.toLowerCase()}">${movement.type}</span></td>
+                <td>${movement.quantity > 0 ? '+' : ''}${movement.quantity}</td>
+                <td>${movement.previousStock}</td>
+                <td>${movement.newStock}</td>
+                <td>${movement.reason}</td>
+                <td>${movement.user}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+}
+
+// Load price history
+function loadPriceHistory(itemId) {
+    const tbody = document.getElementById('priceHistoryTableBody');
+    tbody.innerHTML = '';
+    
+    // Get price history from localStorage or create sample data
+    const priceHistory = JSON.parse(localStorage.getItem('priceHistory') || '[]');
+    const itemPriceHistory = priceHistory.filter(history => history.itemId === itemId);
+    
+    if (itemPriceHistory.length === 0) {
+        // Create sample data for demonstration
+        const samplePriceHistory = [
+            {
+                id: 1,
+                itemId: itemId,
+                date: new Date().toISOString().split('T')[0],
+                type: 'Cost Price',
+                previousPrice: 0,
+                newPrice: 1500,
+                change: '+₦1,500.00',
+                user: 'Admin'
+            },
+            {
+                id: 2,
+                itemId: itemId,
+                date: new Date().toISOString().split('T')[0],
+                type: 'Selling Price',
+                previousPrice: 0,
+                newPrice: 2500,
+                change: '+₦2,500.00',
+                user: 'Admin'
+            },
+            {
+                id: 3,
+                itemId: itemId,
+                date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+                type: 'Selling Price',
+                previousPrice: 2500,
+                newPrice: 2300,
+                change: '-₦200.00',
+                user: 'Manager'
+            }
+        ];
+        
+        samplePriceHistory.forEach(history => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${history.date}</td>
+                <td><span class="price-type ${history.type.toLowerCase().replace(' ', '-')}">${history.type}</span></td>
+                <td>₦${parseFloat(history.previousPrice).toFixed(2)}</td>
+                <td>₦${parseFloat(history.newPrice).toFixed(2)}</td>
+                <td><span class="price-change ${history.change.startsWith('+') ? 'increase' : 'decrease'}">${history.change}</span></td>
+                <td>${history.user}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } else {
+        itemPriceHistory.forEach(history => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${history.date}</td>
+                <td><span class="price-type ${history.type.toLowerCase().replace(' ', '-')}">${history.type}</span></td>
+                <td>₦${parseFloat(history.previousPrice).toFixed(2)}</td>
+                <td>₦${parseFloat(history.newPrice).toFixed(2)}</td>
+                <td><span class="price-change ${history.change.startsWith('+') ? 'increase' : 'decrease'}">${history.change}</span></td>
+                <td>${history.user}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+}
+
+// Calculate item statistics
+function calculateItemStatistics(itemId) {
+    const stockMovements = JSON.parse(localStorage.getItem('stockMovements') || '[]');
+    const priceHistory = JSON.parse(localStorage.getItem('priceHistory') || '[]');
+    
+    const itemMovements = stockMovements.filter(movement => movement.itemId === itemId);
+    const itemPriceHistory = priceHistory.filter(history => history.itemId === itemId);
+    
+    // Calculate statistics
+    const totalMovements = itemMovements.length || 3; // Sample data count
+    const totalStockIn = itemMovements.filter(m => m.quantity > 0).reduce((sum, m) => sum + m.quantity, 0) || 50;
+    const totalStockOut = Math.abs(itemMovements.filter(m => m.quantity < 0).reduce((sum, m) => sum + m.quantity, 0)) || 7;
+    const priceChanges = itemPriceHistory.length || 3; // Sample data count
+    
+    // Display statistics
+    document.getElementById('historyTotalMovements').textContent = totalMovements;
+    document.getElementById('historyTotalStockIn').textContent = totalStockIn;
+    document.getElementById('historyTotalStockOut').textContent = totalStockOut;
+    document.getElementById('historyPriceChanges').textContent = priceChanges;
+}
+
+// Export item history
+function exportItemHistory() {
+    const itemName = document.getElementById('historyItemName').textContent;
+    const itemSku = document.getElementById('historyItemSku').textContent;
+    
+    // Get stock movements
+    const stockMovements = document.getElementById('stockHistoryTableBody').innerHTML;
+    const priceHistory = document.getElementById('priceHistoryTableBody').innerHTML;
+    
+    // Create CSV content
+    const csvContent = `Item History Report\nItem: ${itemName} (${itemSku})\nGenerated: ${new Date().toLocaleString()}\n\nStock Movement History\nDate,Type,Quantity,Previous Stock,New Stock,Reason,User\n${stockMovements}\n\nPrice History\nDate,Type,Previous Price,New Price,Change,User\n${priceHistory}`;
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `item-history-${itemSku}-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showToast('Item history exported successfully!', 'success');
 }
 
 // Show toast notification
@@ -701,25 +1090,7 @@ function openShopSettings() {
     window.location.href = 'shop-settings.html';
 }
 
-function openProfileSettings() {
-    showToast('Profile Settings - Coming Soon!', 'info');
-    closeUserDropdown();
-}
 
-function openNotifications() {
-    showToast('Notifications - Coming Soon!', 'info');
-    closeUserDropdown();
-}
-
-function openBackup() {
-    showToast('Backup & Restore - Coming Soon!', 'info');
-    closeUserDropdown();
-}
-
-function openHelp() {
-    showToast('Help & Support - Coming Soon!', 'info');
-    closeUserDropdown();
-}
 
 function logout() {
     localStorage.removeItem('isLoggedIn');
@@ -745,13 +1116,28 @@ function closeUserDropdown() {
 let csvData = [];
 let csvHeaders = [];
 
-function openImportModal() {
-    document.getElementById('importModal').style.display = 'flex';
-    setupFileUpload();
+// Import form functions
+function toggleImportForm() {
+    const formSection = document.getElementById('importFormSection');
+    if (formSection.style.display === 'none') {
+        openImportForm();
+    } else {
+        closeImportForm();
+    }
 }
 
-function closeImportModal() {
-    document.getElementById('importModal').style.display = 'none';
+function openImportForm() {
+    const formSection = document.getElementById('importFormSection');
+    formSection.style.display = 'block';
+    setupFileUpload();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeImportForm() {
+    const formSection = document.getElementById('importFormSection');
+    formSection.style.display = 'none';
     resetImportModal();
 }
 
@@ -982,8 +1368,8 @@ function importCSVData() {
         renderInventoryTable();
         updateInventoryStats();
         
-        // Close modal and show success message
-        closeImportModal();
+        // Close form and show success message
+        closeImportForm();
         showToast(`Import completed! ${importedCount} new items added, ${updatedCount} items updated.`, 'success');
         
     } catch (error) {
@@ -994,8 +1380,15 @@ function importCSVData() {
 
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
-window.openAddPurchaseModal = openAddPurchaseModal;
-window.openStockAdjustmentModal = openStockAdjustmentModal;
+window.togglePurchaseForm = togglePurchaseForm;
+window.openPurchaseForm = openPurchaseForm;
+window.closePurchaseForm = closePurchaseForm;
+window.toggleStockAdjustmentForm = toggleStockAdjustmentForm;
+window.openStockAdjustmentForm = openStockAdjustmentForm;
+window.closeStockAdjustmentForm = closeStockAdjustmentForm;
+window.toggleImportForm = toggleImportForm;
+window.openImportForm = openImportForm;
+window.closeImportForm = closeImportForm;
 window.closeModal = closeModal;
 window.addItemRow = addItemRow;
 window.removeItemRow = removeItemRow;
@@ -1004,18 +1397,26 @@ window.saveStockAdjustment = saveStockAdjustment;
 window.filterInventory = filterInventory;
 window.searchInventory = searchInventory;
 window.exportInventory = exportInventory;
-window.openImportModal = openImportModal;
-window.closeImportModal = closeImportModal;
 window.handleFileSelect = handleFileSelect;
 window.importCSVData = importCSVData;
 window.editItem = editItem;
+window.openEditItemForm = openEditItemForm;
+window.closeEditItemForm = closeEditItemForm;
+window.updateItem = updateItem;
 window.viewItemHistory = viewItemHistory;
+window.openItemHistoryForm = openItemHistoryForm;
+window.closeItemHistoryForm = closeItemHistoryForm;
+window.loadStockMovementHistory = loadStockMovementHistory;
+window.loadPriceHistory = loadPriceHistory;
+window.calculateItemStatistics = calculateItemStatistics;
+window.exportItemHistory = exportItemHistory;
+window.reorderItem = reorderItem;
+window.openReorderForm = openReorderForm;
+window.closeReorderForm = closeReorderForm;
+window.updateReorderSummary = updateReorderSummary;
+window.processReorder = processReorder;
 window.toggleUserDropdown = toggleUserDropdown;
 window.openShopSettings = openShopSettings;
-window.openProfileSettings = openProfileSettings;
-window.openNotifications = openNotifications;
-window.openBackup = openBackup;
-window.openHelp = openHelp;
 window.logout = logout;
 
 // Theme initialization function
@@ -1038,4 +1439,144 @@ function applyTheme(themeName) {
     // Add new theme class to both body and html for better coverage
     body.classList.add(`theme-${themeName}`);
     html.classList.add(`theme-${themeName}`);
+}
+
+// Reorder item
+function reorderItem(itemId) {
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) {
+        showToast('Item not found!', 'error');
+        return;
+    }
+    
+    // Populate item information
+    document.getElementById('reorderItemId').value = item.id;
+    document.getElementById('reorderItemName').textContent = item.name;
+    document.getElementById('reorderItemSku').textContent = item.sku;
+    document.getElementById('reorderCurrentStock').textContent = `${item.current_stock} ${item.unit}`;
+    document.getElementById('reorderMinStock').textContent = `${item.min_stock_level} ${item.unit}`;
+    
+    // Set default values
+    document.getElementById('reorderQuantity').value = Math.max(item.min_stock_level - item.current_stock, 10);
+    document.getElementById('reorderUnitCost').value = item.cost_price;
+    
+    // Set default expected date (7 days from now)
+    const expectedDate = new Date();
+    expectedDate.setDate(expectedDate.getDate() + 7);
+    document.getElementById('reorderExpectedDate').value = expectedDate.toISOString().split('T')[0];
+    
+    // Update summary
+    updateReorderSummary();
+    
+    // Show reorder form
+    openReorderForm();
+}
+
+// Open reorder form
+function openReorderForm() {
+    const formSection = document.getElementById('reorderSection');
+    formSection.style.display = 'block';
+    
+    // Focus on first input
+    document.getElementById('reorderQuantity').focus();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close reorder form
+function closeReorderForm() {
+    const formSection = document.getElementById('reorderSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('reorderForm').reset();
+}
+
+// Update reorder summary
+function updateReorderSummary() {
+    const quantity = parseInt(document.getElementById('reorderQuantity').value) || 0;
+    const unitCost = parseFloat(document.getElementById('reorderUnitCost').value) || 0;
+    const itemId = parseInt(document.getElementById('reorderItemId').value);
+    
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) return;
+    
+    const totalCost = quantity * unitCost;
+    const newStockLevel = item.current_stock + quantity;
+    
+    document.getElementById('reorderSummaryQuantity').textContent = quantity;
+    document.getElementById('reorderSummaryUnitCost').textContent = `₦${unitCost.toFixed(2)}`;
+    document.getElementById('reorderSummaryTotalCost').textContent = `₦${totalCost.toFixed(2)}`;
+    document.getElementById('reorderSummaryNewStock').textContent = `${newStockLevel} ${item.unit}`;
+}
+
+// Process reorder
+function processReorder() {
+    const form = document.getElementById('reorderForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const itemId = parseInt(document.getElementById('reorderItemId').value);
+    const item = inventoryData.find(i => i.id === itemId);
+    
+    if (!item) {
+        showToast('Item not found!', 'error');
+        return;
+    }
+    
+    const reorderData = {
+        id: Date.now(),
+        itemId: itemId,
+        itemName: item.name,
+        itemSku: item.sku,
+        quantity: parseInt(document.getElementById('reorderQuantity').value),
+        unitCost: parseFloat(document.getElementById('reorderUnitCost').value),
+        supplier: document.getElementById('reorderSupplier').value,
+        expectedDate: document.getElementById('reorderExpectedDate').value,
+        notes: document.getElementById('reorderNotes').value,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        createdBy: localStorage.getItem('currentUser') || 'Admin'
+    };
+    
+    // Save reorder to localStorage
+    const reorders = JSON.parse(localStorage.getItem('reorders') || '[]');
+    reorders.push(reorderData);
+    localStorage.setItem('reorders', JSON.stringify(reorders));
+    
+    // Create stock movement record
+    const stockMovement = {
+        id: Date.now(),
+        itemId: itemId,
+        date: new Date().toISOString().split('T')[0],
+        type: 'Reorder',
+        quantity: reorderData.quantity,
+        previousStock: item.current_stock,
+        newStock: item.current_stock + reorderData.quantity,
+        reason: `Reorder from ${reorderData.supplier || 'supplier'}`,
+        user: reorderData.createdBy
+    };
+    
+    const stockMovements = JSON.parse(localStorage.getItem('stockMovements') || '[]');
+    stockMovements.push(stockMovement);
+    localStorage.setItem('stockMovements', JSON.stringify(stockMovements));
+    
+    // Update item stock
+    const itemIndex = inventoryData.findIndex(i => i.id === itemId);
+    inventoryData[itemIndex].current_stock += reorderData.quantity;
+    inventoryData[itemIndex].cost_price = reorderData.unitCost; // Update cost price
+    inventoryData[itemIndex].updated_at = new Date().toISOString();
+    
+    // Save updated inventory
+    localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
+    
+    // Update displays
+    updateInventoryStats();
+    renderInventoryTable();
+    closeReorderForm();
+    
+    showToast(`Reorder processed successfully! ${reorderData.quantity} units added to stock.`, 'success');
 }

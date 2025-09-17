@@ -30,6 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Force reinitialize data to include new fields
+    localStorage.removeItem('employeeDataInitialized');
+    localStorage.removeItem('products');
+    localStorage.removeItem('sales');
+    localStorage.removeItem('customers');
+
+    // Initialize sample data first
+    initializeEmployeeData();
+    
     initializeEmployeeDashboard();
     loadEmployeeData();
     setupEventListeners();
@@ -60,7 +69,7 @@ function initializeEmployeeDashboard() {
 
 // Load Employee Information
 function loadEmployeeInfo() {
-    const employeeName = localStorage.getItem('userName') || 'Employee';
+    const employeeName = localStorage.getItem('userName') || 'Usman Umar';
     const shopName = localStorage.getItem('shopName') || 'Construction Shop';
     
     // Update UI
@@ -183,19 +192,36 @@ function updateRecentSalesDisplay() {
         return;
     }
     
-    recentSalesList.innerHTML = sales.map(sale => `
-        <div class="sale-item">
-            <div class="sale-info">
-                <h4>Sale #${sale.id || 'N/A'}</h4>
-                <p>${sale.customerName || 'Walk-in Customer'}</p>
+    // Get products data for image lookup
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    
+    recentSalesList.innerHTML = sales.map(sale => {
+        // Get first product image for display
+        const firstItem = sale.items?.[0];
+        const product = firstItem ? products.find(p => p.id === firstItem.productId) : null;
+        const imageUrl = product?.image || 'https://via.placeholder.com/40x40?text=No+Image';
+        
+        return `
+            <div class="sale-item">
+                <div class="sale-product-preview">
+                    <img src="${imageUrl}" 
+                         alt="${firstItem?.name || 'Product'}" 
+                         class="recent-sale-thumbnail"
+                         onerror="this.src='https://via.placeholder.com/40x40?text=No+Image'">
+                </div>
+                <div class="sale-info">
+                    <h4>Sale #${sale.id || 'N/A'}</h4>
+                    <p>${sale.customerName || 'Walk-in Customer'}</p>
+                    <p class="sale-items-preview">${sale.items?.length || 0} item(s)</p>
+                </div>
+                <div class="sale-details">
+                    <span class="sale-amount">${formatCurrency(sale.total || 0)}</span>
+                    <span class="sale-method ${sale.paymentMethod}">${sale.paymentMethod}</span>
+                </div>
+                <div class="sale-time">${formatTime(sale.date)}</div>
             </div>
-            <div class="sale-details">
-                <span class="sale-amount">${formatCurrency(sale.total || 0)}</span>
-                <span class="sale-method ${sale.paymentMethod}">${sale.paymentMethod}</span>
-            </div>
-            <div class="sale-time">${formatTime(sale.date)}</div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Load Performance Data
@@ -246,10 +272,16 @@ async function loadProducts() {
         const products = JSON.parse(localStorage.getItem('products') || '[]');
         const tableBody = document.getElementById('productsTableBody');
         
+        // Debug: Log products to see if they have image and brand data
+        console.log('Products loaded:', products);
+        if (products.length > 0) {
+            console.log('First product:', products[0]);
+        }
+        
         if (products.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="no-data-cell">
+                    <td colspan="10" class="no-data-cell">
                         <div class="no-data">
                             <i class="material-icons-round">inventory_2</i>
                             <p>No products found</p>
@@ -261,22 +293,61 @@ async function loadProducts() {
         }
         
         tableBody.innerHTML = products.map(product => {
-            const isLowStock = product.quantity <= (product.lowStockThreshold || 10);
+            const cartItem = cart.find(item => item.productId === product.id);
+            const salesQuantity = cartItem ? cartItem.quantity : 0;
+            
+            // Calculate available stock (original stock - current cart quantity)
+            const availableStock = product.quantity - salesQuantity;
+            
+            const isLowStock = availableStock <= (product.lowStockThreshold || 10);
             const statusClass = isLowStock ? 'low-stock' : 'in-stock';
             const statusText = isLowStock ? 'Low Stock' : 'In Stock';
-            const canAdd = product.quantity > 0;
-            const cartItem = cart.find(item => item.productId === product.id);
+            const canAdd = availableStock > 0;
             const isInCart = cartItem !== undefined;
             
             return `
                 <tr>
+                    <td class="product-image-cell">
+                        <div class="product-image-container" onclick="openImageModal(${product.id})">
+                            <img src="${product.image || 'https://via.placeholder.com/60x60?text=No+Image'}" 
+                                 alt="${product.name}" 
+                                 class="product-thumbnail"
+                                 onerror="this.src='https://via.placeholder.com/60x60?text=No+Image'"
+                                 onload="console.log('Image loaded successfully:', this.src)"
+                                 onerror="console.log('Image failed to load:', this.src)">
+                            <div class="image-overlay">
+                                <i class="material-icons-round">zoom_in</i>
+                            </div>
+                        </div>
+                    </td>
                     <td>${product.name}</td>
+                    <td><span class="brand-badge">${product.brand || 'N/A'}</span></td>
                     <td>${product.category}</td>
-                    <td>${product.quantity}</td>
+                    <td>
+                        <span class="stock-quantity ${availableStock <= 0 ? 'out-of-stock' : ''}">${availableStock}</span>
+                        ${salesQuantity > 0 ? `<span class="in-cart-indicator">(${salesQuantity} in cart)</span>` : ''}
+                    </td>
                     <td>${product.unit || 'units'}</td>
                     <td>${formatCurrency(product.sellingPrice || 0)}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td>
+                    <td class="sales-quantity-cell">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn decrease" onclick="decreaseSalesQuantity(${product.id})" ${salesQuantity <= 0 ? 'disabled' : ''}>
+                                <i class="material-icons-round">remove</i>
+                            </button>
+                            <input type="number" 
+                                   class="sales-quantity-input" 
+                                   value="${salesQuantity}" 
+                                   min="0" 
+                                   max="${availableStock}"
+                                   onchange="updateSalesQuantity(${product.id}, this.value)"
+                                   onkeyup="updateSalesQuantity(${product.id}, this.value)">
+                            <button class="quantity-btn increase" onclick="increaseSalesQuantity(${product.id})" ${salesQuantity >= availableStock ? 'disabled' : ''}>
+                                <i class="material-icons-round">add</i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="actions-cell">
                         <button class="add-btn ${canAdd ? (isInCart ? 'in-cart' : '') : 'disabled'}" 
                                 onclick="${canAdd ? `addToCart(${product.id})` : 'return false'}"
                                 ${!canAdd ? 'disabled' : ''}>
@@ -295,18 +366,159 @@ async function loadProducts() {
 // Filter Products
 function filterProducts() {
     const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+    const brandFilter = document.getElementById('brandFilter').value;
     const tableRows = document.querySelectorAll('#productsTableBody tr');
     
     tableRows.forEach(row => {
-        const productName = row.cells[0]?.textContent.toLowerCase() || '';
-        const category = row.cells[1]?.textContent.toLowerCase() || '';
+        const productName = row.cells[1]?.textContent.toLowerCase() || '';
+        const brand = row.cells[2]?.textContent.toLowerCase() || '';
+        const category = row.cells[3]?.textContent.toLowerCase() || '';
         
-        if (productName.includes(searchTerm) || category.includes(searchTerm)) {
+        const matchesSearch = !searchTerm || 
+            productName.includes(searchTerm) || 
+            brand.includes(searchTerm) || 
+            category.includes(searchTerm);
+        
+        const matchesBrand = brandFilter === 'all' || brand.includes(brandFilter.toLowerCase());
+        
+        if (matchesSearch && matchesBrand) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
         }
     });
+}
+
+// Sales Quantity Functions
+function increaseSalesQuantity(productId) {
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) return;
+    
+    const cartItem = cart.find(item => item.productId === productId);
+    const currentQuantity = cartItem ? cartItem.quantity : 0;
+    
+    // Calculate available stock (original stock - current cart quantity)
+    const availableStock = product.quantity - currentQuantity;
+    
+    if (currentQuantity >= availableStock) {
+        showToast('Cannot exceed available stock!', 'warning');
+        return;
+    }
+    
+    const newQuantity = currentQuantity + 1;
+    updateSalesQuantity(productId, newQuantity);
+}
+
+function decreaseSalesQuantity(productId) {
+    const cartItem = cart.find(item => item.productId === productId);
+    const currentQuantity = cartItem ? cartItem.quantity : 0;
+    
+    if (currentQuantity <= 0) return;
+    
+    const newQuantity = currentQuantity - 1;
+    updateSalesQuantity(productId, newQuantity);
+}
+
+function updateSalesQuantity(productId, quantity) {
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) return;
+    
+    const numQuantity = parseInt(quantity) || 0;
+    
+    // Validate quantity
+    if (numQuantity < 0) {
+        showToast('Quantity cannot be negative!', 'warning');
+        return;
+    }
+    
+    // Get current cart item to calculate available stock
+    const existingCartItem = cart.find(item => item.productId === productId);
+    const currentCartQuantity = existingCartItem ? existingCartItem.quantity : 0;
+    
+    // Calculate available stock (original stock - current cart quantity)
+    const availableStock = product.quantity - currentCartQuantity;
+    
+    // Check if new quantity exceeds available stock
+    if (numQuantity > availableStock) {
+        showToast(`Cannot exceed available stock (${availableStock})!`, 'warning');
+        return;
+    }
+    
+    // Update cart
+    if (numQuantity === 0) {
+        // Remove from cart
+        cart = cart.filter(item => item.productId !== productId);
+    } else {
+        // Add or update cart item
+        const existingItem = cart.find(item => item.productId === productId);
+        if (existingItem) {
+            existingItem.quantity = numQuantity;
+        } else {
+            cart.push({
+                productId: productId,
+                name: product.name,
+                price: product.sellingPrice,
+                quantity: numQuantity,
+                image: product.image,
+                brand: product.brand
+            });
+        }
+    }
+    
+    // Save cart to localStorage
+    localStorage.setItem('employeeCart', JSON.stringify(cart));
+    
+    // Update cart display
+    updateCartDisplay();
+    
+    // Reload products to update quantity controls and stock display
+    loadProducts();
+    
+    // Show feedback
+    if (numQuantity > 0) {
+        showToast(`Updated ${product.name} quantity to ${numQuantity}`, 'success');
+    } else {
+        showToast(`Removed ${product.name} from sales`, 'info');
+    }
+}
+
+// Complete Sale Function - Permanently reduce stock
+function completeSale() {
+    if (cart.length === 0) {
+        showToast('No items in cart to sell!', 'warning');
+        return;
+    }
+    
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    let stockUpdated = false;
+    
+    // Reduce stock for each item in cart
+    cart.forEach(cartItem => {
+        const product = products.find(p => p.id === cartItem.productId);
+        if (product) {
+            product.quantity -= cartItem.quantity;
+            stockUpdated = true;
+        }
+    });
+    
+    if (stockUpdated) {
+        // Save updated products
+        localStorage.setItem('products', JSON.stringify(products));
+        
+        // Clear cart
+        cart = [];
+        localStorage.setItem('employeeCart', JSON.stringify(cart));
+        
+        // Update displays
+        updateCartDisplay();
+        loadProducts();
+        
+        showToast('Sale completed! Stock has been reduced.', 'success');
+    }
 }
 
 // Sales Functions
@@ -418,10 +630,29 @@ function loadSalesTable() {
         return;
     }
     
+    // Get products data for image lookup
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    
     tableBody.innerHTML = filteredSales.map(sale => {
         const saleDate = new Date(sale.date);
         const itemsCount = sale.items ? sale.items.length : 0;
         const itemsText = itemsCount === 1 ? '1 item' : `${itemsCount} items`;
+        
+        // Create product images display
+        const productImages = (sale.items || []).slice(0, 3).map(item => {
+            const product = products.find(p => p.id === item.productId);
+            const imageUrl = product?.image || 'https://via.placeholder.com/40x40?text=No+Image';
+            return `
+                <div class="sale-product-image" title="${item.name}">
+                    <img src="${imageUrl}" 
+                         alt="${item.name}" 
+                         class="sale-product-thumbnail"
+                         onerror="this.src='https://via.placeholder.com/40x40?text=No+Image'">
+                </div>
+            `;
+        }).join('');
+        
+        const moreItemsIndicator = itemsCount > 3 ? `<div class="more-items">+${itemsCount - 3}</div>` : '';
         
         return `
             <tr>
@@ -433,7 +664,15 @@ function loadSalesTable() {
                     </div>
                 </td>
                 <td>${sale.customerName || 'Walk-in Customer'}</td>
-                <td>${itemsText}</td>
+                <td>
+                    <div class="sale-products-container">
+                        <div class="sale-product-images">
+                            ${productImages}
+                            ${moreItemsIndicator}
+                        </div>
+                        <div class="sale-items-count">${itemsText}</div>
+                    </div>
+                </td>
                 <td>
                     <span class="payment-badge ${sale.paymentMethod}">${sale.paymentMethod}</span>
                 </td>
@@ -498,6 +737,9 @@ function viewSaleDetails(saleId) {
         return;
     }
     
+    // Get products data for image lookup
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    
     // Create detailed view modal
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -537,14 +779,27 @@ function viewSaleDetails(saleId) {
                 <div class="sale-items-details">
                     <h4>Items Sold:</h4>
                     <div class="items-list">
-                        ${(sale.items || []).map(item => `
-                            <div class="item-detail">
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-quantity">Qty: ${item.quantity}</div>
-                                <div class="item-price">${formatCurrency(item.price)} each</div>
-                                <div class="item-total">${formatCurrency(item.total)}</div>
-                            </div>
-                        `).join('')}
+                        ${(sale.items || []).map(item => {
+                            const product = products.find(p => p.id === item.productId);
+                            const imageUrl = product?.image || 'https://via.placeholder.com/60x60?text=No+Image';
+                            return `
+                                <div class="item-detail">
+                                    <div class="item-image">
+                                        <img src="${imageUrl}" 
+                                             alt="${item.name}" 
+                                             class="item-thumbnail"
+                                             onerror="this.src='https://via.placeholder.com/60x60?text=No+Image'">
+                                    </div>
+                                    <div class="item-info">
+                                        <div class="item-name">${item.name}</div>
+                                        <div class="item-brand">${product?.brand || 'N/A'}</div>
+                                        <div class="item-quantity">Qty: ${item.quantity}</div>
+                                        <div class="item-price">${formatCurrency(item.price)} each</div>
+                                        <div class="item-total">${formatCurrency(item.total)}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             </div>
@@ -710,9 +965,9 @@ function closeUserDropdown() {
 function loadProfileData() {
     try {
         // Load user information
-        const userName = localStorage.getItem('userName') || 'Jane Smith';
+        const userName = localStorage.getItem('userName') || 'Usman Umar';
         const userRole = localStorage.getItem('userRole') || 'Cashier';
-        const userEmail = 'jane.smith@company.com'; // This would come from user data
+        const userEmail = 'usman.umar@company.com'; // This would come from user data
         
         document.getElementById('profileName').textContent = userName;
         document.getElementById('profileRole').textContent = userRole;
@@ -726,11 +981,10 @@ function loadProfileData() {
 
 // Theme Management Functions
 function loadThemeSettings() {
-    const currentTheme = localStorage.getItem('employeeTheme') || 'green';
-    selectTheme(currentTheme, false);
+    loadGlobalTheme();
 }
 
-function selectTheme(themeName, save = true) {
+function selectTheme(themeName, save = false) {
     // Remove existing theme classes from both body and html
     const body = document.body;
     const html = document.documentElement;
@@ -761,7 +1015,16 @@ function selectTheme(themeName, save = true) {
     // Update preview
     updateThemePreview(themeName);
     
-    // Save to localStorage
+    // Update avatar colors
+    updateAvatarColors(themeName);
+    
+    // Update theme status
+    updateThemeStatus(`Selected: ${themeName.charAt(0).toUpperCase() + themeName.slice(1)} theme. Click Save to apply globally.`);
+    
+    // Store the selected theme for saving
+    window.currentSelectedTheme = themeName;
+    
+    // Save to localStorage only if explicitly requested
     if (save) {
         localStorage.setItem('employeeTheme', themeName);
         showToast(`Theme changed to ${themeName.charAt(0).toUpperCase() + themeName.slice(1)}`, 'success');
@@ -789,6 +1052,285 @@ function updateThemePreview(themeName) {
 function loadThemeOnInit() {
     const savedTheme = localStorage.getItem('globalTheme') || localStorage.getItem('employeeTheme') || 'green';
     selectTheme(savedTheme, false);
+}
+
+// Global Theme Management Functions
+function saveGlobalTheme() {
+    console.log('=== SAVE THEME FUNCTION CALLED ===');
+    
+    // Get the currently selected theme from the UI
+    const selectedOption = document.querySelector('.color-option.selected');
+    console.log('Selected option:', selectedOption);
+    
+    if (!selectedOption) {
+        console.log('No theme selected, trying to get from stored theme');
+        const storedTheme = localStorage.getItem('employeeTheme') || 'green';
+        console.log('Using stored theme:', storedTheme);
+        saveThemeDirectly(storedTheme);
+        return;
+    }
+    
+    const currentTheme = selectedOption.dataset.theme;
+    console.log('Selected theme:', currentTheme);
+    
+    if (!currentTheme) {
+        updateThemeStatus('Please select a theme first!', 'error');
+        return;
+    }
+    
+    saveThemeDirectly(currentTheme);
+}
+
+function saveThemeDirectly(themeName) {
+    console.log('Saving theme directly:', themeName);
+    
+    try {
+        // Use global theme manager if available
+        if (window.GlobalThemeManager) {
+            window.GlobalThemeManager.saveTheme(themeName);
+        } else {
+            // Fallback to localStorage
+        localStorage.setItem('globalTheme', themeName);
+        localStorage.setItem('employeeTheme', themeName);
+        localStorage.setItem('ownerTheme', themeName);
+        }
+        
+        // Also save employee name
+        localStorage.setItem('userName', 'Usman Umar');
+        
+        console.log('Theme saved to localStorage:', themeName);
+        
+        // Apply theme immediately
+        const body = document.body;
+        const html = document.documentElement;
+        const existingThemes = ['green', 'blue', 'purple', 'red', 'orange', 'teal'];
+        
+        existingThemes.forEach(theme => {
+            body.classList.remove(`theme-${theme}`);
+            html.classList.remove(`theme-${theme}`);
+        });
+        
+        body.classList.add(`theme-${themeName}`);
+        html.classList.add(`theme-${themeName}`);
+        
+        console.log('Theme applied to body and html:', themeName);
+        
+        // Force avatar color update
+        updateAvatarColors(themeName);
+        
+        // Update employee name display
+        updateEmployeeNameDisplay();
+        
+        // Update theme status
+        updateThemeStatus(`✅ ${themeName.charAt(0).toUpperCase() + themeName.slice(1)} theme saved globally!`, 'success');
+        
+        // Show success message
+        showToast(`Theme saved globally! It will apply to all pages including storefront.`, 'success');
+        
+        // Update save button
+        const saveBtn = document.getElementById('saveThemeBtn');
+        if (saveBtn) {
+            saveBtn.innerHTML = `
+                <i class="material-icons-round">check</i>
+                Theme Saved
+            `;
+            saveBtn.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                saveBtn.innerHTML = `
+                    <i class="material-icons-round">save</i>
+                    Save Theme
+                `;
+                saveBtn.style.background = 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))';
+            }, 3000);
+        }
+        
+        console.log('Theme save completed successfully');
+        
+    } catch (error) {
+        console.error('Error in saveThemeDirectly:', error);
+        updateThemeStatus('❌ Failed to save theme. Please try again.', 'error');
+        showToast('Failed to save theme', 'error');
+    }
+}
+
+// Function to update employee name display
+function updateEmployeeNameDisplay() {
+    const employeeName = 'Usman Umar';
+    const initials = 'UU';
+    
+    // Update main header
+    const employeeNameElement = document.getElementById('employeeName');
+    const employeeAvatarElement = document.getElementById('employeeAvatar');
+    
+    if (employeeNameElement) {
+        employeeNameElement.textContent = employeeName;
+    }
+    
+    if (employeeAvatarElement) {
+        employeeAvatarElement.textContent = initials;
+    }
+    
+    // Update dropdown
+    const dropdownUserNameElement = document.getElementById('dropdownUserName');
+    if (dropdownUserNameElement) {
+        dropdownUserNameElement.textContent = employeeName;
+    }
+    
+    // Update profile
+    const profileNameElement = document.getElementById('profileName');
+    if (profileNameElement) {
+        profileNameElement.textContent = employeeName;
+    }
+    
+    console.log('Employee name updated to:', employeeName);
+}
+
+// Function to update avatar colors based on theme
+function updateAvatarColors(themeName) {
+    console.log('Updating avatar colors for theme:', themeName);
+    
+    // Get theme colors
+    const themeColors = getThemeColors(themeName);
+    
+    // Update all avatar elements
+    const avatars = document.querySelectorAll('.user-avatar, .user-avatar-small, .profile-avatar-large, .preview-avatar');
+    
+    avatars.forEach(avatar => {
+        avatar.style.background = `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})`;
+        avatar.style.boxShadow = `0 4px 16px rgba(${themeColors.primaryRgb}, 0.3)`;
+    });
+    
+    console.log('Avatar colors updated:', themeColors);
+}
+
+// Function to get theme colors
+function getThemeColors(themeName) {
+    const themes = {
+        green: {
+            primary: '#10b981',
+            secondary: '#059669',
+            primaryRgb: '16, 185, 129'
+        },
+        blue: {
+            primary: '#3b82f6',
+            secondary: '#2563eb',
+            primaryRgb: '59, 130, 246'
+        },
+        purple: {
+            primary: '#8b5cf6',
+            secondary: '#7c3aed',
+            primaryRgb: '139, 92, 246'
+        },
+        red: {
+            primary: '#ef4444',
+            secondary: '#dc2626',
+            primaryRgb: '239, 68, 68'
+        },
+        orange: {
+            primary: '#f97316',
+            secondary: '#ea580c',
+            primaryRgb: '249, 115, 22'
+        },
+        teal: {
+            primary: '#14b8a6',
+            secondary: '#0d9488',
+            primaryRgb: '20, 184, 166'
+        }
+    };
+    
+    return themes[themeName] || themes.green;
+}
+
+function updateThemeStatus(message, type = 'info') {
+    const statusElement = document.getElementById('themeStatus');
+    if (!statusElement) return;
+    
+    statusElement.innerHTML = `
+        <i class="material-icons-round">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</i>
+        <span>${message}</span>
+    `;
+    
+    // Update status class
+    statusElement.className = `theme-status ${type}`;
+}
+
+function loadGlobalTheme() {
+    const globalTheme = localStorage.getItem('globalTheme');
+    if (globalTheme) {
+        selectTheme(globalTheme, false);
+        updateAvatarColors(globalTheme);
+        updateThemeStatus(`Current global theme: ${globalTheme.charAt(0).toUpperCase() + globalTheme.slice(1)}`, 'success');
+    } else {
+        updateThemeStatus('Select a theme and click Save to apply globally', 'info');
+    }
+}
+
+// Debug function for theme selection
+function debugThemeSelection() {
+    console.log('=== THEME DEBUG ===');
+    console.log('Current selected theme:', window.currentSelectedTheme);
+    console.log('Selected element:', document.querySelector('.color-option.selected'));
+    console.log('All color options:', document.querySelectorAll('.color-option'));
+    console.log('Global theme:', localStorage.getItem('globalTheme'));
+    console.log('Employee theme:', localStorage.getItem('employeeTheme'));
+    console.log('Theme manager available:', typeof window.saveGlobalTheme);
+    console.log('==================');
+}
+
+// Simple test function for theme saving
+function testThemeSave() {
+    console.log('Testing theme save...');
+    const testTheme = 'blue';
+    
+    try {
+        localStorage.setItem('globalTheme', testTheme);
+        localStorage.setItem('employeeTheme', testTheme);
+        localStorage.setItem('ownerTheme', testTheme);
+        
+        console.log('Theme saved successfully:', testTheme);
+        console.log('Stored values:');
+        console.log('- globalTheme:', localStorage.getItem('globalTheme'));
+        console.log('- employeeTheme:', localStorage.getItem('employeeTheme'));
+        console.log('- ownerTheme:', localStorage.getItem('ownerTheme'));
+        
+        return true;
+    } catch (error) {
+        console.error('Theme save test failed:', error);
+        return false;
+    }
+}
+
+// Manual theme save functions for testing
+function saveGreenTheme() {
+    console.log('Manually saving green theme...');
+    saveThemeDirectly('green');
+}
+
+function saveBlueTheme() {
+    console.log('Manually saving blue theme...');
+    saveThemeDirectly('blue');
+}
+
+function savePurpleTheme() {
+    console.log('Manually saving purple theme...');
+    saveThemeDirectly('purple');
+}
+
+function saveRedTheme() {
+    console.log('Manually saving red theme...');
+    saveThemeDirectly('red');
+}
+
+function saveOrangeTheme() {
+    console.log('Manually saving orange theme...');
+    saveThemeDirectly('orange');
+}
+
+function saveTealTheme() {
+    console.log('Manually saving teal theme...');
+    saveThemeDirectly('teal');
 }
 
 // Close dropdown when clicking outside
@@ -868,6 +1410,73 @@ function openCartModal() {
 
 function closeCartModal() {
     document.getElementById('cartModal').style.display = 'none';
+}
+
+// Image Modal Functions
+function openImageModal(productId) {
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) {
+        showToast('Product not found', 'error');
+        return;
+    }
+    
+    const modal = document.getElementById('imageModal');
+    const imagePreview = document.getElementById('imagePreview');
+    const imageModalTitle = document.getElementById('imageModalTitle');
+    const imageInfo = document.getElementById('imageInfo');
+    
+    // Set image
+    imagePreview.src = product.image || 'https://via.placeholder.com/400x300?text=No+Image';
+    imagePreview.alt = product.name;
+    
+    // Set title
+    imageModalTitle.textContent = product.name;
+    
+    // Set product info
+    imageInfo.innerHTML = `
+        <div class="product-details">
+            <h4>${product.name}</h4>
+            <p><strong>Brand:</strong> ${product.brand || 'N/A'}</p>
+            <p><strong>Category:</strong> ${product.category}</p>
+            <p><strong>Price:</strong> ${formatCurrency(product.sellingPrice || 0)}</p>
+            <p><strong>Quantity:</strong> ${product.quantity} ${product.unit || 'units'}</p>
+            <p><strong>Status:</strong> 
+                <span class="status-badge ${product.quantity <= (product.lowStockThreshold || 10) ? 'low-stock' : 'in-stock'}">
+                    ${product.quantity <= (product.lowStockThreshold || 10) ? 'Low Stock' : 'In Stock'}
+                </span>
+            </p>
+        </div>
+    `;
+    
+    modal.style.display = 'flex';
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+// Debug function to check data
+function debugData() {
+    console.log('=== DEBUG DATA ===');
+    console.log('Products:', JSON.parse(localStorage.getItem('products') || '[]'));
+    console.log('Employee Data Initialized:', localStorage.getItem('employeeDataInitialized'));
+    console.log('Cart:', cart);
+    console.log('==================');
+}
+
+// Function to manually refresh data
+function refreshData() {
+    localStorage.removeItem('employeeDataInitialized');
+    localStorage.removeItem('products');
+    localStorage.removeItem('sales');
+    localStorage.removeItem('customers');
+    
+    // Reinitialize data
+    initializeEmployeeData();
+    loadProducts();
+    showToast('Data refreshed successfully', 'success');
 }
 
 function updateCartModal() {
@@ -1037,8 +1646,12 @@ function setupEventListeners() {
     // Close modal when clicking outside
     document.addEventListener('click', function(event) {
         const cartModal = document.getElementById('cartModal');
+        const imageModal = document.getElementById('imageModal');
         if (event.target === cartModal) {
             closeCartModal();
+        }
+        if (event.target === imageModal) {
+            closeImageModal();
         }
     });
 }

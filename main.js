@@ -23,11 +23,11 @@ function createWindow() {
       contextIsolation: false,
     },
     icon: path.join(__dirname, "assets", "icon.png"), // Add your app icon here
-    title: "Inventa - Construction Shop Management",
+    title: "Inventa Store - Browse Products",
   });
 
-  // Load index.html from theme_0.1 folder
-  win.loadFile(path.join(__dirname, "theme_0.1", "index.html"));
+  // Load storefront.html from theme_0.1 folder
+  win.loadFile(path.join(__dirname, "theme_0.1", "storefront.html"));
 
   // Open DevTools automatically in development
   if (process.env.NODE_ENV === 'development') {

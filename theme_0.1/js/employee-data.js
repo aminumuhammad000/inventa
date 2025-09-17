@@ -3,10 +3,11 @@
 
 // Initialize sample data for employee dashboard
 function initializeEmployeeData() {
-    // Check if data already exists
-    if (localStorage.getItem('employeeDataInitialized') === 'true') {
-        return;
-    }
+    // Force reinitialize data to include new image and brand fields
+    // Remove this check temporarily to update existing data
+    // if (localStorage.getItem('employeeDataInitialized') === 'true') {
+    //     return;
+    // }
 
     // Sample products for inventory
     const sampleProducts = [
@@ -14,67 +15,131 @@ function initializeEmployeeData() {
             id: 1,
             name: 'Cement (50kg)',
             category: 'Construction Materials',
+            brand: 'Dangote',
             quantity: 245,
             unit: 'bags',
             purchasePrice: 2500,
             sellingPrice: 3000,
             supplier: 'Dangote Cement',
-            lowStockThreshold: 20
+            lowStockThreshold: 20,
+            image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=300&h=200&fit=crop&auto=format'
         },
         {
             id: 2,
             name: 'Steel Rods (12mm)',
             category: 'Construction Materials',
+            brand: 'Steel Works',
             quantity: 89,
             unit: 'pieces',
             purchasePrice: 450,
             sellingPrice: 550,
             supplier: 'Steel Works Ltd',
-            lowStockThreshold: 15
+            lowStockThreshold: 15,
+            image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop&auto=format'
         },
         {
             id: 3,
             name: 'Sand (Truck Load)',
             category: 'Construction Materials',
+            brand: 'Premium Sand',
             quantity: 12,
             unit: 'loads',
             purchasePrice: 15000,
             sellingPrice: 18000,
             supplier: 'Sand Suppliers',
-            lowStockThreshold: 3
+            lowStockThreshold: 3,
+            image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop&auto=format'
         },
         {
             id: 4,
             name: 'Paint (White)',
             category: 'Finishing Materials',
+            brand: 'Dulux',
             quantity: 5,
             unit: 'gallons',
             purchasePrice: 2500,
             sellingPrice: 3200,
             supplier: 'Paint Co',
-            lowStockThreshold: 10
+            lowStockThreshold: 10,
+            image: 'https://images.unsplash.com/photo-1581578731548-c6a0c3f15f30?w=300&h=200&fit=crop&auto=format'
         },
         {
             id: 5,
             name: 'Nails (2 inches)',
             category: 'Fasteners',
+            brand: 'Hardware Pro',
             quantity: 15,
             unit: 'boxes',
             purchasePrice: 800,
             sellingPrice: 1200,
             supplier: 'Hardware Store',
-            lowStockThreshold: 20
+            lowStockThreshold: 20,
+            image: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&h=200&fit=crop&auto=format'
         },
         {
             id: 6,
             name: 'PVC Pipes (4 inches)',
             category: 'Plumbing',
+            brand: 'AquaFlow',
             quantity: 8,
             unit: 'pieces',
             purchasePrice: 1200,
             sellingPrice: 1800,
             supplier: 'Plumbing Supplies',
-            lowStockThreshold: 15
+            lowStockThreshold: 15,
+            image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=300&h=200&fit=crop&auto=format'
+        },
+        {
+            id: 7,
+            name: 'Cement (50kg)',
+            category: 'Construction Materials',
+            brand: 'Lafarge',
+            quantity: 180,
+            unit: 'bags',
+            purchasePrice: 2600,
+            sellingPrice: 3100,
+            supplier: 'Lafarge Cement',
+            lowStockThreshold: 20,
+            image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=300&h=200&fit=crop&auto=format'
+        },
+        {
+            id: 8,
+            name: 'Paint (Blue)',
+            category: 'Finishing Materials',
+            brand: 'Dulux',
+            quantity: 8,
+            unit: 'gallons',
+            purchasePrice: 2700,
+            sellingPrice: 3400,
+            supplier: 'Paint Co',
+            lowStockThreshold: 10,
+            image: 'https://images.unsplash.com/photo-1581578731548-c6a0c3f15f30?w=300&h=200&fit=crop&auto=format'
+        },
+        {
+            id: 9,
+            name: 'Steel Rods (16mm)',
+            category: 'Construction Materials',
+            brand: 'Steel Works',
+            quantity: 45,
+            unit: 'pieces',
+            purchasePrice: 650,
+            sellingPrice: 750,
+            supplier: 'Steel Works Ltd',
+            lowStockThreshold: 15,
+            image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop&auto=format'
+        },
+        {
+            id: 10,
+            name: 'Paint (Red)',
+            category: 'Finishing Materials',
+            brand: 'Berger',
+            quantity: 6,
+            unit: 'gallons',
+            purchasePrice: 2800,
+            sellingPrice: 3500,
+            supplier: 'Paint Co',
+            lowStockThreshold: 10,
+            image: 'https://images.unsplash.com/photo-1581578731548-c6a0c3f15f30?w=300&h=200&fit=crop&auto=format'
         }
     ];
 
@@ -91,7 +156,7 @@ function initializeEmployeeData() {
             total: 32750,
             paymentMethod: 'cash',
             employeeId: 'employee_inventa_com',
-            employeeName: 'Jane Smith'
+            employeeName: 'Usman Umar'
         },
         {
             id: 'S002',
@@ -103,7 +168,7 @@ function initializeEmployeeData() {
             total: 18000,
             paymentMethod: 'credit',
             employeeId: 'employee_inventa_com',
-            employeeName: 'Jane Smith'
+            employeeName: 'Usman Umar'
         },
         {
             id: 'S003',
@@ -116,7 +181,7 @@ function initializeEmployeeData() {
             total: 10000,
             paymentMethod: 'cash',
             employeeId: 'employee_inventa_com',
-            employeeName: 'Jane Smith'
+            employeeName: 'Usman Umar'
         }
     ];
 

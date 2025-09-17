@@ -271,14 +271,32 @@ function filterCustomers() {
 }
 
 // Open add customer modal
-function openAddCustomerModal() {
-    document.getElementById('addCustomerModal').style.display = 'flex';
-    document.getElementById('customerName').focus();
+// Add Customer form functions
+function toggleAddCustomerForm() {
+    const formSection = document.getElementById('addCustomerSection');
+    if (formSection.style.display === 'none') {
+        openAddCustomerForm();
+    } else {
+        closeAddCustomerForm();
+    }
 }
 
-// Close add customer modal
-function closeAddCustomerModal() {
-    document.getElementById('addCustomerModal').style.display = 'none';
+function openAddCustomerForm() {
+    const formSection = document.getElementById('addCustomerSection');
+    formSection.style.display = 'block';
+    
+    // Focus on first input
+    document.getElementById('customerName').focus();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeAddCustomerForm() {
+    const formSection = document.getElementById('addCustomerSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
     document.getElementById('addCustomerForm').reset();
 }
 
@@ -307,7 +325,7 @@ function saveCustomer() {
     
     updateCustomerStats();
     displayCustomers();
-    closeAddCustomerModal();
+    closeAddCustomerForm();
     showToast('Customer added successfully!', 'success');
 }
 
@@ -497,7 +515,84 @@ function savePayment() {
 
 // Edit customer
 function editCustomer(customerId) {
-    showToast('Edit customer functionality coming soon!', 'info');
+    const customer = customersData.find(c => c.id === customerId);
+    if (!customer) {
+        showToast('Customer not found!', 'error');
+        return;
+    }
+    
+    // Populate edit form with customer data
+    document.getElementById('editCustomerId').value = customer.id;
+    document.getElementById('editCustomerName').value = customer.name;
+    document.getElementById('editCustomerPhone').value = customer.phone;
+    document.getElementById('editCustomerEmail').value = customer.email || '';
+    document.getElementById('editCustomerAddress').value = customer.address || '';
+    document.getElementById('editCreditLimit').value = customer.creditLimit || 0;
+    document.getElementById('editCustomerType').value = customer.type || 'individual';
+    document.getElementById('editCustomerNotes').value = customer.notes || '';
+    
+    // Show edit form
+    openEditCustomerForm();
+}
+
+// Open edit customer form
+function openEditCustomerForm() {
+    const formSection = document.getElementById('editCustomerSection');
+    formSection.style.display = 'block';
+    
+    // Focus on first input
+    document.getElementById('editCustomerName').focus();
+    
+    // Scroll to form
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Close edit customer form
+function closeEditCustomerForm() {
+    const formSection = document.getElementById('editCustomerSection');
+    formSection.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('editCustomerForm').reset();
+}
+
+// Update customer
+function updateCustomer() {
+    const form = document.getElementById('editCustomerForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const customerId = parseInt(document.getElementById('editCustomerId').value);
+    const customerIndex = customersData.findIndex(c => c.id === customerId);
+    
+    if (customerIndex === -1) {
+        showToast('Customer not found!', 'error');
+        return;
+    }
+    
+    // Update customer data
+    customersData[customerIndex] = {
+        ...customersData[customerIndex],
+        name: document.getElementById('editCustomerName').value,
+        phone: document.getElementById('editCustomerPhone').value,
+        email: document.getElementById('editCustomerEmail').value,
+        address: document.getElementById('editCustomerAddress').value,
+        creditLimit: parseFloat(document.getElementById('editCreditLimit').value) || 0,
+        type: document.getElementById('editCustomerType').value,
+        notes: document.getElementById('editCustomerNotes').value,
+        updatedAt: new Date().toISOString()
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('customersData', JSON.stringify(customersData));
+    
+    // Update displays
+    updateCustomerStats();
+    displayCustomers();
+    closeEditCustomerForm();
+    showToast('Customer updated successfully!', 'success');
 }
 
 // Delete customer
@@ -736,9 +831,14 @@ function getSamplePayments() {
 
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
-window.openAddCustomerModal = openAddCustomerModal;
-window.closeAddCustomerModal = closeAddCustomerModal;
+window.toggleAddCustomerForm = toggleAddCustomerForm;
+window.openAddCustomerForm = openAddCustomerForm;
+window.closeAddCustomerForm = closeAddCustomerForm;
 window.saveCustomer = saveCustomer;
+window.editCustomer = editCustomer;
+window.openEditCustomerForm = openEditCustomerForm;
+window.closeEditCustomerForm = closeEditCustomerForm;
+window.updateCustomer = updateCustomer;
 window.viewCustomerDetails = viewCustomerDetails;
 window.closeCustomerDetailsModal = closeCustomerDetailsModal;
 window.switchCustomerTab = switchCustomerTab;
