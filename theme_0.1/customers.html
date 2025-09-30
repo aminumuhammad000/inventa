@@ -10,111 +10,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <!-- Sidebar Header -->
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">🏗️</div>
-                    <div class="logo-text">Inventa</div>
-                </div>
-                <button class="sidebar-toggle" onclick="toggleSidebar()">
-                    <i class="material-icons-round">menu</i>
-                </button>
-            </div>
-
-            <!-- Navigation -->
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-section-title">Home</div>
-                    <a href="index.html" class="nav-item">
-                        <i class="material-icons-round">home</i>
-                        <span>Home</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Your Shop</div>
-                    <a href="inventory.html" class="nav-item">
-                        <i class="material-icons-round">inventory_2</i>
-                        <span>Stock Items</span>
-                    </a>
-                    <a href="sales.html" class="nav-item">
-                        <i class="material-icons-round">point_of_sale</i>
-                        <span>Sell Items</span>
-                    </a>
-                    <a href="credit.html" class="nav-item">
-                        <i class="material-icons-round">credit_card</i>
-                        <span>Sell on Credit</span>
-                    </a>
-                    <a href="customers.html" class="nav-item active">
-                        <i class="material-icons-round">people</i>
-                        <span>Customer List</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Reports</div>
-                    <a href="reports.html" class="nav-item">
-                        <i class="material-icons-round">assessment</i>
-                        <span>View Reports</span>
-                    </a>
-                </div>
-            </nav>
-
-            <!-- Footer -->
-            <div class="sidebar-footer">
-                <div class="powered-by">
-                    <span>Powered By</span>
-                    <span class="company-name">PioneerICT</span>
-                </div>
-            </div>
-        </aside>
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
 
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
-            <!-- Header -->
-            <header class="header">
-                <div class="header-left">
-                    <h1 class="page-title">Customer Management</h1>
-                    <p class="page-subtitle">Manage customer profiles, credit limits, and payment history</p>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar">JD</div>
-                        <div class="user-details">
-                            <span class="user-name">John Doe</span>
-                            <span class="user-role">Shop Manager</span>
-                        </div>
-                        <div class="user-dropdown">
-                            <button class="dropdown-toggle" onclick="toggleUserDropdown()">
-                                <i class="material-icons-round">keyboard_arrow_down</i>
-                            </button>
-                            <div class="dropdown-menu" id="userDropdown">
-                                <div class="dropdown-header">
-                                    <div class="shop-info">
-                                        <div class="shop-name">My Construction Shop</div>
-                                        <div class="shop-location">Your Location</div>
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item" onclick="openShopSettings()">
-                                    <i class="material-icons-round">settings</i>
-                                    <span>Change Shop Info</span>
-                                </a>
-                                <a href="#" class="dropdown-item" onclick="openProfileSettings()">
-                                    <i class="material-icons-round">person</i>
-                                    <span>Change My Info</span>
-                                </a>
-                                <a href="#" class="dropdown-item logout" onclick="logout()">
-                                    <i class="material-icons-round">logout</i>
-                                    <span>Logout</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <!-- Header Container -->
+            <div id="header-container"></div>
 
             <!-- Content -->
             <div class="content">
@@ -438,6 +340,18 @@
     </div>
 
     <script src="js/theme-manager.js"></script>
-    <!-- <script src="js/customers.js"></script> -->
+    <script src="js/sidebar-component.js"></script>
+    <script src="js/header-component.js"></script>
+    <script src="js/customers.js"></script>
+    <script>
+        // Load components when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load sidebar component
+            window.sidebarComponent = await SidebarComponent.loadSidebar('sidebar-container');
+            
+            // Load header component
+            window.headerComponent = await HeaderComponent.loadHeader('header-container');
+        });
+    </script>
 </body>
 </html>

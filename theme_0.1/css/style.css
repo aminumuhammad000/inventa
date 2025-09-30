@@ -1675,7 +1675,7 @@ body::before {
     transition: all 0.3s ease;
     overflow: hidden;
     cursor: pointer;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .report-card:hover {
@@ -1764,7 +1764,7 @@ body::before {
     transform: translateY(-4px);
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
     background: rgba(16, 185, 129, 0.05);
-    border-color: #10b981;
+    border-color: #e0e0e0;
 }
 
 .quick-action-btn i {
@@ -1963,7 +1963,7 @@ body::before {
     height: 20px;
     margin: -10px 0 0 -10px;
     border: 2px solid rgba(16, 185, 129, 0.3);
-    border-top: 2px solid #10b981;
+    border-top: 2px solid #e0e0e0;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -2153,7 +2153,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
     padding: 24px;
     display: flex;
     align-items: center;
@@ -2247,7 +2247,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .breakdown-card:hover {
@@ -2284,7 +2284,7 @@ body::before {
 .period-selector select:focus,
 .trend-selector select:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -2405,7 +2405,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .margin-card:hover {
@@ -2548,7 +2548,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .trends-card:hover {
@@ -2620,7 +2620,7 @@ body::before {
     border: 1px solid rgba(16, 185, 129, 0.1);
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .data-table {
@@ -2671,7 +2671,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .settings-card:hover {
@@ -2736,7 +2736,7 @@ body::before {
 .setting-item textarea:focus,
 .setting-item select:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     background: rgba(255, 255, 255, 1);
 }
@@ -2891,7 +2891,7 @@ body::before {
 
 .settings-actions .btn-secondary:hover {
     background: rgba(16, 185, 129, 0.1);
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
 }
 
@@ -2979,7 +2979,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
     padding: 24px;
     display: flex;
     align-items: center;
@@ -3030,7 +3030,7 @@ body::before {
     border: 1px solid rgba(16, 185, 129, 0.1);
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .list-header {
@@ -3099,7 +3099,7 @@ body::before {
 
 .list-controls select:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -3510,7 +3510,7 @@ body::before {
     
     .tab-button.active {
         border-bottom: none;
-        border-right-color: #10b981;
+        border-right-color: #e0e0e0;
     }
 }
 
@@ -3542,7 +3542,7 @@ body::before {
 .receipt-header {
     text-align: center;
     margin-bottom: 24px;
-    border-bottom: 2px solid #10b981;
+    border-bottom: 2px solid #e0e0e0;
     padding-bottom: 20px;
 }
 
@@ -3634,7 +3634,7 @@ body::before {
 }
 
 .receipt-summary {
-    border-top: 2px solid #10b981;
+    border-top: 2px solid #e0e0e0;
     padding-top: 12px;
 }
 
@@ -3730,7 +3730,7 @@ body::before {
     border: 1px solid rgba(16, 185, 129, 0.1);
     box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
     overflow: hidden;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
 }
 
 .section-header {
@@ -3781,7 +3781,7 @@ body::before {
 
 .section-controls .search-group input:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     background: rgba(255, 255, 255, 1);
 }
@@ -3799,7 +3799,7 @@ body::before {
 
 .section-controls select:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -3908,7 +3908,7 @@ body::before {
 }
 
 .file-upload-area.drag-over {
-    border-color: #10b981;
+    border-color: #e0e0e0;
     background: rgba(16, 185, 129, 0.1);
 }
 
@@ -4258,7 +4258,7 @@ body::before {
     z-index: 10000;
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #e0e0e0;
     max-width: 400px;
 }
 
@@ -5363,7 +5363,7 @@ body::before {
 
 .setting-control:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -5571,7 +5571,7 @@ input:checked + .toggle-slider:before {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: #e0e0e0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
