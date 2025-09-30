@@ -1,16 +1,9 @@
-// Shop Settings Module
-console.log('Shop Settings module loaded');
 
 // Global variables
 let settingsData = {};
 
 // Initialize shop settings page
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing shop settings...');
-    
-    // Check authentication
-    checkAuthentication();
-    
+document.addEventListener('DOMContentLoaded', function() {    
     // Initialize sidebar
     initializeSidebar();
     
@@ -23,20 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme settings
     initializeThemeSettings();
 });
-
-// Check authentication
-function checkAuthentication() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const currentUser = localStorage.getItem('currentUser');
-    
-    if (!isLoggedIn || !currentUser) {
-        console.log('User not authenticated, redirecting to login...');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    console.log('User authenticated:', currentUser);
-}
 
 // Update user info in header
 function updateUserInfo() {
@@ -182,36 +161,6 @@ function saveSettings() {
     }
 }
 
-// Validate settings
-function validateSettings(settings) {
-    // Validate required fields
-    if (!settings.general.shopName.trim()) {
-        showToast('Shop name is required', 'error');
-        return false;
-    }
-    
-    
-    return true;
-}
-
-// Reset settings to default
-function resetSettings() {
-    if (confirm('Are you sure you want to reset settings to default?')) {
-        // Reset to basic defaults
-        settingsData = {
-            general: {
-                shopName: 'My Shop',
-                shopAddress: 'Your Address',
-                shopPhone: '+234-000-000-0000',
-                shopEmail: 'info@myshop.com',
-                currency: 'NGN'
-            }
-        };
-        localStorage.setItem('shopSettings', JSON.stringify(settingsData));
-        populateSettingsForm();
-        showToast('Settings reset to default', 'success');
-    }
-}
 
 // Update shop info in dropdown
 function updateShopInfo() {

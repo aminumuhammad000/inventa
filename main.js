@@ -1,17 +1,17 @@
-// main.js
-// import { app, BrowserWindow } from "electron";
-// import path from "path";
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain  } = require("electron");
 const path = require("path");
+const db = require("./database/db");
+require("./ipc/userIPC");
+require("./ipc/shopIPC");
+require("./ipc/productIPC");
+require("./ipc/orderIPC");
 
-// Add electron-reload for development
 try {
-  require('electron-reload')(__dirname, {
-    electron: require(`${__dirname}/node_modules/electron`)
+  require("electron-reload")(__dirname, {
+    electron: require(`${__dirname}/node_modules/electron`),
   });
 } catch (_) {
-  // electron-reload not installed, continue without it
-  console.log('electron-reload not available - running in production mode');
+  console.log("electron-reload not available - running in production mode");
 }
 
 function createWindow() {
@@ -22,18 +22,23 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-    icon: path.join(__dirname, "assets", "icon.png"), // Add your app icon here
+    icon: path.join(__dirname, "assets", "icon.png"),
     title: "Inventa Store - Browse Products",
   });
 
-  // Load storefront.html from theme_0.1 folder
-  win.loadFile(path.join(__dirname, "theme_0.1", "storefront.html"));
+  win.loadFile(path.join(__dirname, "theme_0.1", "login.html"));
 
-  // Open DevTools automatically in development
   if (process.env.NODE_ENV === 'development') {
-    win.webContents.openDevTools();
-  }
+  win.webContents.openDevTools();
 }
+}
+
+ipcMain.on('load-dashboard', (event) => {
+  const win = BrowserWindow.getFocusedWindow(); // get the current window
+  if (win) {
+    win.loadFile(path.join(__dirname, "theme_0.1", 'dashboard.html'));
+  }
+});
 
 app.whenReady().then(() => {
   createWindow();
@@ -42,6 +47,8 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
+
+
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

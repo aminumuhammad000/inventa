@@ -437,8 +437,7 @@ body::before {
 }
 
 .main-content.sidebar-collapsed {
-    margin-left: 0;
-    width: calc(100% - 70px);
+    /* No margin needed since sidebar is now relative positioned */
 }
 
 /* Header */

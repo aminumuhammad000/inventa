@@ -137,7 +137,7 @@
                         <div class="settings-content">
                             <div class="setting-item">
                                 <label for="shopName">Shop Name</label>
-                                <input type="text" id="shopName" value="ABC Construction Supplies" placeholder="Enter shop name">
+                                <input type="text" id="shopName" value="" placeholder="Enter shop name">
                             </div>
                             <div class="setting-item">
                                 <label for="shopAddress">Shop Address</label>
@@ -145,20 +145,11 @@
                             </div>
                             <div class="setting-item">
                                 <label for="shopPhone">Phone Number</label>
-                                <input type="tel" id="shopPhone" value="+234-800-000-0000" placeholder="Enter phone number">
+                                <input type="tel" id="shopPhone" value="" placeholder="Enter phone number">
                             </div>
                             <div class="setting-item">
                                 <label for="shopEmail">Email Address</label>
-                                <input type="email" id="shopEmail" value="info@abcconstruction.com" placeholder="Enter email address">
-                            </div>
-                            <div class="setting-item">
-                                <label for="currency">Currency</label>
-                                <select id="currency">
-                                    <option value="NGN" selected>Nigerian Naira (₦)</option>
-                                    <option value="USD">US Dollar ($)</option>
-                                    <option value="EUR">Euro (€)</option>
-                                    <option value="GBP">British Pound (£)</option>
-                                </select>
+                                <input type="email" id="shopEmail" value="" placeholder="Enter email address">
                             </div>
                         </div>
                     </div>
@@ -203,10 +194,7 @@
                                             <div class="color-preview" style="background: #8b5cf6;"></div>
                                             <span>Purple</span>
                                         </div>
-                                        <div class="color-option" data-theme="red" onclick="selectTheme('red')">
-                                            <div class="color-preview" style="background: #ef4444;"></div>
-                                            <span>Red</span>
-                                        </div>
+                                      
                                         <div class="color-option" data-theme="orange" onclick="selectTheme('orange')">
                                             <div class="color-preview" style="background: #f97316;"></div>
                                             <span>Orange</span>
@@ -214,6 +202,13 @@
                                         <div class="color-option" data-theme="teal" onclick="selectTheme('teal')">
                                             <div class="color-preview" style="background: #14b8a6;"></div>
                                             <span>Teal</span>
+                                        </div>
+
+                                         <div class="color-option" data-theme="teal" onclick="selectTheme(document.getElementById('custom').value)"> 
+                                            <div class="color-preview">
+                                                <input type="color" name="" id="custom" style="border-radius: 50%; border: none; width: 50px; height: 50px; margin-left: -10px; margin-top: -10px;">
+                                            </div>
+                                            <span>Custom</span>
                                         </div>
                                     </div>
                                 </div>
@@ -225,10 +220,6 @@
 
                 <!-- Action Buttons -->
                 <div class="settings-actions">
-                    <button class="btn-secondary" onclick="resetSettings()">
-                        <i class="material-icons-round">refresh</i>
-                        Reset to Default
-                    </button>
                     <button class="btn-primary" onclick="saveSettings()">
                         <i class="material-icons-round">save</i>
                         Save Settings
