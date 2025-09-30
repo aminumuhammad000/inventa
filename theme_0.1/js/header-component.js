@@ -141,8 +141,7 @@ function openShopSettings() {
 }
 
 function openProfileSettings() {
-    // Add profile settings functionality here
-    console.log('Profile settings clicked');
+    window.location.href = 'profile-settings.html';
 }
 
 // Export for global access
