@@ -18,8 +18,9 @@
             <!-- Header Container -->
             <div id="header-container"></div>
 
-            <!-- Page Content -->
+            <!-- Content -->
             <div class="content">
+                <!-- Coming Soon Card -->
                 <div class="coming-soon-container">
                     <div class="coming-soon-card">
                         <div class="coming-soon-icon">
@@ -28,35 +29,31 @@
                         <h1 class="coming-soon-title">Profile Settings</h1>
                         <p class="coming-soon-subtitle">Coming Soon</p>
                         <p class="coming-soon-description">
-                            We're working on bringing you a comprehensive profile settings page where you can manage your personal information, preferences, and account settings.
+                            We're working on bringing you a comprehensive profile management system. 
+                            Soon you'll be able to update your personal information, change your password, 
+                            and customize your account settings.
                         </p>
+                        
                         <div class="coming-soon-features">
                             <div class="feature-item">
-                                <i class="material-icons-round">check_circle</i>
-                                <span>Update Personal Information</span>
+                                <i class="material-icons-round">person</i>
+                                <span>Personal Information</span>
                             </div>
                             <div class="feature-item">
-                                <i class="material-icons-round">check_circle</i>
-                                <span>Change Password</span>
+                                <i class="material-icons-round">lock</i>
+                                <span>Password Management</span>
                             </div>
                             <div class="feature-item">
-                                <i class="material-icons-round">check_circle</i>
-                                <span>Notification Preferences</span>
-                            </div>
-                            <div class="feature-item">
-                                <i class="material-icons-round">check_circle</i>
-                                <span>Account Security</span>
+                                <i class="material-icons-round">settings</i>
+                                <span>Account Preferences</span>
                             </div>
                         </div>
+
                         <div class="coming-soon-actions">
-                            <a href="index.html" class="btn-primary">
-                                <i class="material-icons-round">home</i>
-                                <span>Back to Dashboard</span>
-                            </a>
-                            <a href="shop-settings.html" class="btn-secondary">
-                                <i class="material-icons-round">settings</i>
-                                <span>Shop Settings</span>
-                            </a>
+                            <button class="btn-primary" onclick="window.history.back()">
+                                <i class="material-icons-round">arrow_back</i>
+                                <span>Go Back</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -64,7 +61,6 @@
         </main>
     </div>
 
-    <!-- Scripts -->
     <script src="js/theme-manager.js"></script>
     <script src="js/sidebar-component.js"></script>
     <script src="js/header-component.js"></script>
@@ -74,12 +70,8 @@
             // Load sidebar component
             window.sidebarComponent = await SidebarComponent.loadSidebar('sidebar-container');
             
-            // Load header component with custom title
-            window.headerComponent = await HeaderComponent.loadHeader(
-                'header-container', 
-                'Profile Settings', 
-                'Manage your personal information and account preferences'
-            );
+            // Load header component
+            window.headerComponent = await HeaderComponent.loadHeader('header-container');
         });
     </script>
 </body>
