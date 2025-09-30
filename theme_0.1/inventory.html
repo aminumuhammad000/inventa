@@ -122,7 +122,7 @@
                 <div class="actions-bar">
                     <button class="btn-primary" onclick="togglePurchaseForm()">
                         <i class="material-icons-round">add_box</i>
-                        Add Purchase
+                        Add Products
                     </button>
                     <button class="btn-secondary" onclick="toggleStockAdjustmentForm()">
                         <i class="material-icons-round">edit</i>
@@ -138,57 +138,135 @@
                     </button>
                 </div>
 
-                <!-- Add Purchase Form (Inline) -->
+                <!-- Add Products Form (Inline) -->
                 <div class="purchase-form-section" id="purchaseFormSection" style="display: none;">
                     <div class="form-card">
                         <div class="form-header">
-                            <h3>Add New Purchase</h3>
+                            <h3>Add New Products</h3>
                             <button class="btn-close" onclick="closePurchaseForm()">
                     <i class="material-icons-round">close</i>
                 </button>
             </div>
-                <form id="addPurchaseForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="supplier">Supplier</label>
-                            <select id="supplier" required>
-                                <option value="">Select Supplier</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="purchaseDate">Purchase Date</label>
-                            <input type="date" id="purchaseDate" required>
-                        </div>
-                    </div>
-                    
+                <form id="addProductForm">
+                    <!-- Product Image -->
                     <div class="form-group">
-                        <label>Items</label>
-                        <div class="items-container" id="purchaseItems">
-                            <div class="item-row">
-                                <select class="item-select" required>
-                                    <option value="">Select Item</option>
-                                </select>
-                                <input type="number" class="quantity-input" placeholder="Quantity" min="1" required>
-                                <input type="number" class="cost-input" placeholder="Unit Cost" step="0.01" min="0" required>
-                                <button type="button" class="btn-remove" onclick="removeItemRow(this)">
-                                    <i class="material-icons-round">remove</i>
+                        <label for="productImage">Product Image</label>
+                        <div class="image-upload-container">
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <input type="file" id="productImage" accept="image/*" style="display: none;">
+                                <div class="upload-placeholder" onclick="document.getElementById('productImage').click()">
+                                    <i class="material-icons-round">cloud_upload</i>
+                                    <span>Click to upload image</span>
+                                    <small>Supports JPG, PNG, GIF (Max 5MB)</small>
+                                </div>
+                            </div>
+                            <div class="image-preview" id="imagePreview" style="display: none;">
+                                <img id="previewImg" src="" alt="Product Preview">
+                                <button type="button" class="remove-image-btn" onclick="removeImage()">
+                                    <i class="material-icons-round">close</i>
                                 </button>
                             </div>
                         </div>
-                        <button type="button" class="btn-add-item" onclick="addItemRow()">
-                            <i class="material-icons-round">add</i>
-                            Add Item
-                        </button>
+                    </div>
+
+                    <!-- Product Basic Information -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Product Name *</label>
+                            <input type="text" id="productName" placeholder="Enter product name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productSku">SKU</label>
+                            <input type="text" id="productSku" placeholder="Enter SKU (optional)">
+                        </div>
                     </div>
                     
+                    <!-- Category Selection -->
+                    <div class="form-row">
                     <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" rows="3" placeholder="Additional notes..."></textarea>
+                            <label for="productCategory">Category *</label>
+                            <div class="category-select-container">
+                                <select id="productCategory" required>
+                                    <option value="">Select Category</option>
+                                </select>
+                                <button type="button" class="btn-secondary btn-small" onclick="openCategoryModal()">
+                                    <i class="material-icons-round">add</i>
+                                    New Category
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="productBrand">Brand *</label>
+                            <div class="brand-select-container">
+                                <select id="productBrand" required>
+                                    <option value="">Select Brand</option>
+                                </select>
+                                <button type="button" class="btn-secondary btn-small" onclick="openBrandModal()">
+                            <i class="material-icons-round">add</i>
+                                    New Brand
+                        </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock and Pricing Information -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productQuantity">Initial Quantity *</label>
+                            <input type="number" id="productQuantity" placeholder="Enter quantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productUnit">Unit *</label>
+                            <select id="productUnit" required>
+                                <option value="">Select Unit</option>
+                                <option value="pcs">Pieces</option>
+                                <option value="pairs">Pairs</option>
+                                <option value="sets">Sets</option>
+                                <option value="boxes">Boxes</option>
+                                <option value="kg">Kilograms</option>
+                                <option value="g">Grams</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productCostPrice">Cost Price *</label>
+                            <input type="number" id="productCostPrice" placeholder="Enter cost price" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productSellingPrice">Selling Price *</label>
+                            <input type="number" id="productSellingPrice" placeholder="Enter selling price" step="0.01" min="0" required>
+                        </div>
+                    </div>
+
+                    <!-- Stock Management -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productMinStock">Minimum Stock Level</label>
+                            <input type="number" id="productMinStock" placeholder="Enter minimum stock level" min="0" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="productMaxStock">Maximum Stock Level</label>
+                            <input type="number" id="productMaxStock" placeholder="Enter maximum stock level" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Product Description -->
+                    <div class="form-group">
+                        <label for="productDescription">Product Description</label>
+                        <textarea id="productDescription" rows="3" placeholder="Enter product description (optional)"></textarea>
+                    </div>
+                    
+                    <!-- Product Specifications -->
+                    <div class="form-group">
+                        <label for="productSpecifications">Specifications</label>
+                        <textarea id="productSpecifications" rows="2" placeholder="Enter product specifications (optional)"></textarea>
                     </div>
                             
                             <div class="form-actions">
                                 <button type="button" class="btn-secondary" onclick="closePurchaseForm()">Cancel</button>
-                                <button type="button" class="btn-primary" onclick="savePurchase()">Save Purchase</button>
+                        <button type="button" class="btn-primary" onclick="saveNewProduct()">Add Product</button>
                             </div>
                 </form>
         </div>
@@ -652,8 +730,78 @@
         </main>
     </div>
 
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Product Image</h3>
+                <button class="modal-close" onclick="closeImageModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="image-container">
+                    <img id="modalImage" src="" alt="Product Image" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Category</h3>
+                <button class="modal-close" onclick="closeCategoryModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label for="newCategoryName">Category Name *</label>
+                        <input type="text" id="newCategoryName" placeholder="Enter category name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newCategoryDescription">Description</label>
+                        <textarea id="newCategoryDescription" rows="2" placeholder="Enter category description (optional)"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+                        <button type="button" class="btn-primary" onclick="saveNewCategory()">Add Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
+    <!-- Brand Modal -->
+    <div id="brandModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Brand</h3>
+                <button class="modal-close" onclick="closeBrandModal()">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="brandForm">
+                    <div class="form-group">
+                        <label for="newBrandName">Brand Name *</label>
+                        <input type="text" id="newBrandName" placeholder="Enter brand name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newBrandDescription">Description</label>
+                        <textarea id="newBrandDescription" rows="2" placeholder="Enter brand description (optional)"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeBrandModal()">Cancel</button>
+                        <button type="button" class="btn-primary" onclick="saveNewBrand()">Add Brand</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="js/theme-manager.js"></script>
     <script src="js/shop-config.js"></script>

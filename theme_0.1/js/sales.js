@@ -6,6 +6,9 @@ let salesData = [];
 let customers = [];
 let inventoryData = [];
 let returnsData = [];
+let cart = [];
+let products = [];
+let currentSaleType = 'normal';
 
 // Initialize sales page
 document.addEventListener('DOMContentLoaded', function() {
@@ -61,6 +64,14 @@ function initializeSidebar() {
     if (isCollapsed) {
         sidebar.classList.add('collapsed');
         mainContent.classList.add('sidebar-collapsed');
+        
+        // Update toggle button icon for collapsed state
+        const toggleBtn = document.getElementById('sidebarToggle');
+        if (toggleBtn) {
+            const icon = toggleBtn.querySelector('i');
+            icon.textContent = 'menu_open';
+            toggleBtn.title = 'Expand Sidebar';
+        }
     }
     
     if (toggleBtn) {
@@ -80,12 +91,23 @@ function initializeSidebar() {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.getElementById('sidebarToggle');
     
     sidebar.classList.toggle('collapsed');
     mainContent.classList.toggle('sidebar-collapsed');
     
     const isCollapsed = sidebar.classList.contains('collapsed');
     localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
+    
+    // Update toggle button icon
+    const icon = toggleBtn.querySelector('i');
+    if (isCollapsed) {
+        icon.textContent = 'menu_open';
+        toggleBtn.title = 'Expand Sidebar';
+    } else {
+        icon.textContent = 'menu';
+        toggleBtn.title = 'Collapse Sidebar';
+    }
 }
 
 // Initialize sales data
@@ -103,11 +125,17 @@ async function initializeSales() {
         // Load returns data
         await loadReturnsData();
         
+        // Load products data
+        await loadProductsData();
+        
         // Render sales table
         renderSalesTable();
         
         // Render returns table
         renderReturnsTable();
+        
+        // Load products table
+        loadProducts();
         
         // Update stats
         updateSalesStats();
@@ -190,6 +218,24 @@ async function loadReturnsData() {
     } catch (error) {
         console.error('Error loading returns data:', error);
         returnsData = getSampleReturnsData();
+    }
+}
+
+// Load products data
+async function loadProductsData() {
+    try {
+        const savedData = localStorage.getItem('products');
+        if (savedData) {
+            products = JSON.parse(savedData);
+        } else {
+            products = getSampleProductsData();
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+        console.log('Loaded products data:', products.length, 'products');
+        
+    } catch (error) {
+        console.error('Error loading products data:', error);
+        products = getSampleProductsData();
     }
 }
 
@@ -1631,6 +1677,1445 @@ function closeUserDropdown() {
     }
 }
 
+// Product Management Functions
+function loadProducts() {
+    try {
+        const tableBody = document.getElementById('productsTableBody');
+        
+        if (products.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="no-data-cell">
+                        <div class="no-data">
+                            <i class="material-icons-round">inventory_2</i>
+                            <p>No products found</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tableBody.innerHTML = products.map(product => {
+            const cartItem = cart.find(item => item.productId === product.id);
+            const salesQuantity = cartItem ? cartItem.quantity : 0;
+            
+            // Calculate available stock (original stock - current cart quantity)
+            const availableStock = product.quantity - salesQuantity;
+            
+            const isLowStock = availableStock <= (product.lowStockThreshold || 10);
+            const statusClass = isLowStock ? 'low-stock' : 'in-stock';
+            const statusText = isLowStock ? 'Low Stock' : 'In Stock';
+            const canAdd = availableStock > 0;
+            const isInCart = cartItem !== undefined;
+            
+            return `
+                <tr>
+                    <td class="product-image-cell">
+                        <div class="product-image-container" onclick="openImageModal(${product.id})">
+                            <img src="${product.image || 'https://via.placeholder.com/60x60?text=No+Image'}" 
+                                 alt="${product.name}" 
+                                 class="product-thumbnail"
+                                 onerror="this.src='https://via.placeholder.com/60x60?text=No+Image'">
+                            <div class="image-overlay">
+                                <i class="material-icons-round">zoom_in</i>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${product.name}</td>
+                    <td><span class="brand-badge">${product.brand || 'N/A'}</span></td>
+                    <td>${product.category}</td>
+                    <td>
+                        <span class="stock-quantity ${availableStock <= 0 ? 'out-of-stock' : ''}">${availableStock}</span>
+                        ${salesQuantity > 0 ? `<span class="in-cart-indicator">(${salesQuantity} in cart)</span>` : ''}
+                    </td>
+                    <td>${product.unit || 'units'}</td>
+                    <td>${formatCurrency(product.sellingPrice || 0)}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td class="sales-quantity-cell">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn decrease" onclick="decreaseSalesQuantity(${product.id})" ${salesQuantity <= 0 ? 'disabled' : ''}>
+                                <i class="material-icons-round">remove</i>
+                            </button>
+                            <input type="number" 
+                                   class="sales-quantity-input" 
+                                   value="${salesQuantity}" 
+                                   min="0" 
+                                   max="${availableStock}"
+                                   onchange="updateSalesQuantity(${product.id}, this.value)"
+                                   onkeyup="updateSalesQuantity(${product.id}, this.value)">
+                            <button class="quantity-btn increase" onclick="increaseSalesQuantity(${product.id})" ${salesQuantity >= availableStock ? 'disabled' : ''}>
+                                <i class="material-icons-round">add</i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="add-btn ${canAdd ? (isInCart ? 'in-cart' : '') : 'disabled'}" 
+                                onclick="${canAdd ? `addToCart(${product.id})` : 'return false'}"
+                                ${!canAdd ? 'disabled' : ''}>
+                            <i class="material-icons-round">${isInCart ? 'check' : 'add'}</i>
+                            ${isInCart ? 'Added' : (canAdd ? 'Add' : 'Out of Stock')}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading products:', error);
+    }
+}
+
+// Filter Products
+function filterProducts() {
+    const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+    const brandFilter = document.getElementById('brandFilter').value;
+    const tableRows = document.querySelectorAll('#productsTableBody tr');
+    
+    tableRows.forEach(row => {
+        const productName = row.cells[1]?.textContent.toLowerCase() || '';
+        const brand = row.cells[2]?.textContent.toLowerCase() || '';
+        const category = row.cells[3]?.textContent.toLowerCase() || '';
+        
+        const matchesSearch = !searchTerm || 
+            productName.includes(searchTerm) || 
+            brand.includes(searchTerm) || 
+            category.includes(searchTerm);
+        
+        const matchesBrand = brandFilter === 'all' || brand.includes(brandFilter.toLowerCase());
+        
+        if (matchesSearch && matchesBrand) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Sales Quantity Functions
+function increaseSalesQuantity(productId) {
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) return;
+    
+    const cartItem = cart.find(item => item.productId === productId);
+    const currentQuantity = cartItem ? cartItem.quantity : 0;
+    
+    // Calculate available stock (original stock - current cart quantity)
+    const availableStock = product.quantity - currentQuantity;
+    
+    if (currentQuantity >= availableStock) {
+        showToast('Cannot exceed available stock!', 'warning');
+        return;
+    }
+    
+    const newQuantity = currentQuantity + 1;
+    updateSalesQuantity(productId, newQuantity);
+}
+
+function decreaseSalesQuantity(productId) {
+    const cartItem = cart.find(item => item.productId === productId);
+    const currentQuantity = cartItem ? cartItem.quantity : 0;
+    
+    if (currentQuantity <= 0) return;
+    
+    const newQuantity = currentQuantity - 1;
+    updateSalesQuantity(productId, newQuantity);
+}
+
+function updateSalesQuantity(productId, quantity) {
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) return;
+    
+    const numQuantity = parseInt(quantity) || 0;
+    
+    // Validate quantity
+    if (numQuantity < 0) {
+        showToast('Quantity cannot be negative!', 'warning');
+        return;
+    }
+    
+    // Get current cart item to calculate available stock
+    const existingCartItem = cart.find(item => item.productId === productId);
+    const currentCartQuantity = existingCartItem ? existingCartItem.quantity : 0;
+    
+    // Calculate available stock (original stock - current cart quantity)
+    const availableStock = product.quantity - currentCartQuantity;
+    
+    // Check if new quantity exceeds available stock
+    if (numQuantity > availableStock) {
+        showToast(`Cannot exceed available stock (${availableStock})!`, 'warning');
+        return;
+    }
+    
+    // Update cart
+    if (numQuantity === 0) {
+        // Remove from cart
+        cart = cart.filter(item => item.productId !== productId);
+    } else {
+        // Add or update cart item
+        const existingItem = cart.find(item => item.productId === productId);
+        if (existingItem) {
+            existingItem.quantity = numQuantity;
+        } else {
+            cart.push({
+                productId: productId,
+                name: product.name,
+                price: product.sellingPrice,
+                quantity: numQuantity,
+                image: product.image,
+                brand: product.brand
+            });
+        }
+    }
+    
+    // Save cart to localStorage
+    localStorage.setItem('salesCart', JSON.stringify(cart));
+    
+    // Update cart display
+    updateCartDisplay();
+    
+    // Reload products to update quantity controls and stock display
+    loadProducts();
+    
+    // Show feedback
+    if (numQuantity > 0) {
+        showToast(`Updated ${product.name} quantity to ${numQuantity}`, 'success');
+    } else {
+        showToast(`Removed ${product.name} from sales`, 'info');
+    }
+}
+
+// Cart Functions
+function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) {
+        showToast('Product not found', 'error');
+        return;
+    }
+    
+    if (product.quantity <= 0) {
+        showToast('Product is out of stock', 'error');
+        return;
+    }
+    
+    // Check if product is already in cart
+    const existingItem = cart.find(item => item.productId === productId);
+    
+    if (existingItem) {
+        // Remove from cart
+        cart = cart.filter(item => item.productId !== productId);
+        showToast(`${product.name} removed from cart`, 'info');
+    } else {
+        // Add to cart
+        cart.push({
+            productId: product.id,
+            name: product.name,
+            price: product.sellingPrice,
+            quantity: 1,
+            unit: product.unit || 'units',
+            total: product.sellingPrice
+        });
+        showToast(`${product.name} added to cart`, 'success');
+    }
+    
+    // Update cart count and button state
+    updateCartDisplay();
+    
+    // Refresh products table to show updated button states
+    loadProducts();
+}
+
+function updateCartDisplay() {
+    const cartCount = cart.length;
+    const totalAmount = cart.reduce((sum, item) => sum + item.total, 0);
+    
+    document.getElementById('cartCount').textContent = cartCount;
+    document.getElementById('markSoldBtn').disabled = cartCount === 0;
+    
+    // Update cart modal if open
+    if (document.getElementById('cartModal').style.display === 'flex') {
+        updateCartModal();
+    }
+}
+
+function openCartModal() {
+    if (cart.length === 0) {
+        showToast('Cart is empty', 'warning');
+        return;
+    }
+    
+    console.log('Opening cart modal, cart items:', cart.length);
+    
+    // Set current date automatically
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('saleDate').value = today;
+    
+    // Update form fields based on current sale type
+    updateCartModalFields();
+    
+    updateCartModal();
+    
+    const modal = document.getElementById('cartModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+        console.log('Modal should be visible now');
+    } else {
+        console.error('Cart modal element not found');
+    }
+}
+
+function updateCartModalFields() {
+    // Hide all sale type fields first
+    document.querySelectorAll('.sale-type-fields').forEach(field => {
+        field.style.display = 'none';
+    });
+    
+    // Show fields based on current sale type
+    switch (currentSaleType) {
+        case 'normal':
+            document.getElementById('normalSaleFields').style.display = 'block';
+            document.getElementById('submitButton').textContent = 'Complete Sale';
+            document.getElementById('cartModalTitle').textContent = 'Complete Sale';
+            break;
+        case 'credit':
+            document.getElementById('creditSaleFields').style.display = 'block';
+            document.getElementById('submitButton').textContent = 'Sell on Credit';
+            document.getElementById('cartModalTitle').textContent = 'Sell on Credit';
+            // Set default due date to 30 days from now
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+            document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+            break;
+        case 'return':
+            document.getElementById('returnSaleFields').style.display = 'block';
+            document.getElementById('submitButton').textContent = 'Process Return';
+            document.getElementById('cartModalTitle').textContent = 'Process Return';
+            break;
+    }
+}
+
+function closeCartModal() {
+    document.getElementById('cartModal').style.display = 'none';
+    document.getElementById('cartModal').classList.remove('show');
+}
+
+function updateCartModal() {
+    const cartItemsContainer = document.getElementById('cartItems');
+    const totalItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const totalAmount = cart.reduce((sum, item) => sum + item.total, 0);
+    
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = `
+            <div class="no-data">
+                <i class="material-icons-round">shopping_cart</i>
+                <p>Cart is empty</p>
+            </div>
+        `;
+    } else {
+        cartItemsContainer.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <p>${formatCurrency(item.price)} per ${item.unit}</p>
+                </div>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" onclick="updateCartQuantity(${index}, -1)">-</button>
+                    <span class="quantity">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateCartQuantity(${index}, 1)">+</button>
+                </div>
+                <div class="cart-item-total">
+                    ${formatCurrency(item.total)}
+                </div>
+                <button class="remove-btn" onclick="removeFromCart(${index})">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+        `).join('');
+    }
+    
+    document.getElementById('totalItemsCount').textContent = totalItemsCount;
+    document.getElementById('totalAmountDisplay').textContent = formatCurrency(totalAmount);
+}
+
+function updateCartQuantity(index, change) {
+    if (index < 0 || index >= cart.length) return;
+    
+    const newQuantity = cart[index].quantity + change;
+    
+    if (newQuantity <= 0) {
+        removeFromCart(index);
+        return;
+    }
+    
+    // Check stock availability
+    const product = products.find(p => p.id === cart[index].productId);
+    
+    if (newQuantity > product.quantity) {
+        showToast('Not enough stock available', 'error');
+        return;
+    }
+    
+    cart[index].quantity = newQuantity;
+    cart[index].total = cart[index].quantity * cart[index].price;
+    
+    updateCartDisplay();
+    updateCartModal();
+}
+
+function removeFromCart(index) {
+    if (index < 0 || index >= cart.length) return;
+    
+    cart.splice(index, 1);
+    updateCartDisplay();
+    loadProducts(); // Refresh to update button states
+    updateCartModal();
+}
+
+function processCartSale(event) {
+    event.preventDefault();
+    
+    if (cart.length === 0) {
+        showToast('Cart is empty', 'error');
+        return;
+    }
+    
+    const customerName = document.getElementById('customerName').value.trim();
+    
+    // Handle different sale types
+    switch (currentSaleType) {
+        case 'normal':
+            processNormalSale(customerName);
+            break;
+        case 'credit':
+            processCreditSale(customerName);
+            break;
+        case 'return':
+            processReturnSale(customerName);
+            break;
+    }
+}
+
+function processNormalSale(customerName) {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const saleDate = document.getElementById('saleDate').value;
+    
+    // Create sale record
+    const saleData = {
+        items: cart.map(item => ({
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
+        })),
+        total: cart.reduce((sum, item) => sum + item.total, 0),
+        paymentMethod: paymentMethod,
+        customerName: customerName || 'Walk-in Customer',
+        saleType: 'normal',
+        date: saleDate
+    };
+    
+    // Add sale to records
+    addSaleToRecords(saleData);
+    
+    // Update product quantities (reduce stock)
+    cart.forEach(cartItem => {
+        const productIndex = products.findIndex(p => p.id === cartItem.productId);
+        if (productIndex !== -1) {
+            products[productIndex].quantity -= cartItem.quantity;
+        }
+    });
+    localStorage.setItem('products', JSON.stringify(products));
+    
+    // Show success message
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    showToast(`Sale completed! ${totalItems} items sold for ${formatCurrency(saleData.total)}`, 'success');
+    
+    // Clear cart and close modal
+    clearCartAndClose();
+    
+    // Show receipt modal automatically
+    showReceipt(saleData);
+}
+
+function processCreditSale(customerName) {
+    const creditLimit = document.getElementById('creditLimit').value;
+    const dueDate = document.getElementById('dueDate').value;
+    const creditNotes = document.getElementById('creditNotes').value;
+    
+    if (!dueDate) {
+        showToast('Please select a due date', 'error');
+        return;
+    }
+    
+    // Create credit sale record
+    const saleData = {
+        items: cart.map(item => ({
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
+        })),
+        total: cart.reduce((sum, item) => sum + item.total, 0),
+        paymentMethod: 'credit',
+        customerName: customerName || 'Walk-in Customer',
+        saleType: 'credit',
+        creditLimit: parseFloat(creditLimit) || 0,
+        dueDate: dueDate,
+        notes: creditNotes
+    };
+    
+    // Add sale to records
+    addSaleToRecords(saleData);
+    
+    // Update product quantities (reduce stock)
+    cart.forEach(cartItem => {
+        const productIndex = products.findIndex(p => p.id === cartItem.productId);
+        if (productIndex !== -1) {
+            products[productIndex].quantity -= cartItem.quantity;
+        }
+    });
+    localStorage.setItem('products', JSON.stringify(products));
+    
+    // Show success message
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    showToast(`Credit sale completed! ${totalItems} items sold for ${formatCurrency(saleData.total)}`, 'success');
+    
+    // Clear cart and close modal
+    clearCartAndClose();
+    
+    // Show receipt modal automatically
+    showReceipt(saleData);
+}
+
+function processReturnSale(customerName) {
+    const originalSaleId = document.getElementById('originalSaleId').value;
+    const returnReason = document.getElementById('returnReason').value;
+    const returnNotes = document.getElementById('returnNotes').value;
+    
+    if (!originalSaleId || !returnReason) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Create return record
+    const returnData = {
+        items: cart.map(item => ({
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
+        })),
+        total: cart.reduce((sum, item) => sum + item.total, 0),
+        customerName: customerName || 'Walk-in Customer',
+        originalSaleId: originalSaleId,
+        returnReason: returnReason,
+        notes: returnNotes,
+        returnType: 'return'
+    };
+    
+    // Add return to records
+    addReturnToRecords(returnData);
+    
+    // Update product quantities (increase stock for returns)
+    cart.forEach(cartItem => {
+        const productIndex = products.findIndex(p => p.id === cartItem.productId);
+        if (productIndex !== -1) {
+            products[productIndex].quantity += cartItem.quantity;
+        }
+    });
+    localStorage.setItem('products', JSON.stringify(products));
+    
+    // Show success message
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    showToast(`Return processed! ${totalItems} items returned for ${formatCurrency(returnData.total)}`, 'success');
+    
+    // Clear cart and close modal
+    clearCartAndClose();
+}
+
+function addReturnToRecords(returnData) {
+    const returnRecord = {
+        id: Date.now(),
+        originalSaleId: returnData.originalSaleId,
+        date: new Date().toISOString().split('T')[0],
+        items: returnData.items,
+        refundAmount: returnData.total,
+        reason: returnData.returnReason,
+        status: 'processed',
+        customerName: returnData.customerName,
+        notes: returnData.notes,
+        createdAt: new Date().toISOString()
+    };
+    
+    // Add to returns data
+    returnsData.unshift(returnRecord);
+    localStorage.setItem('returnsData', JSON.stringify(returnsData));
+}
+
+function clearCartAndClose() {
+    // Clear cart
+    cart = [];
+    updateCartDisplay();
+    
+    // Close modal
+    closeCartModal();
+    
+    // Refresh products table
+    loadProducts();
+    
+    // Refresh sales table
+    renderSalesTable();
+    updateSalesStats();
+}
+
+// Image Modal Functions
+function openImageModal(productId) {
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) {
+        showToast('Product not found', 'error');
+        return;
+    }
+    
+    const modal = document.getElementById('imageModal');
+    const imagePreview = document.getElementById('imagePreview');
+    const imageModalTitle = document.getElementById('imageModalTitle');
+    const imageInfo = document.getElementById('imageInfo');
+    
+    // Set image
+    imagePreview.src = product.image || 'https://via.placeholder.com/400x300?text=No+Image';
+    imagePreview.alt = product.name;
+    
+    // Set title
+    imageModalTitle.textContent = product.name;
+    
+    // Set product info
+    imageInfo.innerHTML = `
+        <div class="product-details">
+            <h4>${product.name}</h4>
+            <p><strong>Brand:</strong> ${product.brand || 'N/A'}</p>
+            <p><strong>Category:</strong> ${product.category}</p>
+            <p><strong>Price:</strong> ${formatCurrency(product.sellingPrice || 0)}</p>
+            <p><strong>Quantity:</strong> ${product.quantity} ${product.unit || 'units'}</p>
+            <p><strong>Status:</strong> 
+                <span class="status-badge ${product.quantity <= (product.lowStockThreshold || 10) ? 'low-stock' : 'in-stock'}">
+                    ${product.quantity <= (product.lowStockThreshold || 10) ? 'Low Stock' : 'In Stock'}
+                </span>
+            </p>
+        </div>
+    `;
+    
+    modal.style.display = 'flex';
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+// Add sale to records
+function addSaleToRecords(saleData) {
+    const sale = {
+        id: Date.now(),
+        date: saleData.date || new Date().toISOString().split('T')[0],
+        customer: saleData.customerName,
+        items: saleData.items,
+        subtotal: saleData.total,
+        discount: 0,
+        totalAmount: saleData.total,
+        paymentMethod: saleData.paymentMethod,
+        status: 'completed',
+        notes: '',
+        saleType: saleData.saleType || 'normal',
+        createdAt: new Date().toISOString()
+    };
+    
+    // Add to sales data
+    salesData.unshift(sale);
+    localStorage.setItem('salesData', JSON.stringify(salesData));
+}
+
+// Sale Type Switching Functions
+function switchSaleType(saleType) {
+    currentSaleType = saleType;
+    
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(saleType + 'SaleBtn').classList.add('active');
+    
+    // Handle return sells differently - show returns history
+    if (saleType === 'return') {
+        showReturnsHistory();
+        return;
+    }
+    
+    // For normal and credit sales, show product table
+    showProductTable();
+    
+    // Update title and button text based on sale type
+    const titleElement = document.getElementById('saleTypeTitle');
+    const buttonTextElement = document.getElementById('markSoldText');
+    
+    switch (saleType) {
+        case 'normal':
+            titleElement.textContent = 'Select Products to Sell';
+            buttonTextElement.textContent = 'Mark as Sold';
+            break;
+        case 'credit':
+            titleElement.textContent = 'Select Products for Credit Sale';
+            buttonTextElement.textContent = 'Sell on Credit';
+            break;
+    }
+    
+    // Clear cart when switching sale types
+    cart = [];
+    updateCartDisplay();
+    
+    // Reload products to reset any previous selections
+    loadProducts();
+    
+    showToast(`Switched to ${getSaleTypeDisplayName(saleType)}`, 'info');
+}
+
+function getSaleTypeDisplayName(saleType) {
+    switch (saleType) {
+        case 'normal': return 'Normal Sale';
+        case 'credit': return 'Credit Sale';
+        case 'return': return 'Return Sale';
+        default: return 'Sale';
+    }
+}
+
+// Utility Functions
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-NG', {
+        style: 'currency',
+        currency: 'NGN'
+    }).format(amount);
+}
+
+// Sample Products Data
+function getSampleProductsData() {
+    return [
+        {
+            id: 1,
+            name: 'Cement (50kg)',
+            brand: 'Dangote',
+            category: 'Construction Materials',
+            quantity: 245,
+            unit: 'bags',
+            sellingPrice: 4000.00,
+            image: 'https://via.placeholder.com/60x60?text=Cement',
+            lowStockThreshold: 50
+        },
+        {
+            id: 2,
+            name: 'Steel Rods (12mm)',
+            brand: 'Steel Works',
+            category: 'Construction Materials',
+            quantity: 89,
+            unit: 'pieces',
+            sellingPrice: 3000.00,
+            image: 'https://via.placeholder.com/60x60?text=Steel',
+            lowStockThreshold: 20
+        },
+        {
+            id: 3,
+            name: 'Sand (Truck Load)',
+            brand: 'Premium Sand',
+            category: 'Construction Materials',
+            quantity: 12,
+            unit: 'loads',
+            sellingPrice: 18000.00,
+            image: 'https://via.placeholder.com/60x60?text=Sand',
+            lowStockThreshold: 5
+        },
+        {
+            id: 4,
+            name: 'Paint (White)',
+            brand: 'Dulux',
+            category: 'Finishing Materials',
+            quantity: 5,
+            unit: 'gallons',
+            sellingPrice: 3000.00,
+            image: 'https://via.placeholder.com/60x60?text=Paint',
+            lowStockThreshold: 10
+        },
+        {
+            id: 5,
+            name: 'Nails (2 inches)',
+            brand: 'Hardware Pro',
+            category: 'Hardware',
+            quantity: 15,
+            unit: 'boxes',
+            sellingPrice: 1000.00,
+            image: 'https://via.placeholder.com/60x60?text=Nails',
+            lowStockThreshold: 20
+        },
+        {
+            id: 6,
+            name: 'PVC Pipes (4 inches)',
+            brand: 'AquaFlow',
+            category: 'Plumbing',
+            quantity: 8,
+            unit: 'pieces',
+            sellingPrice: 2500.00,
+            image: 'https://via.placeholder.com/60x60?text=PVC',
+            lowStockThreshold: 15
+        }
+    ];
+}
+
+// Show returns history table
+function showReturnsHistory() {
+    const recordSaleSection = document.getElementById('recordSaleSection');
+    if (recordSaleSection) {
+        recordSaleSection.innerHTML = `
+            <div class="form-card">
+                <div class="form-header">
+                    <h3>Returns History</h3>
+                    <button class="btn-primary" onclick="openAddReturnForm()">
+                        <i class="material-icons-round">add</i>
+                        Add Return
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="returnsHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Return ID</th>
+                                <th>Date</th>
+                                <th>Original Sale ID</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="returnsHistoryBody">
+                            <!-- Returns data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        // Load returns history
+        loadReturnsHistory();
+    }
+}
+
+// Show product table for normal/credit sales
+function showProductTable() {
+    const recordSaleSection = document.getElementById('recordSaleSection');
+    if (recordSaleSection) {
+        recordSaleSection.innerHTML = `
+            <div class="form-card">
+                <div class="form-header">
+                    <h3 id="saleTypeTitle">Select Products to Sell</h3>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProducts()">
+                            <i class="material-icons-round">search</i>
+                        </div>
+                        <div class="filter-actions">
+                            <select id="brandFilter" onchange="filterProducts()">
+                                <option value="all">All Brands</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="products-table-container">
+                    <table class="products-table" id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product</th>
+                                <th>Brand</th>
+                                <th>Stock</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- Products will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <div class="summary-label">Total Items:</div>
+                        <div class="summary-value" id="totalItemsCount">0</div>
+                    </div>
+                    <div class="summary-row total-row">
+                        <div class="summary-label">Total Amount:</div>
+                        <div class="summary-value total-amount" id="totalAmountDisplay">₦0</div>
+                    </div>
+                </div>
+                
+                <div class="cart-actions">
+                    <div class="cart-info">
+                        <span class="cart-count" id="cartCount">0</span>
+                        <button class="mark-sold-btn" onclick="openCartModal()" id="markSoldBtn" disabled>
+                            <i class="material-icons-round">shopping_cart</i>
+                            <span id="markSoldText">Mark as Sold</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Load products
+        loadProducts();
+        
+        // Update button text based on current sale type
+        updateSaleTypeButton();
+    }
+}
+
+// Update sale type button text
+function updateSaleTypeButton() {
+    const buttonTextElement = document.getElementById('markSoldText');
+    const titleElement = document.getElementById('saleTypeTitle');
+    
+    if (buttonTextElement && titleElement) {
+        switch (currentSaleType) {
+            case 'normal':
+                titleElement.textContent = 'Select Products to Sell';
+                buttonTextElement.textContent = 'Mark as Sold';
+                break;
+            case 'credit':
+                titleElement.textContent = 'Select Products for Credit Sale';
+                buttonTextElement.textContent = 'Mark as Sold (Credit)';
+                break;
+        }
+    }
+}
+
+// Load returns history
+function loadReturnsHistory() {
+    const tbody = document.getElementById('returnsHistoryBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    if (returnsData.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="no-data">
+                    <div class="no-data-content">
+                        <i class="material-icons-round">inbox</i>
+                        <p>No returns found</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    returnsData.forEach(returnItem => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>#${returnItem.id}</td>
+            <td>${returnItem.date}</td>
+            <td>#${returnItem.originalSaleId}</td>
+            <td>${returnItem.productName}</td>
+            <td>${returnItem.quantity}</td>
+            <td>${returnItem.reason}</td>
+            <td>
+                <span class="status-badge ${returnItem.status === 'completed' ? 'success' : 'pending'}">
+                    ${returnItem.status}
+                </span>
+            </td>
+            <td>
+                <button class="btn-icon" onclick="viewReturnDetails(${returnItem.id})" title="View Details">
+                    <i class="material-icons-round">visibility</i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Open add return form
+function openAddReturnForm() {
+    const modal = document.getElementById('addReturnModal');
+    if (modal) {
+        // Set current date
+        document.getElementById('returnDate').value = new Date().toISOString().split('T')[0];
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+    }
+}
+
+// Close add return modal
+function closeAddReturnModal() {
+    const modal = document.getElementById('addReturnModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        document.getElementById('addReturnForm').reset();
+    }
+}
+
+// Load sale details when Sale ID is entered
+function loadSaleDetails() {
+    const saleId = document.getElementById('saleIdInput').value.trim();
+    if (!saleId) return;
+    
+    // Find sale by ID
+    const sale = salesData.find(s => s.id == saleId);
+    if (sale) {
+        const saleDetailsCard = document.getElementById('saleDetailsCard');
+        const saleDetailsSection = document.getElementById('saleDetailsSection');
+        
+        saleDetailsCard.innerHTML = `
+            <div class="sale-info">
+                <h4>Sale #${sale.id}</h4>
+                <p><strong>Date:</strong> ${sale.date}</p>
+                <p><strong>Customer:</strong> ${sale.customer}</p>
+                <p><strong>Total:</strong> ₦${sale.totalAmount}</p>
+                <div class="sale-items">
+                    <h5>Items:</h5>
+                    <ul>
+                        ${sale.items.map(item => `<li>${item.name} - Qty: ${item.quantity} - ₦${item.price}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+        `;
+        saleDetailsSection.style.display = 'block';
+    } else {
+        showToast('Sale not found', 'error');
+    }
+}
+
+// Load product details when Product ID is entered
+function loadProductDetails() {
+    const productId = document.getElementById('productIdInput').value.trim();
+    if (!productId) return;
+    
+    // Find product by ID
+    const product = products.find(p => p.id == productId);
+    if (product) {
+        const saleDetailsCard = document.getElementById('saleDetailsCard');
+        const saleDetailsSection = document.getElementById('saleDetailsSection');
+        
+        saleDetailsCard.innerHTML = `
+            <div class="product-info">
+                <h4>Product #${product.id}</h4>
+                <p><strong>Name:</strong> ${product.name}</p>
+                <p><strong>Brand:</strong> ${product.brand}</p>
+                <p><strong>Price:</strong> ₦${product.price}</p>
+                <p><strong>Stock:</strong> ${product.stock}</p>
+            </div>
+        `;
+        saleDetailsSection.style.display = 'block';
+    } else {
+        showToast('Product not found', 'error');
+    }
+}
+
+// Process add return
+function processAddReturn() {
+    try {
+        const returnData = {
+            id: Date.now(),
+            date: document.getElementById('returnDate').value,
+            originalSaleId: document.getElementById('saleIdInput').value,
+            productId: document.getElementById('productIdInput').value,
+            productName: '', // Will be filled from sale or product data
+            quantity: parseInt(document.getElementById('returnQuantity').value),
+            reason: document.getElementById('returnReason').value,
+            notes: document.getElementById('returnNotes').value,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+        
+        // Validate required fields
+        if (!returnData.date || !returnData.quantity || !returnData.reason) {
+            showToast('Please fill in all required fields', 'error');
+            return;
+        }
+        
+        // Add to returns data
+        returnsData.unshift(returnData);
+        localStorage.setItem('returnsData', JSON.stringify(returnsData));
+        
+        // Close modal and show success
+        closeAddReturnModal();
+        showToast('Return added successfully!', 'success');
+        
+        // Refresh returns history if visible
+        if (currentSaleType === 'return') {
+            loadReturnsHistory();
+        }
+        
+    } catch (error) {
+        console.error('Error processing return:', error);
+        showToast('Failed to add return', 'error');
+    }
+}
+
+// Invoice Generation Functions
+let currentInvoiceData = null;
+
+// Generate invoice
+function generateInvoice() {
+    console.log('generateInvoice called');
+    console.log('Cart length:', cart.length);
+    console.log('Cart items:', cart);
+    
+    // Get current sale data from cart or recent sale
+    if (cart.length === 0) {
+        showToast('No items in cart to generate invoice', 'error');
+        return;
+    }
+    
+    // Prepare invoice data
+    currentInvoiceData = {
+        invoiceNumber: generateInvoiceNumber(),
+        invoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+        items: cart.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
+        })),
+        subtotal: cart.reduce((sum, item) => sum + item.total, 0),
+        tax: 0, // You can add tax calculation here
+        total: cart.reduce((sum, item) => sum + item.total, 0),
+        customerName: document.getElementById('customerName')?.value || 'Walk-in Customer',
+        paymentMethod: document.getElementById('paymentMethod')?.value || 'Cash'
+    };
+    
+    console.log('Invoice data prepared:', currentInvoiceData);
+    
+    // Open invoice modal
+    openInvoiceModal();
+}
+
+// Open invoice modal
+function openInvoiceModal() {
+    console.log('openInvoiceModal called');
+    const modal = document.getElementById('invoiceModal');
+    console.log('Modal element:', modal);
+    console.log('Current invoice data:', currentInvoiceData);
+    
+    if (modal && currentInvoiceData) {
+        console.log('Modal found, populating fields');
+        // Populate form fields
+        document.getElementById('invoiceNumber').value = currentInvoiceData.invoiceNumber;
+        document.getElementById('invoiceDate').value = currentInvoiceData.invoiceDate;
+        document.getElementById('dueDate').value = currentInvoiceData.dueDate;
+        
+        // Generate invoice preview
+        generateInvoicePreview();
+        
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+        console.log('Modal should be visible now');
+    } else {
+        console.error('Modal not found or no invoice data');
+        if (!modal) console.error('invoiceModal element not found');
+        if (!currentInvoiceData) console.error('No currentInvoiceData');
+    }
+}
+
+// Close invoice modal
+function closeInvoiceModal() {
+    const modal = document.getElementById('invoiceModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+    }
+}
+
+// Generate invoice number
+function generateInvoiceNumber() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `INV-${year}${month}${day}-${random}`;
+}
+
+// Generate invoice preview
+function generateInvoicePreview() {
+    const preview = document.getElementById('invoicePreview');
+    if (!preview || !currentInvoiceData) return;
+    
+    preview.innerHTML = `
+        <div class="invoice-document">
+            <div class="invoice-header">
+                <div class="company-info">
+                    <h2>🏪 Inventa Store</h2>
+                    <p>📍 123 Business Avenue, Downtown</p>
+                    <p>📞 Phone: (555) 123-4567</p>
+                    <p>📧 Email: info@inventastore.com</p>
+                    <p>🌐 Website: www.inventastore.com</p>
+                </div>
+                <div class="invoice-details">
+                    <div class="invoice-status">PAID</div>
+                    <h3>INVOICE</h3>
+                    <p><strong>Invoice #:</strong> ${currentInvoiceData.invoiceNumber}</p>
+                    <p><strong>Date:</strong> ${new Date(currentInvoiceData.invoiceDate).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}</p>
+                    <p><strong>Due Date:</strong> ${new Date(currentInvoiceData.dueDate).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}</p>
+                </div>
+            </div>
+            
+            <div class="invoice-body">
+                <div class="bill-to">
+                    <h4>Bill To:</h4>
+                    <p><strong>${currentInvoiceData.customerName}</strong></p>
+                    <p>💳 Payment Method: ${currentInvoiceData.paymentMethod}</p>
+                    <p>📅 Transaction Date: ${new Date().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}</p>
+                </div>
+                
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>📦 Item Description</th>
+                            <th>🔢 Qty</th>
+                            <th>💰 Unit Price</th>
+                            <th>💵 Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${currentInvoiceData.items.map(item => `
+                            <tr>
+                                <td><strong>${item.name}</strong></td>
+                                <td>${item.quantity}</td>
+                                <td>₦${item.price.toFixed(2)}</td>
+                                <td><strong>₦${item.total.toFixed(2)}</strong></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"><strong>Subtotal:</strong></td>
+                            <td><strong>₦${currentInvoiceData.subtotal.toFixed(2)}</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><strong>Tax (0%):</strong></td>
+                            <td><strong>₦${currentInvoiceData.tax.toFixed(2)}</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3"><strong>🎯 TOTAL AMOUNT:</strong></td>
+                            <td class="invoice-amount"><strong>₦${currentInvoiceData.total.toFixed(2)}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                <div class="invoice-footer">
+                    <p><strong>Thank you for your business! 🙏</strong></p>
+                    <p>Payment received and processed successfully ✅</p>
+                    <p>For any questions about this invoice, please contact us at (555) 123-4567</p>
+                    <p>This invoice was generated on ${new Date().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Print invoice
+function printInvoice() {
+    const printContent = document.getElementById('invoicePreview').innerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Invoice ${currentInvoiceData?.invoiceNumber || ''}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .invoice-document { max-width: 800px; margin: 0 auto; }
+                    .invoice-header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                    .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    .invoice-table th { background-color: #f2f2f2; }
+                    .total-row { background-color: #f9f9f9; font-weight: bold; }
+                    .invoice-footer { margin-top: 30px; }
+                </style>
+            </head>
+            <body>${printContent}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// Download invoice as PDF
+function downloadInvoice() {
+    const printContent = document.getElementById('invoicePreview').innerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Invoice ${currentInvoiceData?.invoiceNumber || ''}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .invoice-document { max-width: 800px; margin: 0 auto; }
+                    .invoice-header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                    .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    .invoice-table th { background-color: #f2f2f2; }
+                    .total-row { background-color: #f9f9f9; font-weight: bold; }
+                    .invoice-footer { margin-top: 30px; }
+                </style>
+            </head>
+            <body>${printContent}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// Share invoice link
+function shareInvoiceLink() {
+    if (navigator.share) {
+        navigator.share({
+            title: `Invoice ${currentInvoiceData?.invoiceNumber || ''}`,
+            text: `Invoice for ${currentInvoiceData?.customerName || 'Customer'}`,
+            url: window.location.href
+        }).then(() => {
+            showToast('Invoice shared successfully!', 'success');
+        }).catch((error) => {
+            console.error('Error sharing:', error);
+            showToast('Failed to share invoice', 'error');
+        });
+    } else {
+        // Fallback: copy to clipboard
+        const invoiceText = `Invoice ${currentInvoiceData?.invoiceNumber || ''} for ${currentInvoiceData?.customerName || 'Customer'} - Total: ₦${currentInvoiceData?.total?.toFixed(2) || '0.00'}`;
+        navigator.clipboard.writeText(invoiceText).then(() => {
+            showToast('Invoice details copied to clipboard!', 'success');
+        }).catch(() => {
+            showToast('Failed to copy invoice details', 'error');
+        });
+    }
+}
+
+// Email invoice
+function emailInvoice() {
+    const customerEmail = document.getElementById('customerEmail').value;
+    if (!customerEmail) {
+        showToast('Please enter customer email address', 'error');
+        return;
+    }
+    
+    const subject = `Invoice ${currentInvoiceData?.invoiceNumber || ''} - Inventa Shoe Store`;
+    const body = `Dear ${currentInvoiceData?.customerName || 'Customer'},
+
+Please find attached your invoice for the recent purchase.
+
+Invoice Number: ${currentInvoiceData?.invoiceNumber || ''}
+Total Amount: ₦${currentInvoiceData?.total?.toFixed(2) || '0.00'}
+Due Date: ${currentInvoiceData?.dueDate || ''}
+
+Thank you for your business!
+
+Best regards,
+Inventa Shoe Store`;
+
+    const mailtoLink = `mailto:${customerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+    showToast('Email client opened with invoice details', 'success');
+}
+
+// Share invoice (from receipt modal)
+function shareInvoice() {
+    generateInvoice();
+}
+
+// Generate invoice from most recent sale
+function generateInvoiceFromRecentSale() {
+    console.log('generateInvoiceFromRecentSale called');
+    showToast('Invoice button clicked!', 'success');
+    
+    console.log('salesData length:', salesData.length);
+    console.log('salesData:', salesData);
+    
+    if (salesData.length === 0) {
+        showToast('No sales found to generate invoice. Please complete a sale first.', 'error');
+        return;
+    }
+    
+    // Get the most recent sale
+    const recentSale = salesData[0];
+    console.log('Recent sale:', recentSale);
+    
+    if (!recentSale || !recentSale.items) {
+        showToast('Invalid sale data found', 'error');
+        return;
+    }
+    
+    // Create sample invoice data directly
+    currentInvoiceData = {
+        invoiceNumber: generateInvoiceNumber(),
+        invoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        items: recentSale.items.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
+        })),
+        subtotal: recentSale.items.reduce((sum, item) => sum + item.total, 0),
+        tax: 0,
+        total: recentSale.items.reduce((sum, item) => sum + item.total, 0),
+        customerName: recentSale.customerName || 'Walk-in Customer',
+        paymentMethod: recentSale.paymentMethod || 'Cash'
+    };
+    
+    console.log('Invoice data prepared:', currentInvoiceData);
+    
+    // Open invoice modal directly
+    const modal = document.getElementById('invoiceModal');
+    if (modal) {
+        // Populate form fields
+        document.getElementById('invoiceNumber').value = currentInvoiceData.invoiceNumber;
+        document.getElementById('invoiceDate').value = currentInvoiceData.invoiceDate;
+        document.getElementById('dueDate').value = currentInvoiceData.dueDate;
+        
+        // Generate invoice preview
+        generateInvoicePreview();
+        
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+        console.log('Modal should be visible now');
+    } else {
+        console.error('Invoice modal not found');
+        showToast('Invoice modal not found', 'error');
+    }
+}
+
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
 window.toggleRecordSaleForm = toggleRecordSaleForm;
@@ -1679,3 +3164,65 @@ window.printReceipt = printReceipt;
 window.showReceipt = showReceipt;
 window.closeReceiptModal = closeReceiptModal;
 window.downloadReceipt = downloadReceipt;
+// New product and cart functions
+window.loadProducts = loadProducts;
+window.filterProducts = filterProducts;
+window.increaseSalesQuantity = increaseSalesQuantity;
+window.decreaseSalesQuantity = decreaseSalesQuantity;
+window.updateSalesQuantity = updateSalesQuantity;
+window.addToCart = addToCart;
+window.updateCartDisplay = updateCartDisplay;
+window.openCartModal = openCartModal;
+window.closeCartModal = closeCartModal;
+window.updateCartModal = updateCartModal;
+window.updateCartQuantity = updateCartQuantity;
+window.removeFromCart = removeFromCart;
+window.processCartSale = processCartSale;
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
+window.showReturnsHistory = showReturnsHistory;
+window.showProductTable = showProductTable;
+window.loadReturnsHistory = loadReturnsHistory;
+window.openAddReturnForm = openAddReturnForm;
+window.closeAddReturnModal = closeAddReturnModal;
+window.loadSaleDetails = loadSaleDetails;
+window.loadProductDetails = loadProductDetails;
+window.processAddReturn = processAddReturn;
+window.updateSaleTypeButton = updateSaleTypeButton;
+// Sale type switching functions
+window.switchSaleType = switchSaleType;
+window.getSaleTypeDisplayName = getSaleTypeDisplayName;
+window.updateCartModalFields = updateCartModalFields;
+window.processNormalSale = processNormalSale;
+window.processCreditSale = processCreditSale;
+window.processReturnSale = processReturnSale;
+window.addReturnToRecords = addReturnToRecords;
+window.clearCartAndClose = clearCartAndClose;
+// Invoice functions
+window.generateInvoice = generateInvoice;
+window.openInvoiceModal = openInvoiceModal;
+window.closeInvoiceModal = closeInvoiceModal;
+window.printInvoice = printInvoice;
+window.downloadInvoice = downloadInvoice;
+window.shareInvoiceLink = shareInvoiceLink;
+window.emailInvoice = emailInvoice;
+window.shareInvoice = shareInvoice;
+window.generateInvoiceFromRecentSale = generateInvoiceFromRecentSale;
+
+// Simple fallback function to show invoice modal
+function showInvoiceModalDirectly() {
+    console.log('showInvoiceModalDirectly called');
+    const modal = document.getElementById('invoiceModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+        console.log('Modal should be visible now');
+        showToast('Invoice modal opened directly', 'success');
+    } else {
+        console.error('Invoice modal not found');
+        showToast('Invoice modal not found', 'error');
+    }
+}
+
+window.showInvoiceModalDirectly = showInvoiceModalDirectly;
+

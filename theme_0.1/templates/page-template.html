@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title - Inventa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header Container -->
+            <div id="header-container"></div>
+
+            <!-- Page Content -->
+            <div class="content">
+                <!-- Dashboard Container (optional - can be replaced with custom content) -->
+                <div id="dashboard-container"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/theme-manager.js"></script>
+    <script src="js/sidebar-component.js"></script>
+    <script src="js/header-component.js"></script>
+    <script src="js/dashboard-component.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Add your page-specific scripts here -->
+    <script>
+        // Load components when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load sidebar component
+            window.sidebarComponent = await SidebarComponent.loadSidebar('sidebar-container');
+            
+            // Load header component
+            window.headerComponent = await HeaderComponent.loadHeader('header-container');
+            
+            // Load dashboard component (optional - comment out if not needed)
+            window.dashboardComponent = await DashboardComponent.loadDashboard('dashboard-container');
+        });
+    </script>
+</body>
+</html>

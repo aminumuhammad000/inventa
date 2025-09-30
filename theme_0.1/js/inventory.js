@@ -108,6 +108,13 @@ async function initializeInventory() {
         // Populate dropdowns
         populateDropdowns();
         
+        // Setup image preview
+        setupImagePreview();
+        
+        // Populate category and brand dropdowns
+        populateCategoryDropdown();
+        populateBrandDropdown();
+        
     } catch (error) {
         console.error('Error initializing inventory:', error);
         showToast('Failed to load inventory data', 'error');
@@ -178,6 +185,13 @@ function renderInventoryTable() {
     inventoryData.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td class="product-image-cell">
+                <div class="product-image" onclick="openImageModal('${item.image || 'https://via.placeholder.com/80x80?text=No+Image'}')">
+                    <img src="${item.image || 'https://via.placeholder.com/80x80?text=No+Image'}" 
+                         alt="${item.name}" 
+                         onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'">
+                </div>
+            </td>
             <td>${item.name}</td>
             <td>${item.sku || 'N/A'}</td>
             <td>${item.category_name || 'Uncategorized'}</td>
@@ -193,14 +207,11 @@ function renderInventoryTable() {
                 </span>
             </td>
             <td>
-                <button class="btn-icon" onclick="editItem(${item.id})" title="Edit">
+                <button class="btn-icon" onclick="openStockAdjustment(${item.id})" title="Stock Adjustment">
                     <i class="material-icons-round">edit</i>
                 </button>
                 <button class="btn-icon" onclick="viewItemHistory(${item.id})" title="History">
                     <i class="material-icons-round">history</i>
-                </button>
-                <button class="btn-icon" onclick="reorderItem(${item.id})" title="Reorder">
-                    <i class="material-icons-round">shopping_cart</i>
                 </button>
             </td>
         `;
@@ -322,6 +333,13 @@ function renderFilteredTable(data) {
     data.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td class="product-image-cell">
+                <div class="product-image" onclick="openImageModal('${item.image || 'https://via.placeholder.com/80x80?text=No+Image'}')">
+                    <img src="${item.image || 'https://via.placeholder.com/80x80?text=No+Image'}" 
+                         alt="${item.name}" 
+                         onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'">
+                </div>
+            </td>
             <td>${item.name}</td>
             <td>${item.sku || 'N/A'}</td>
             <td>${item.category_name || 'Uncategorized'}</td>
@@ -337,14 +355,11 @@ function renderFilteredTable(data) {
                 </span>
             </td>
             <td>
-                <button class="btn-icon" onclick="editItem(${item.id})" title="Edit">
+                <button class="btn-icon" onclick="openStockAdjustment(${item.id})" title="Stock Adjustment">
                     <i class="material-icons-round">edit</i>
                 </button>
                 <button class="btn-icon" onclick="viewItemHistory(${item.id})" title="History">
                     <i class="material-icons-round">history</i>
-                </button>
-                <button class="btn-icon" onclick="reorderItem(${item.id})" title="Reorder">
-                    <i class="material-icons-round">shopping_cart</i>
                 </button>
             </td>
         `;
@@ -1378,6 +1393,295 @@ function importCSVData() {
     }
 }
 
+// Open stock adjustment for specific item
+function openStockAdjustment(itemId) {
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) {
+        showToast('Item not found!', 'error');
+        return;
+    }
+    
+    // Set the item in the adjustment form
+    document.getElementById('adjustmentItem').value = itemId;
+    document.getElementById('adjustmentItemName').textContent = item.name;
+    
+    // Open the stock adjustment form
+    openStockAdjustmentForm();
+}
+
+// Open image modal
+function openImageModal(imageUrl) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    
+    if (modal && modalImage) {
+        modalImage.src = imageUrl;
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+    }
+}
+
+// Close image modal
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+    }
+}
+
+// Save new product
+async function saveNewProduct() {
+    try {
+        // Get image as base64
+        const imageBase64 = await getImageBase64();
+        
+        // Get form data
+        const productData = {
+            id: Date.now(),
+            name: document.getElementById('productName').value.trim(),
+            sku: document.getElementById('productSku').value.trim() || `SKU-${Date.now()}`,
+            category: document.getElementById('productCategory').value,
+            brand: document.getElementById('productBrand').value,
+            current_stock: parseInt(document.getElementById('productQuantity').value),
+            unit: document.getElementById('productUnit').value,
+            cost_price: parseFloat(document.getElementById('productCostPrice').value),
+            selling_price: parseFloat(document.getElementById('productSellingPrice').value),
+            min_stock_level: parseInt(document.getElementById('productMinStock').value) || 5,
+            max_stock_level: parseInt(document.getElementById('productMaxStock').value) || null,
+            image: imageBase64 || null,
+            description: document.getElementById('productDescription').value.trim(),
+            specifications: document.getElementById('productSpecifications').value.trim(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        // Validate required fields
+        if (!productData.name || !productData.category || !productData.brand || 
+            !productData.current_stock || !productData.unit || 
+            !productData.cost_price || !productData.selling_price) {
+            showToast('Please fill in all required fields', 'error');
+            return;
+        }
+
+        // Add to inventory data
+        inventoryData.push(productData);
+        
+        // Save to localStorage
+        localStorage.setItem('inventoryData', JSON.stringify(inventoryData));
+        
+        // Update displays
+        updateInventoryStats();
+        renderInventoryTable();
+        
+        // Close form and show success
+        closePurchaseForm();
+        showToast('Product added successfully!', 'success');
+        
+        // Reset form
+        document.getElementById('addProductForm').reset();
+        
+    } catch (error) {
+        console.error('Error saving product:', error);
+        showToast('Failed to save product', 'error');
+    }
+}
+
+// Open category modal
+function openCategoryModal() {
+    document.getElementById('categoryModal').style.display = 'flex';
+    document.getElementById('categoryModal').classList.add('show');
+}
+
+// Close category modal
+function closeCategoryModal() {
+    document.getElementById('categoryModal').style.display = 'none';
+    document.getElementById('categoryModal').classList.remove('show');
+    document.getElementById('categoryForm').reset();
+}
+
+// Save new category
+function saveNewCategory() {
+    try {
+        const categoryName = document.getElementById('newCategoryName').value.trim();
+        const categoryDescription = document.getElementById('newCategoryDescription').value.trim();
+        
+        if (!categoryName) {
+            showToast('Please enter category name', 'error');
+            return;
+        }
+        
+        // Add to categories
+        const newCategory = {
+            id: Date.now(),
+            name: categoryName,
+            description: categoryDescription,
+            created_at: new Date().toISOString()
+        };
+        
+        categories.push(newCategory);
+        localStorage.setItem('categories', JSON.stringify(categories));
+        
+        // Update category dropdown
+        populateCategoryDropdown();
+        
+        // Close modal and show success
+        closeCategoryModal();
+        showToast('Category added successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error saving category:', error);
+        showToast('Failed to save category', 'error');
+    }
+}
+
+// Open brand modal
+function openBrandModal() {
+    document.getElementById('brandModal').style.display = 'flex';
+    document.getElementById('brandModal').classList.add('show');
+}
+
+// Close brand modal
+function closeBrandModal() {
+    document.getElementById('brandModal').style.display = 'none';
+    document.getElementById('brandModal').classList.remove('show');
+    document.getElementById('brandForm').reset();
+}
+
+// Save new brand
+function saveNewBrand() {
+    try {
+        const brandName = document.getElementById('newBrandName').value.trim();
+        const brandDescription = document.getElementById('newBrandDescription').value.trim();
+        
+        if (!brandName) {
+            showToast('Please enter brand name', 'error');
+            return;
+        }
+        
+        // Add to brands (assuming we have a brands array)
+        const newBrand = {
+            id: Date.now(),
+            name: brandName,
+            description: brandDescription,
+            created_at: new Date().toISOString()
+        };
+        
+        // If brands array doesn't exist, create it
+        if (!window.brands) {
+            window.brands = [];
+        }
+        window.brands.push(newBrand);
+        localStorage.setItem('brands', JSON.stringify(window.brands));
+        
+        // Update brand dropdown
+        populateBrandDropdown();
+        
+        // Close modal and show success
+        closeBrandModal();
+        showToast('Brand added successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error saving brand:', error);
+        showToast('Failed to save brand', 'error');
+    }
+}
+
+// Populate category dropdown
+function populateCategoryDropdown() {
+    const categorySelect = document.getElementById('productCategory');
+    if (!categorySelect) return;
+    
+    categorySelect.innerHTML = '<option value="">Select Category</option>';
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.name;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+    });
+}
+
+// Populate brand dropdown
+function populateBrandDropdown() {
+    const brandSelect = document.getElementById('productBrand');
+    if (!brandSelect) return;
+    
+    brandSelect.innerHTML = '<option value="">Select Brand</option>';
+    if (window.brands) {
+        window.brands.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand.name;
+            option.textContent = brand.name;
+            brandSelect.appendChild(option);
+        });
+    }
+}
+
+// Image preview functionality
+function setupImagePreview() {
+    const imageInput = document.getElementById('productImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    
+    if (imageInput && imagePreview && previewImg && fileUploadArea) {
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showToast('Please select a valid image file', 'error');
+                    return;
+                }
+                
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Image size must be less than 5MB', 'error');
+                    return;
+                }
+                
+                // Create preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    fileUploadArea.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+}
+
+// Remove image
+function removeImage() {
+    const imageInput = document.getElementById('productImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    
+    if (imageInput && imagePreview && fileUploadArea) {
+        imageInput.value = '';
+        imagePreview.style.display = 'none';
+        fileUploadArea.style.display = 'block';
+    }
+}
+
+// Convert file to base64 for storage
+function getImageBase64() {
+    const imageInput = document.getElementById('productImage');
+    if (imageInput.files && imageInput.files[0]) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resolve(e.target.result);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(imageInput.files[0]);
+        });
+    }
+    return null;
+}
+
 // Export functions for global access
 window.toggleSidebar = toggleSidebar;
 window.togglePurchaseForm = togglePurchaseForm;
@@ -1386,6 +1690,17 @@ window.closePurchaseForm = closePurchaseForm;
 window.toggleStockAdjustmentForm = toggleStockAdjustmentForm;
 window.openStockAdjustmentForm = openStockAdjustmentForm;
 window.closeStockAdjustmentForm = closeStockAdjustmentForm;
+window.openStockAdjustment = openStockAdjustment;
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
+window.saveNewProduct = saveNewProduct;
+window.openCategoryModal = openCategoryModal;
+window.closeCategoryModal = closeCategoryModal;
+window.saveNewCategory = saveNewCategory;
+window.openBrandModal = openBrandModal;
+window.closeBrandModal = closeBrandModal;
+window.saveNewBrand = saveNewBrand;
+window.removeImage = removeImage;
 window.toggleImportForm = toggleImportForm;
 window.openImportForm = openImportForm;
 window.closeImportForm = closeImportForm;

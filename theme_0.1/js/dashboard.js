@@ -123,12 +123,17 @@ function closeUserDropdown() {
 function initializeSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.querySelector('.sidebar-toggle');
+    const toggleBtn = document.getElementById('sidebarToggle');
     
     const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     if (isCollapsed) {
         sidebar.classList.add('collapsed');
         mainContent.classList.add('sidebar-collapsed');
+        
+        // Update toggle button icon for collapsed state
+        const icon = toggleBtn.querySelector('i');
+        icon.textContent = 'menu_open';
+        toggleBtn.title = 'Expand Sidebar';
     }
     
     if (toggleBtn) {
@@ -146,14 +151,33 @@ function initializeSidebar() {
 
 // Toggle sidebar
 function toggleSidebar() {
+    console.log('toggleSidebar called'); // Debug log
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    
+    if (!sidebar || !mainContent || !toggleBtn) {
+        console.error('Required elements not found');
+        return;
+    }
     
     sidebar.classList.toggle('collapsed');
     mainContent.classList.toggle('sidebar-collapsed');
     
     const isCollapsed = sidebar.classList.contains('collapsed');
     localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
+    
+    // Update toggle button icon
+    const icon = toggleBtn.querySelector('i');
+    if (isCollapsed) {
+        icon.textContent = 'menu_open';
+        toggleBtn.title = 'Expand Sidebar';
+        console.log('Sidebar collapsed');
+    } else {
+        icon.textContent = 'menu';
+        toggleBtn.title = 'Collapse Sidebar';
+        console.log('Sidebar expanded');
+    }
 }
 
 // Initialize dashboard data

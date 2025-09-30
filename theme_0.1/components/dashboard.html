@@ -1,0 +1,120 @@
+<!-- Dashboard Component -->
+<div class="content">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="material-icons-round">inventory_2</i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="totalProducts">0</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="material-icons-round">point_of_sale</i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="totalSales">₦0</div>
+                <div class="stat-label">Total Sales</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="material-icons-round">people</i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="totalCustomers">0</div>
+                <div class="stat-label">Total Customers</div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="material-icons-round">trending_up</i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="totalProfit">₦0</div>
+                <div class="stat-label">Total Profit</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Recent Sales -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>Recent Sales</h3>
+                <a href="sales.html" class="view-all-link">View All</a>
+            </div>
+            <div class="card-content">
+                <div class="sales-list" id="recentSalesList">
+                    <!-- Sales will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Items -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>Low Stock Items</h3>
+                <a href="inventory.html" class="view-all-link">View All</a>
+            </div>
+            <div class="card-content">
+                <div class="stock-list" id="lowStockList">
+                    <!-- Low stock items will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3>Quick Actions</h3>
+            </div>
+            <div class="card-content">
+                <div class="quick-actions">
+                    <a href="sales.html" class="action-btn">
+                        <i class="material-icons-round">add_shopping_cart</i>
+                        <span>New Sale</span>
+                    </a>
+                    <a href="inventory.html" class="action-btn">
+                        <i class="material-icons-round">add_box</i>
+                        <span>Add Product</span>
+                    </a>
+                    <a href="customers.html" class="action-btn">
+                        <i class="material-icons-round">person_add</i>
+                        <span>Add Customer</span>
+                    </a>
+                    <a href="reports.html" class="action-btn">
+                        <i class="material-icons-round">assessment</i>
+                        <span>View Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Chart -->
+        <div class="content-card chart-card">
+            <div class="card-header">
+                <h3>Sales Overview</h3>
+                <div class="chart-controls">
+                    <select id="chartPeriod" class="chart-select">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

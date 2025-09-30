@@ -1,0 +1,42 @@
+<!-- Header Component -->
+<header class="header">
+    <div class="header-left">
+        <h1 class="page-title" id="pageTitle">Your Shop Overview</h1>
+        <p class="page-subtitle" id="pageSubtitle">Welcome back! Here's how your shop is doing today.</p>
+    </div>
+    <div class="header-right">
+        <div class="user-info">
+            <div class="user-avatar">JD</div>
+            <div class="user-details">
+                <span class="user-name">John Doe</span>
+                <span class="user-role">Shop Owner</span>
+            </div>
+            <div class="user-dropdown">
+                <button class="dropdown-toggle" onclick="toggleUserDropdown()">
+                    <i class="material-icons-round">keyboard_arrow_down</i>
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="shop-info">
+                            <div class="shop-name">My Construction Shop</div>
+                            <div class="shop-location">Your Location</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" onclick="openShopSettings()">
+                        <i class="material-icons-round">settings</i>
+                        <span>Change Shop Info</span>
+                    </a>
+                    <a href="#" class="dropdown-item" onclick="openProfileSettings()">
+                        <i class="material-icons-round">person</i>
+                        <span>Change My Info</span>
+                    </a>
+                    <a href="#" class="dropdown-item logout" onclick="logout()">
+                        <i class="material-icons-round">logout</i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
