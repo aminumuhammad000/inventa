@@ -1,5 +1,3 @@
-// Global Theme Manager
-// This script handles theme application across all pages
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', function() {

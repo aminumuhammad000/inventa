@@ -1,5 +1,3 @@
-// Dashboard Management Module
-console.log('Dashboard module loaded');
 
 // Global variables
 let inventoryData = [];
@@ -13,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing dashboard...');
     
     // Check authentication
-    checkAuthentication();
+    // checkAuthentication();
     
     // Initialize sidebar
     initializeSidebar();
