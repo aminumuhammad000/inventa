@@ -17,8 +17,8 @@ ipcMain.handle('get-shop', (event, id) => new Promise((resolve, reject) => {
 }));
 
 // Update shop
-ipcMain.handle('update-shop', (event, { id, shop }) => new Promise((resolve, reject) => {
-  shopDB.updateShop(id, shop, (err, result) => err ? reject(err) : resolve(result));
+ipcMain.handle('update-shop', (event, shop) => new Promise((resolve, reject) => {
+  shopDB.updateShop(shop.id, shop, (err, result) => err ? reject(err) : resolve(result));
 }));
 
 // Delete shop

@@ -19,26 +19,24 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
     },
     icon: path.join(__dirname, "assets", "icon.png"),
-    title: "Inventa Store - Browse Products",
+    title: "Inventa Store - React App",
   });
 
-  win.loadFile(path.join(__dirname, "theme_0.1", "login.html"));
-
   if (process.env.NODE_ENV === 'development') {
-  win.webContents.openDevTools();
-}
+    // Load Vite dev server
+    win.loadURL('http://localhost:5173/');
+    win.webContents.openDevTools();
+  } else {
+    // Load React build output
+    win.loadFile(path.join(__dirname, 'src', 'dist', 'index.html'));
+  }
 }
 
-ipcMain.on('load-dashboard', (event) => {
-  const win = BrowserWindow.getFocusedWindow(); // get the current window
-  if (win) {
-    win.loadFile(path.join(__dirname, "theme_0.1", 'dashboard.html'));
-  }
-});
 
 app.whenReady().then(() => {
   createWindow();
