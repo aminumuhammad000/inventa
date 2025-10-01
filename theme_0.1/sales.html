@@ -1,56 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventa - Sales Management</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-</head>
-<body>
-    <div class="app-container">
+import React, { useEffect } from "react";
+
+const Sales = () => {
+    useEffect(() => {
+        // Load sidebar and header components after DOM is ready
+        (async function() {
+            if (window.SidebarComponent) {
+                window.sidebarComponent = await window.SidebarComponent.loadSidebar('sidebar-container');
+            }
+            if (window.HeaderComponent) {
+                window.headerComponent = await window.HeaderComponent.loadHeader('header-container');
+            }
+        })();
+    }, []);
+
+    return (
+        <div className="app-container">
         <!-- Sidebar Container -->
-        <div id="sidebar-container"></div>
+    <div id="sidebar-container"></div>
 
         <!-- Main Content -->
-        <main class="main-content" id="mainContent">
+    <main className="main-content" id="mainContent">
             <!-- Header Container -->
             <div id="header-container"></div>
 
             <!-- Content -->
-            <div class="content">
+            <div className="content">
 
                 <!-- Sale Type Filter Buttons -->
-                <div class="tabs-container">
-                    <div class="tabs">
-                        <button class="tab-button active" onclick="switchSaleType('normal')" id="normalSaleBtn">
-                            <i class="material-icons-round">point_of_sale</i>
+                <div className="tabs-container">
+                    <div className="tabs">
+                        <button className="tab-button active" onClick={() => window.switchSaleType('normal')} id="normalSaleBtn">
+                            <i className="material-icons-round">point_of_sale</i>
                             <span>Normal Sell</span>
                         </button>
-                        <button class="tab-button" onclick="switchSaleType('credit')" id="creditSaleBtn">
-                            <i class="material-icons-round">credit_card</i>
+                        <button className="tab-button" onClick={() => window.switchSaleType('credit')} id="creditSaleBtn">
+                            <i className="material-icons-round">credit_card</i>
                             <span>Sell on Credit</span>
                         </button>
-                        <button class="tab-button" onclick="switchSaleType('return')" id="returnSaleBtn">
-                            <i class="material-icons-round">undo</i>
+                        <button className="tab-button" onClick={() => window.switchSaleType('return')} id="returnSaleBtn">
+                            <i className="material-icons-round">undo</i>
                             <span>Return Sells</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Product Selection for Sale -->
-                <div class="record-sale-section" id="recordSaleSection" style="display: block;">
-                    <div class="form-card">
-                        <div class="form-header">
+                <div className="record-sale-section" id="recordSaleSection" style={{display: 'block'}}>
+                    <div className="form-card">
+                        <div className="form-header">
                             <h3 id="saleTypeTitle">Select Products to Sell</h3>
-                            <div class="header-actions">
-                                <div class="search-box">
-                                    <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProducts()">
-                                    <i class="material-icons-round">search</i>
+                            <div className="header-actions">
+                                <div className="search-box">
+                                    <input type="text" id="productSearch" placeholder="Search products..." onKeyUp={() => window.filterProducts()} />
+                                    <i className="material-icons-round">search</i>
                                 </div>
-                                <div class="filter-actions">
-                                    <select id="brandFilter" onchange="filterProducts()">
+                                <div className="filter-actions">
+                                    <select id="brandFilter" onChange={() => window.filterProducts()}>
                                         <option value="all">All Brands</option>
                                         <option value="Dangote">Dangote</option>
                                         <option value="Lafarge">Lafarge</option>
@@ -62,22 +67,22 @@
                                         <option value="AquaFlow">AquaFlow</option>
                                     </select>
                                 </div>
-                                <div class="cart-info">
-                                    <span class="cart-count" id="cartCount">0</span>
-                                    <button class="mark-sold-btn" onclick="openCartModal()" id="markSoldBtn" disabled>
-                                        <i class="material-icons-round">shopping_cart</i>
+                                <div className="cart-info">
+                                    <span className="cart-count" id="cartCount">0</span>
+                                    <button className="mark-sold-btn" onClick={() => window.openCartModal()} id="markSoldBtn" disabled>
+                                        <i className="material-icons-round">shopping_cart</i>
                                         <span id="markSoldText">Mark as Sold</span>
                                     </button>
-<button class="btn-secondary" onclick="showInvoiceModalDirectly()" title="Generate Invoice from Recent Sale">
-    <i class="material-icons-round">receipt_long</i>
-    <span>Invoice</span>
-</button>
+                                    <button className="btn-secondary" onClick={() => window.showInvoiceModalDirectly()} title="Generate Invoice from Recent Sale">
+                                        <i className="material-icons-round">receipt_long</i>
+                                        <span>Invoice</span>
+                                    </button>
                                 </div>
                             </div>
                             </div>
-                        <div class="card-content">
-                            <div class="products-table-container">
-                                <table class="products-table">
+                        <div className="card-content">
+                            <div className="products-table-container">
+                                <table className="products-table">
                                     <thead>
                                         <tr>
                                             <th>Image</th>
@@ -93,7 +98,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="productsTableBody">
-                                        <!-- Products will be loaded here -->
+                                        {/* Products will be loaded here */}
                                     </tbody>
                                 </table>
                             </div>
@@ -103,12 +108,12 @@
 
 
                 <!-- Sale Details Form (Inline) -->
-                <div class="sale-details-section" id="saleDetailsSection" style="display: none;">
+                <div className="sale-details-section" id="saleDetailsSection" style={{display: 'none'}}>
                     <div class="form-card">
-                        <div class="form-header">
+                        <div className="form-header">
                             <h3>Sale Details</h3>
-                            <button class="btn-close" onclick="closeSaleDetailsForm()">
-                                <i class="material-icons-round">close</i>
+                            <button className="btn-close" onClick={() => window.closeSaleDetailsForm()}>
+                                <i className="material-icons-round">close</i>
                             </button>
                         </div>
                         <div class="sale-details-content">
@@ -173,7 +178,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="detailsItemsTableBody">
-                                            <!-- Items will be loaded here -->
+                                            {/* Items will be loaded here */}
                                         </tbody>
                                     </table>
                                 </div>
@@ -204,21 +209,21 @@
 
                             <!-- Actions -->
                             <div class="details-actions">
-                                <button type="button" class="btn-secondary" onclick="closeSaleDetailsForm()">Close</button>
-                                <button type="button" class="btn-primary" onclick="printReceiptFromDetails()">Print Receipt</button>
-                                <button type="button" class="btn-primary" onclick="showReceiptFromDetails()">View Receipt</button>
+                                <button type="button" className="btn-secondary" onClick={() => window.closeSaleDetailsForm()}>Close</button>
+                                <button type="button" className="btn-primary" onClick={() => window.printReceiptFromDetails()}>Print Receipt</button>
+                                <button type="button" className="btn-primary" onClick={() => window.showReceiptFromDetails()}>View Receipt</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Return Details Form (Inline) -->
-                <div class="return-details-section" id="returnDetailsSection" style="display: none;">
+                <div className="return-details-section" id="returnDetailsSection" style={{display: 'none'}}>
                     <div class="form-card">
-                        <div class="form-header">
+                        <div className="form-header">
                             <h3>Return Details</h3>
-                            <button class="btn-close" onclick="closeReturnDetailsForm()">
-                                <i class="material-icons-round">close</i>
+                            <button className="btn-close" onClick={() => window.closeReturnDetailsForm()}>
+                                <i className="material-icons-round">close</i>
                             </button>
                         </div>
                         <div class="return-details-content">
@@ -283,7 +288,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="detailsReturnItemsTableBody">
-                                            <!-- Items will be loaded here -->
+                                            {/* Items will be loaded here */}
                                         </tbody>
                                     </table>
                                 </div>
@@ -314,8 +319,8 @@
 
                             <!-- Actions -->
                             <div class="details-actions">
-                                <button type="button" class="btn-secondary" onclick="closeReturnDetailsForm()">Close</button>
-                                <button type="button" class="btn-primary" onclick="printReturnReceiptFromDetails()">Print Return Receipt</button>
+                                <button type="button" className="btn-secondary" onClick={() => window.closeReturnDetailsForm()}>Close</button>
+                                <button type="button" className="btn-primary" onClick={() => window.printReturnReceiptFromDetails()}>Print Return Receipt</button>
                             </div>
                         </div>
                     </div>
@@ -326,36 +331,36 @@
           
 
     <!-- Add Return Modal -->
-    <div id="addReturnModal" class="modal">
+    <div id="addReturnModal" className="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Add Return</h3>
-                <button class="modal-close" onclick="closeAddReturnModal()">
-                    <i class="material-icons-round">close</i>
+                <button className="modal-close" onClick={() => window.closeAddReturnModal()}>
+                    <i className="material-icons-round">close</i>
                 </button>
             </div>
             <div class="modal-body">
                 <form id="addReturnForm">
                     <div class="form-group">
                         <label for="returnDate">Return Date:</label>
-                        <input type="date" id="returnDate" required>
+                        <input type="date" id="returnDate" required />
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="saleIdInput">Sale ID:</label>
-                            <input type="text" id="saleIdInput" placeholder="Enter Sale ID" onchange="loadSaleDetails()">
+                            <input type="text" id="saleIdInput" placeholder="Enter Sale ID" onChange={() => window.loadSaleDetails()} />
                         </div>
                         <div class="form-group">
                             <label for="productIdInput">Product ID:</label>
-                            <input type="text" id="productIdInput" placeholder="Enter Product ID" onchange="loadProductDetails()">
+                            <input type="text" id="productIdInput" placeholder="Enter Product ID" onChange={() => window.loadProductDetails()} />
                         </div>
                     </div>
                     
-                    <div class="form-group" id="saleDetailsSection" style="display: none;">
+                    <div className="form-group" id="saleDetailsSection" style={{display: 'none'}}>
                         <label>Sale Details:</label>
-                        <div class="sale-details-card" id="saleDetailsCard">
-                            <!-- Sale details will be loaded here -->
+                        <div className="sale-details-card" id="saleDetailsCard">
+                            {/* Sale details will be loaded here */}
                         </div>
                     </div>
                     
@@ -373,7 +378,7 @@
                     
                     <div class="form-group">
                         <label for="returnQuantity">Return Quantity:</label>
-                        <input type="number" id="returnQuantity" placeholder="Enter quantity" min="1" required>
+                        <input type="number" id="returnQuantity" placeholder="Enter quantity" min="1" required />
                     </div>
                     
                     <div class="form-group">
@@ -382,8 +387,8 @@
                     </div>
                     
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeAddReturnModal()">Cancel</button>
-                        <button type="button" class="btn-primary" onclick="processAddReturn()">Add Return</button>
+                        <button type="button" className="btn-secondary" onClick={() => window.closeAddReturnModal()}>Cancel</button>
+                        <button type="button" className="btn-primary" onClick={() => window.processAddReturn()}>Add Return</button>
                     </div>
                 </form>
             </div>
@@ -391,84 +396,84 @@
     </div>
 
     <!-- Receipt Modal -->
-    <div class="modal" id="receiptModal">
+    <div className="modal" id="receiptModal">
         <div class="modal-content large">
             <div class="modal-header">
                 <h3>Sales Receipt</h3>
                 <div class="modal-actions">
-                    <button class="btn-secondary" onclick="printReceipt()">
-                        <i class="material-icons-round">print</i>
+                    <button className="btn-secondary" onClick={() => window.printReceipt()}>
+                        <i className="material-icons-round">print</i>
                         Print
                     </button>
-                    <button class="btn-secondary" onclick="downloadReceipt()">
-                        <i class="material-icons-round">download</i>
+                    <button className="btn-secondary" onClick={() => window.downloadReceipt()}>
+                        <i className="material-icons-round">download</i>
                         Download PDF
                     </button>
-                    <button class="btn-primary" onclick="generateInvoice()">
-                        <i class="material-icons-round">receipt_long</i>
+                    <button className="btn-primary" onClick={() => window.generateInvoice()}>
+                        <i className="material-icons-round">receipt_long</i>
                         Generate Invoice
                     </button>
-                    <button class="btn-secondary" onclick="shareInvoice()">
-                        <i class="material-icons-round">share</i>
+                    <button className="btn-secondary" onClick={() => window.shareInvoice()}>
+                        <i className="material-icons-round">share</i>
                         Share
                     </button>
-                    <button class="modal-close" onclick="closeReceiptModal()">
-                        <i class="material-icons-round">close</i>
+                    <button className="modal-close" onClick={() => window.closeReceiptModal()}>
+                        <i className="material-icons-round">close</i>
                     </button>
                 </div>
             </div>
             <div class="modal-body">
-                <div class="receipt" id="receiptContent">
-                    <!-- Receipt content will be generated here -->
+                <div className="receipt" id="receiptContent">
+                    {/* Receipt content will be generated here */}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Invoice Modal -->
-    <div class="modal" id="invoiceModal">
+    <div className="modal" id="invoiceModal">
         <div class="modal-content large">
             <div class="modal-header">
                 <h3>Invoice Generator</h3>
                 <div class="modal-actions">
-                    <button class="btn-secondary" onclick="printInvoice()">
-                        <i class="material-icons-round">print</i>
+                    <button className="btn-secondary" onClick={() => window.printInvoice()}>
+                        <i className="material-icons-round">print</i>
                         Print Invoice
                     </button>
-                    <button class="btn-secondary" onclick="downloadInvoice()">
-                        <i class="material-icons-round">download</i>
+                    <button className="btn-secondary" onClick={() => window.downloadInvoice()}>
+                        <i className="material-icons-round">download</i>
                         Download PDF
                     </button>
-                    <button class="btn-primary" onclick="shareInvoiceLink()">
-                        <i class="material-icons-round">share</i>
+                    <button className="btn-primary" onClick={() => window.shareInvoiceLink()}>
+                        <i className="material-icons-round">share</i>
                         Share Invoice
                     </button>
-                    <button class="btn-secondary" onclick="emailInvoice()">
-                        <i class="material-icons-round">email</i>
+                    <button className="btn-secondary" onClick={() => window.emailInvoice()}>
+                        <i className="material-icons-round">email</i>
                         Email Invoice
                     </button>
-                    <button class="modal-close" onclick="closeInvoiceModal()">
-                        <i class="material-icons-round">close</i>
+                    <button className="modal-close" onClick={() => window.closeInvoiceModal()}>
+                        <i className="material-icons-round">close</i>
                     </button>
                 </div>
             </div>
             <div class="modal-body">
-                <div class="invoice-form">
+                <div className="invoice-form">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="invoiceNumber">Invoice Number:</label>
-                            <input type="text" id="invoiceNumber" readonly>
+                            <input type="text" id="invoiceNumber" readOnly />
                         </div>
                         <div class="form-group">
                             <label for="invoiceDate">Invoice Date:</label>
-                            <input type="date" id="invoiceDate">
+                            <input type="date" id="invoiceDate" />
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="dueDate">Due Date:</label>
-                            <input type="date" id="dueDate">
+                            <input type="date" id="dueDate" />
                         </div>
                         <div class="form-group">
                             <label for="paymentTerms">Payment Terms:</label>
@@ -484,7 +489,7 @@
                     
                     <div class="form-group">
                         <label for="customerEmail">Customer Email (for sharing):</label>
-                        <input type="email" id="customerEmail" placeholder="customer@example.com">
+                        <input type="email" id="customerEmail" placeholder="customer@example.com" />
                     </div>
                     
                     <div class="form-group">
@@ -493,26 +498,15 @@
                     </div>
                 </div>
                 
-                <div class="invoice-preview" id="invoicePreview">
-                    <!-- Invoice preview will be generated here -->
+                <div className="invoice-preview" id="invoicePreview">
+                    {/* Invoice preview will be generated here */}
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="js/theme-manager.js"></script>
-    <script src="js/sidebar-component.js"></script>
-    <script src="js/header-component.js"></script>
-    <script src="js/sales.js"></script>
-    <script>
-        // Load components when page loads
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Load sidebar component
-            window.sidebarComponent = await SidebarComponent.loadSidebar('sidebar-container');
-            
-            // Load header component
-            window.headerComponent = await HeaderComponent.loadHeader('header-container');
-        });
-    </script>
-</body>
-</html>
+    {/* External CSS and fonts should be included in index.html or imported in your main JS/JSX file */}
+  );
+};
+
+export default Sales;
