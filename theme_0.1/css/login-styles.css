@@ -173,7 +173,7 @@ body {
 
 .circle {
     position: absolute;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     animation: rotate 10s linear infinite;
 }
@@ -357,7 +357,7 @@ body {
     align-items: center;
     gap: 8px;
     background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
     color: #10b981;
     padding: 10px 16px;
     border-radius: 8px;
@@ -371,7 +371,6 @@ body {
 
 .back-to-login-btn:hover {
     background: rgba(16, 185, 129, 0.2);
-    border-color: #10b981;
     transform: translateX(-2px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
@@ -412,18 +411,17 @@ body {
 .form-input {
     width: 100%;
     padding: 16px 20px;
-    border: 1px solid #d1d5db;
+    box-shadow: 0 0 0 1px #d1d5db;
     border-radius: 8px;
     font-size: 16px;
     color: #374151;
     background: #ffffff;
     transition: all 0.3s ease;
-    border-left: 4px solid #10b981;
+    box-shadow: -4px 0 0 #e0e0e0;
 }
 
 .form-input:focus {
     outline: none;
-    border-color: #10b981;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -454,7 +452,7 @@ body {
 .checkmark {
     width: 18px;
     height: 18px;
-    border: 2px solid #10b981;
+    box-shadow: 0 0 0 2px #e0e0e0;
     border-radius: 4px;
     position: relative;
     transition: all 0.3s ease;
@@ -499,7 +497,6 @@ body {
     padding: 16px 24px;
     background: var(--theme-primary);
     color: white;
-    border: none;
     border-radius: 25px;
     font-size: 16px;
     font-weight: 600;
@@ -534,7 +531,7 @@ body {
     z-index: 1000;
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    border-left: 4px solid #3b82f6;
+    box-shadow: -4px 0 0 #3b82f6;
 }
 
 .toast.show {
@@ -560,7 +557,6 @@ body {
 
 .toast-close {
     background: none;
-    border: none;
     color: #9ca3af;
     cursor: pointer;
     padding: 4px;
@@ -655,7 +651,7 @@ body {
     text-align: center;
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid rgba(16, 185, 129, 0.1);
+    box-shadow: 0 -1px 0 rgba(16, 185, 129, 0.1);
 }
 
 .signup-link p {
@@ -696,7 +692,6 @@ body {
 }
 
 .logo-upload-area {
-    border: 2px dashed rgba(16, 185, 129, 0.3);
     border-radius: 12px;
     padding: 24px;
     text-align: center;
@@ -706,7 +701,6 @@ body {
 }
 
 .logo-upload-area:hover {
-    border-color: #10b981;
     background: rgba(16, 185, 129, 0.1);
 }
 
@@ -746,7 +740,7 @@ body {
     border-radius: 12px;
     overflow: hidden;
     background: rgba(16, 185, 129, 0.05);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
 }
 
 .logo-preview img {
@@ -763,7 +757,6 @@ body {
     height: 24px;
     background: rgba(239, 68, 68, 0.9);
     color: white;
-    border: none;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -853,7 +846,7 @@ body {
 
 .store-btn {
     background: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     padding: 1rem 1.5rem;
     color: white;
@@ -870,7 +863,6 @@ body {
 
 .store-btn:hover {
     background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
@@ -933,7 +925,7 @@ body {
 .demo-login-section {
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -1px 0 #e2e8f0;
 }
 
 .demo-divider {
@@ -974,7 +966,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 0.875rem 1rem;
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 0 0 1px #e2e8f0;
     border-radius: 0.5rem;
     background: white;
     color: #374151;
@@ -987,7 +979,6 @@ body {
 }
 
 .demo-btn:hover {
-    border-color: #10b981;
     background: #f0fdf4;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
@@ -1010,11 +1001,9 @@ body {
 }
 
 .owner-btn {
-    border-color: #3b82f6;
 }
 
 .owner-btn:hover {
-    border-color: #3b82f6;
     background: #eff6ff;
 }
 
@@ -1023,11 +1012,9 @@ body {
 }
 
 .employee-btn {
-    border-color: #10b981;
 }
 
 .employee-btn:hover {
-    border-color: #10b981;
     background: #f0fdf4;
 }
 

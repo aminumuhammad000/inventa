@@ -22,20 +22,20 @@
             <div class="content">
 
                 <!-- Sale Type Filter Buttons -->
-                <div class="sale-type-filters">
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="switchSaleType('normal')" id="normalSaleBtn">
-                        <i class="material-icons-round">point_of_sale</i>
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <button class="tab-button active" onclick="switchSaleType('normal')" id="normalSaleBtn">
+                            <i class="material-icons-round">point_of_sale</i>
                             <span>Normal Sell</span>
                         </button>
-                        <button class="filter-btn" onclick="switchSaleType('credit')" id="creditSaleBtn">
+                        <button class="tab-button" onclick="switchSaleType('credit')" id="creditSaleBtn">
                             <i class="material-icons-round">credit_card</i>
                             <span>Sell on Credit</span>
-                    </button>
-                        <button class="filter-btn" onclick="switchSaleType('return')" id="returnSaleBtn">
-                        <i class="material-icons-round">undo</i>
+                        </button>
+                        <button class="tab-button" onclick="switchSaleType('return')" id="returnSaleBtn">
+                            <i class="material-icons-round">undo</i>
                             <span>Return Sells</span>
-                    </button>
+                        </button>
                     </div>
                 </div>
 
@@ -321,270 +321,9 @@
                     </div>
                 </div>
 
-                <!-- Sales Stats -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="material-icons-round">point_of_sale</i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value" id="todaySales">₦0</h3>
-                            <p class="stat-label">Today's Sales</p>
-                            <div class="stat-change positive">
-                                <i class="material-icons-round">trending_up</i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="material-icons-round">receipt</i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value" id="todayTransactions">0</h3>
-                            <p class="stat-label">Today's Transactions</p>
-                            <div class="stat-change positive">
-                                <i class="material-icons-round">trending_up</i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="material-icons-round">account_balance_wallet</i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value" id="averageSale">₦0</h3>
-                            <p class="stat-label">Average Sale</p>
-                            <div class="stat-change positive">
-                                <i class="material-icons-round">trending_up</i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="material-icons-round">inventory_2</i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value" id="itemsSold">0</h3>
-                            <p class="stat-label">Items Sold Today</p>
-                            <div class="stat-change positive">
-                                <i class="material-icons-round">trending_up</i>
-                                <span>+0%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filters -->
-                <div class="filters-bar">
-                    <div class="filter-group">
-                        <label>Date Range:</label>
-                        <select id="dateRangeFilter" onchange="filterSales()">
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Payment Method:</label>
-                        <select id="paymentFilter" onchange="filterSales()">
-                            <option value="">All Methods</option>
-                            <option value="cash">Cash</option>
-                            <option value="card">Card</option>
-                            <option value="transfer">Transfer</option>
-                        </select>
-                    </div>
-                    <div class="search-group">
-                        <input type="text" id="searchInput" placeholder="Search sales..." onkeyup="searchSales()">
-                        <i class="material-icons-round">search</i>
-                    </div>
-                </div>
-
-                <!-- Sales Table -->
-                <div class="table-container">
-                    <table class="data-table" id="salesTable">
-                        <thead>
-                            <tr>
-                                <th>Sale ID</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Items</th>
-                                <th>Total Amount</th>
-                                <th>Payment Method</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="salesTableBody">
-                            <!-- Data will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Returns History -->
-                <div class="returns-section">
-                    <div class="section-header">
-                        <h3>Returns History</h3>
-                        <div class="section-controls">
-                            <div class="search-group">
-                                <input type="text" id="returnSearchInput" placeholder="Search returns..." onkeyup="searchReturns()">
-                                <i class="material-icons-round">search</i>
-                            </div>
-                            <select id="returnDateFilter" onchange="filterReturns()">
-                                <option value="all">All Time</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table" id="returnsTable">
-                            <thead>
-                                <tr>
-                                    <th>Return ID</th>
-                                    <th>Original Sale</th>
-                                    <th>Date</th>
-                                    <th>Items</th>
-                                    <th>Refund Amount</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="returnsTableBody">
-                                <!-- Returns data will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-
-    <!-- Cart Modal -->
-    <div id="cartModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="cartModalTitle">Shopping Cart</h3>
-                <button class="modal-close" onclick="closeCartModal()">
-                    <i class="material-icons-round">close</i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="cart-items" id="cartItems">
-                    <!-- Cart items will be loaded here -->
-                </div>
+               
                 
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <div class="summary-label">Total Items:</div>
-                        <div class="summary-value" id="totalItemsCount">0</div>
-                    </div>
-                    <div class="summary-row total-row">
-                        <div class="summary-label">Total Amount:</div>
-                        <div class="summary-value total-amount" id="totalAmountDisplay">₦0</div>
-                    </div>
-                </div>
-                
-                <form id="cartForm" onsubmit="processCartSale(event)">
-                    <div class="form-group">
-                        <label for="saleDate">Sale Date:</label>
-                        <input type="date" id="saleDate" readonly>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="customerName">Customer Name:</label>
-                        <input type="text" id="customerName" placeholder="Enter customer name (optional)">
-                    </div>
-                    
-                    <!-- Normal Sale Fields -->
-                    <div id="normalSaleFields" class="sale-type-fields">
-                        <div class="form-group">
-                            <label for="paymentMethod">Payment Method:</label>
-                            <select id="paymentMethod" required>
-                                <option value="cash">Cash</option>
-                                <option value="transfer">Transfer</option>
-                                <option value="card">ATM Card</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Credit Sale Fields -->
-                    <div id="creditSaleFields" class="sale-type-fields" style="display: none;">
-                        <div class="form-group">
-                            <label for="creditLimit">Credit Limit:</label>
-                            <input type="number" id="creditLimit" placeholder="Enter credit limit" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="dueDate">Due Date:</label>
-                            <input type="date" id="dueDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="creditNotes">Notes:</label>
-                            <textarea id="creditNotes" rows="3" placeholder="Additional notes for credit sale..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Return Sale Fields -->
-                    <div id="returnSaleFields" class="sale-type-fields" style="display: none;">
-                        <div class="form-group">
-                            <label for="originalSaleId">Original Sale ID:</label>
-                            <input type="text" id="originalSaleId" placeholder="Enter original sale ID" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="returnReason">Return Reason:</label>
-                            <select id="returnReason" required>
-                                <option value="">Select Reason</option>
-                                <option value="defective">Defective Product</option>
-                                <option value="wrong_item">Wrong Item</option>
-                                <option value="customer_change">Customer Changed Mind</option>
-                                <option value="damaged">Damaged in Transit</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="returnNotes">Return Notes:</label>
-                            <textarea id="returnNotes" rows="3" placeholder="Additional notes for return..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-actions">
-                        <button type="button" class="btn-secondary" onclick="closeCartModal()">Cancel</button>
-                        <button type="submit" class="btn-primary" id="submitButton">Complete Sale</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Image Preview Modal -->
-    <div id="imageModal" class="modal">
-        <div class="modal-content image-modal-content">
-            <div class="modal-header">
-                <h3 id="imageModalTitle">Product Image</h3>
-                <button class="modal-close" onclick="closeImageModal()">
-                    <i class="material-icons-round">close</i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="image-preview-container">
-                    <img id="imagePreview" src="" alt="Product Image" class="product-image-preview">
-                    <div class="image-info" id="imageInfo">
-                        <!-- Product info will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+          
 
     <!-- Add Return Modal -->
     <div id="addReturnModal" class="modal">

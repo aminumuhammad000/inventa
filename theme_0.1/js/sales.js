@@ -1255,7 +1255,7 @@ function printReceipt(saleId) {
                 .receipt-header {
                     text-align: center;
                     margin-bottom: 20px;
-                    border-bottom: 2px solid #000;
+                    box-shadow: 0 2px 0 #000;
                     padding-bottom: 20px;
                 }
                 .shop-logo img {
@@ -1294,7 +1294,7 @@ function printReceipt(saleId) {
                 }
                 .receipt-table th,
                 .receipt-table td {
-                    border: 1px solid #000;
+                    box-shadow: 0 0 0 1px #000;
                     padding: 5px;
                     text-align: left;
                     font-size: 11px;
@@ -1303,7 +1303,7 @@ function printReceipt(saleId) {
                     background: #f0f0f0;
                 }
                 .receipt-summary {
-                    border-top: 2px solid #000;
+                    box-shadow: 0 -2px 0 #000;
                     padding-top: 10px;
                 }
                 .summary-row {
@@ -1315,14 +1315,14 @@ function printReceipt(saleId) {
                 .summary-row.total {
                     font-weight: bold;
                     font-size: 14px;
-                    border-top: 1px solid #000;
+                    box-shadow: 0 -1px 0 #000;
                     padding-top: 5px;
                     margin-top: 10px;
                 }
                 .receipt-footer {
                     text-align: center;
                     margin-top: 20px;
-                    border-top: 1px solid #000;
+                    box-shadow: 0 -1px 0 #000;
                     padding-top: 20px;
                 }
                 .receipt-footer p {
@@ -1335,7 +1335,7 @@ function printReceipt(saleId) {
                 .qr-placeholder {
                     width: 60px;
                     height: 60px;
-                    border: 1px solid #000;
+                    box-shadow: 0 0 0 1px #000;
                     margin: 0 auto 5px;
                     display: flex;
                     align-items: center;
@@ -1376,7 +1376,7 @@ function downloadReceipt() {
                 .receipt-header {
                     text-align: center;
                     margin-bottom: 20px;
-                    border-bottom: 2px solid #10b981;
+                    box-shadow: 0 2px 0 #e0e0e0;
                     padding-bottom: 20px;
                 }
                 .shop-logo img {
@@ -1418,7 +1418,7 @@ function downloadReceipt() {
                 }
                 .receipt-table th,
                 .receipt-table td {
-                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 0 0 1px #e2e8f0;
                     padding: 8px;
                     text-align: left;
                     font-size: 11px;
@@ -1429,7 +1429,7 @@ function downloadReceipt() {
                     font-weight: 600;
                 }
                 .receipt-summary {
-                    border-top: 2px solid #10b981;
+                    box-shadow: 0 -2px 0 #e0e0e0;
                     padding-top: 10px;
                 }
                 .summary-row {
@@ -1441,7 +1441,7 @@ function downloadReceipt() {
                 .summary-row.total {
                     font-weight: bold;
                     font-size: 14px;
-                    border-top: 1px solid #e2e8f0;
+                    box-shadow: 0 -1px 0 #e2e8f0;
                     padding-top: 5px;
                     margin-top: 10px;
                     color: #10b981;
@@ -1449,7 +1449,7 @@ function downloadReceipt() {
                 .receipt-footer {
                     text-align: center;
                     margin-top: 20px;
-                    border-top: 1px solid #e2e8f0;
+                    box-shadow: 0 -1px 0 #e2e8f0;
                     padding-top: 20px;
                 }
                 .receipt-footer p {
@@ -1463,7 +1463,7 @@ function downloadReceipt() {
                 .qr-placeholder {
                     width: 60px;
                     height: 60px;
-                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 0 0 1px #e2e8f0;
                     margin: 0 auto 5px;
                     display: flex;
                     align-items: center;
@@ -2959,7 +2959,7 @@ function printInvoice() {
                     .invoice-document { max-width: 800px; margin: 0 auto; }
                     .invoice-header { display: flex; justify-content: space-between; margin-bottom: 30px; }
                     .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    .invoice-table th, .invoice-table td { box-shadow: 0 0 0 1px #ddd; padding: 8px; text-align: left; }
                     .invoice-table th { background-color: #f2f2f2; }
                     .total-row { background-color: #f9f9f9; font-weight: bold; }
                     .invoice-footer { margin-top: 30px; }
@@ -2985,7 +2985,7 @@ function downloadInvoice() {
                     .invoice-document { max-width: 800px; margin: 0 auto; }
                     .invoice-header { display: flex; justify-content: space-between; margin-bottom: 30px; }
                     .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    .invoice-table th, .invoice-table td { box-shadow: 0 0 0 1px #ddd; padding: 8px; text-align: left; }
                     .invoice-table th { background-color: #f2f2f2; }
                     .total-row { background-color: #f9f9f9; font-weight: bold; }
                     .invoice-footer { margin-top: 30px; }

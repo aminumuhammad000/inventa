@@ -90,7 +90,10 @@ function openShopSettings() {
     window.location.href = 'shop-settings.html';
 }
 
-
+function openProfileSettings() {
+    // Redirect to profile settings page
+    window.location.href = 'profile-settings.html';
+}
 
 function logout() {
     // Clear authentication data
@@ -628,4 +631,5 @@ window.toggleSidebar = toggleSidebar;
 window.reorderItem = reorderItem;
 window.toggleUserDropdown = toggleUserDropdown;
 window.openShopSettings = openShopSettings;
+window.openProfileSettings = openProfileSettings;
 window.logout = logout;
