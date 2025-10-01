@@ -1,5 +1,7 @@
-import React from 'react';
-import styles from '../styles/Sidebar.css';
+
+import styles from '../styles/Sidebar.module.css';
+import "../styles/global-style.css"
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => (
   <aside className={styles.sidebar} id="sidebar">
@@ -18,38 +20,38 @@ const Sidebar = () => (
     <nav className={styles['sidebar-nav']}>
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Dashboard</div>
-        <a href="index.html" className={styles['nav-item']} data-page="home">
+        <Link to="/" className={styles['nav-item']} data-page="home">
           <i className="material-icons-round">home</i>
           <span>Dashboard</span>
-        </a>
+        </Link>
       </div>
 
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Your Shop</div>
-        <a href="inventory.html" className={styles['nav-item']} data-page="inventory">
+        <Link to="/inventory" className={styles['nav-item']} data-page="inventory">
           <i className="material-icons-round">inventory_2</i>
           <span>Stock Items</span>
-        </a>
-        <a href="sales.html" className={styles['nav-item']} data-page="sales">
+        </Link>
+        <Link to="/sales" className={styles['nav-item']} data-page="sales">
           <i className="material-icons-round">point_of_sale</i>
           <span>Sell Items</span>
-        </a>
-        <a href="credit.html" className={styles['nav-item']} data-page="credit">
+        </Link>
+        <Link to="/credit" className={styles['nav-item']} data-page="credit">
           <i className="material-icons-round">history</i>
           <span>Sale History</span>
-        </a>
-        <a href="customers.html" className={styles['nav-item']} data-page="customers">
+        </Link>
+        <Link to="/customers" className={styles['nav-item']} data-page="customers">
           <i className="material-icons-round">people</i>
           <span>Customers</span>
-        </a>
+        </Link>
       </div>
 
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Reports</div>
-        <a href="reports.html" className={styles['nav-item']} data-page="reports">
+        <Link to="/reports" className={styles['nav-item']} data-page="reports">
           <i className="material-icons-round">assessment</i>
           <span>View Reports</span>
-        </a>
+        </Link>
       </div>
     </nav>
 
