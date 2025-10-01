@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import "./App.css";
-import styles from "./styles/App.module.css"
 
 // Pages
 import Home from "./pages/Home";
@@ -15,12 +14,13 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Sales from "./pages/Sales";
 import Signup from "./pages/Signup";
 import Storefront from "./pages/Storefront";
+import Header from "./components/Header";
 
 function App() {
   return (
     <Router>
       {/* Global Navigation */}
-
+        <Header />
       {/* Route Mapping */}
       <Routes>
         <Route path="/" element={<Home />} />

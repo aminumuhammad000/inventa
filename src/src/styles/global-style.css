@@ -1,0 +1,61 @@
+:root {
+    --theme-primary: #10b981;
+    --theme-secondary: #059669;
+    --theme-primary-light: #d1fae5;
+    --theme-primary-dark: #047857;
+}
+
+/* Theme Classes */
+.theme-green,
+html.theme-green,
+body.theme-green {
+    --theme-primary: #10b981;
+    --theme-secondary: #059669;
+    --theme-primary-light: #d1fae5;
+    --theme-primary-dark: #047857;
+}
+
+.theme-blue,
+html.theme-blue,
+body.theme-blue {
+    --theme-primary: #3b82f6;
+    --theme-secondary: #1d4ed8;
+    --theme-primary-light: #dbeafe;
+    --theme-primary-dark: #1e40af;
+}
+
+.theme-purple,
+html.theme-purple,
+body.theme-purple {
+    --theme-primary: #8b5cf6;
+    --theme-secondary: #7c3aed;
+    --theme-primary-light: #e9d5ff;
+    --theme-primary-dark: #6d28d9;
+}
+
+.theme-red,
+html.theme-red,
+body.theme-red {
+    --theme-primary: #ef4444;
+    --theme-secondary: #dc2626;
+    --theme-primary-light: #fee2e2;
+    --theme-primary-dark: #b91c1c;
+}
+
+.theme-orange,
+html.theme-orange,
+body.theme-orange {
+    --theme-primary: #f97316;
+    --theme-secondary: #ea580c;
+    --theme-primary-light: #fed7aa;
+    --theme-primary-dark: #c2410c;
+}
+
+.theme-teal,
+html.theme-teal,
+body.theme-teal {
+    --theme-primary: #14b8a6;
+    --theme-secondary: #0d9488;
+    --theme-primary-light: #ccfbf1;
+    --theme-primary-dark: #0f766e;
+}
