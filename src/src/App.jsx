@@ -14,7 +14,6 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Sales from "./pages/Sales";
 import Storefront from "./pages/Storefront";
 import Login from "./components/Login";
-import Sidebar from "./components/Sidebar";
 
 function App() {
   return (

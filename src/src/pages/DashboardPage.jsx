@@ -14,8 +14,7 @@ const Dashboard = () => {
 
   return (
     <div className="app-container">
-      {/* Sidebar Container */}
-      <div id="sidebar-container"></div>
+   
       {/* Main Content */}
       <main className="main-content" id="mainContent">
         {/* Header Container */}

@@ -1,6 +1,9 @@
 import React from 'react';
-// import "../styles/Login.css"
-import "../styles/global-style.css"
+import "../styles/Login.css"
+// import "../styles/global-style.css"
+import TargetIcon from '@mui/icons-material/CenterFocusStrong';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import CloseIcon from '@mui/icons-material/Close';
 
 const Login = () => (
   <div className="login-container">
@@ -31,7 +34,7 @@ const Login = () => (
       {/* Company Logo */}
       <div className="company-logo">
         <div className="logo-icon">
-          <i className="material-icons-round">target</i>
+          <TargetIcon style={{ fontSize: 40 }} />
         </div>
         <span className="company-name">INVENTA</span>
       </div>
@@ -43,7 +46,7 @@ const Login = () => (
         {/* Store Access Button */}
         <div className="store-access">
           <button className="store-btn" onClick={() => window.location.href='storefront.html'}>
-            <i className="material-icons-round">storefront</i>
+            <StorefrontIcon style={{ fontSize: 24, marginRight: 8 }} />
             <span>Visit Our Store</span>
             <small>Browse products before logging in</small>
           </button>
@@ -85,11 +88,11 @@ const Login = () => (
     {/* Notification Toast */}
     <div id="toast" className="toast">
       <div className="toast-content">
-        <i className="material-icons-round toast-icon"></i>
+        {/* You can dynamically render the icon here if needed */}
         <span className="toast-message"></span>
       </div>
       <button className="toast-close" onClick={() => window.hideToast && window.hideToast()}>
-        <i className="material-icons-round">close</i>
+        <CloseIcon style={{ fontSize: 24 }} />
       </button>
     </div>
   </div>
