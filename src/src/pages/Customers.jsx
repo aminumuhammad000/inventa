@@ -1,5 +1,4 @@
-import React from 'react'
-
+import "../styles/global-style.css"
 const Customers = () => {
   return (
     <div>

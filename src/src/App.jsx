@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import "./App.css";
 
 // Pages
@@ -12,16 +12,13 @@ import ShopSettings from "./pages/ShopSettings";
 import Credit from "./pages/Credit";
 import ProfileSettings from "./pages/ProfileSettings";
 import Sales from "./pages/Sales";
-import Signup from "./pages/Signup";
 import Storefront from "./pages/Storefront";
-import Header from "./components/Header";
+import Login from "./components/Login";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
     <Router>
-      {/* Global Navigation */}
-        <Header />
-      {/* Route Mapping */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<DashboardPage />} />
@@ -33,7 +30,7 @@ function App() {
         <Route path="/credit" element={<Credit />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/sales" element={<Sales />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/storefront" element={<Storefront />} />
       </Routes>
     </Router>

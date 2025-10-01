@@ -1,4 +1,4 @@
-import "../styles/Header.css"
+import "../styles/global-style.css"
 
 const Header = () => (
   <header className="header">

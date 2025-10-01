@@ -1,3 +1,5 @@
+import "../styles/global-style.css"
+
 const Home = () => {
   return (
     <div>

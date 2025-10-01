@@ -1,5 +1,7 @@
 import React from 'react';
-import "../styles/signup.css"
+// import "../styles/Login.css"
+import "../styles/global-style.css"
+
 const Login = () => (
   <div className="login-container">
     {/* Left Column - Welcome Section */}
