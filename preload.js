@@ -50,4 +50,20 @@ contextBridge.exposeInMainWorld("api", {
   getThemeColor: async () => {
     return await ipcRenderer.invoke("shop:getThemeColor");
   },
+
+
+  // ============================
+  // PRODUCT API (productIPC)
+  // ============================
+  addProduct: (product) => ipcRenderer.invoke("add-product", product),
+  getProduct: (id) => ipcRenderer.invoke("get-product", id),
+  getAllProducts: () => ipcRenderer.invoke("get-all-products"),
+  updateProduct: (id, product) => ipcRenderer.invoke("update-product", { id, product }),
+  deleteProduct: (id) => ipcRenderer.invoke("delete-product", id),
+  searchProducts: (keyword) => ipcRenderer.invoke("search-products", keyword),
+  updateStatus: (id, status) => ipcRenderer.invoke("update-status", { id, status }),
+  getLowStock: (threshold) => ipcRenderer.invoke("get-low-stock", threshold),
+  countLowStock: (threshold) => ipcRenderer.invoke("count-low-stock", threshold),
+  getTotalProducts: () => ipcRenderer.invoke("get-total-products"),
+  getSomeProducts: (limit) => ipcRenderer.invoke("get-some-products", limit),
 });
