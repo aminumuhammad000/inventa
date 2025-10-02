@@ -3,9 +3,11 @@ import {
   HashRouter,
   BrowserRouter,
   Routes,
-  Route
+  Route,
+  Outlet
 } from "react-router-dom";
 import "./App.css";
+import "./styles/global-style.css";
 
 // Pages
 import Home from "./pages/Home";
@@ -22,7 +24,6 @@ import Storefront from "./pages/Storefront";
 import Login from "./components/Login";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
-import { Outlet } from "react-router-dom";
 
 // Layout wrapper for all main pages
 function MainLayout() {
@@ -39,17 +40,14 @@ function MainLayout() {
   );
 }
 
-
 function App() {
-  const Router =
-    window.location.protocol === "file:"
-      ? HashRouter
-      : BrowserRouter;
+  const Router = window.location.protocol === "file:" ? HashRouter : BrowserRouter;
 
   // Session check and redirect logic
   useEffect(() => {
-    const sessionStr = localStorage.getItem('userSession');
+    const sessionStr = localStorage.getItem("userSession");
     let isValid = false;
+
     if (sessionStr) {
       try {
         const session = JSON.parse(sessionStr);
@@ -57,32 +55,35 @@ function App() {
           isValid = true;
         } else {
           // Expired, clear session
-          localStorage.removeItem('userSession');
-          localStorage.removeItem('isLoggedIn');
-          localStorage.removeItem('currentUser');
+          localStorage.removeItem("userSession");
+          localStorage.removeItem("isLoggedIn");
+          localStorage.removeItem("currentUser");
         }
       } catch (e) {
         // Invalid session, clear
-        localStorage.removeItem('userSession');
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem("userSession");
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("currentUser");
       }
     }
+
     const path = window.location.pathname;
-    if (isValid && (path === '/' || path === '/login')) {
-      window.location.replace('/dashboard');
-    } else if (!isValid && path !== '/login' && path !== '/') {
-      window.location.replace('/login');
+    if (isValid && (path === "/" || path === "/login")) {
+      window.location.replace("/dashboard");
+    } else if (!isValid && path !== "/login" && path !== "/") {
+      window.location.replace("/login");
     }
   }, []);
 
   return (
     <Router>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          element={<MainLayout />}> 
+
+        {/* Protected routes under MainLayout */}
+        <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/inventory" element={<Inventory />} />
