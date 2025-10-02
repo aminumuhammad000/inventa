@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import React from "react";
+import {
+  HashRouter,
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
 import "./App.css";
 
 // Pages
@@ -13,10 +19,13 @@ import Credit from "./pages/Credit";
 import ProfileSettings from "./pages/ProfileSettings";
 import Sales from "./pages/Sales";
 import Storefront from "./pages/Storefront";
-import Login from "./components/Login";
-import Dashboard from "./pages/DashboardPage";
 
 function App() {
+  const Router =
+    window.location.protocol === "file:"
+      ? HashRouter
+      : BrowserRouter;
+
   return (
     <Router>
       <Routes>
