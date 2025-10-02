@@ -1,4 +1,13 @@
 import React, { useEffect } from "react";
+import Sidbar from "../components/Sidebar";
+import Header from "../components/Header";
+import "../styles/global-style.css";
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import WarningIcon from '@mui/icons-material/Warning';
+import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const Dashboard = () => {
   useEffect(() => {
@@ -14,11 +23,12 @@ const Dashboard = () => {
 
   return (
     <div className="app-container">
-   
-      {/* Main Content */}
+      
+      {/* Sidebar Container */}
+      <Sidbar />
       <main className="main-content" id="mainContent">
         {/* Header Container */}
-        <div id="header-container"></div>
+        <Header />
         {/* Content */}
         <div className="content">
           {/* Stats Grid */}
@@ -82,11 +92,11 @@ const Dashboard = () => {
             <div className="content-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  <i className="material-icons-round">inventory_2</i>
+                  <Inventory2Icon />
                   What's in Your Shop
                 </h2>
                 <button className="card-action">
-                  <i className="material-icons-round">more_vert</i>
+                  <MoreVertIcon />
                 </button>
               </div>
               <div className="card-content">
@@ -128,18 +138,18 @@ const Dashboard = () => {
             <div className="content-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  <i className="material-icons-round">warning</i>
+                  <WarningIcon />
                   Items Running Out
                 </h2>
                 <button className="card-action">
-                  <i className="material-icons-round">more_vert</i>
+                  <MoreVertIcon />
                 </button>
               </div>
               <div className="card-content">
                 <div className="alert-list">
                   <div className="alert-item critical">
                     <div className="alert-icon">
-                      <i className="material-icons-round">error</i>
+                      <ErrorIcon />
                     </div>
                     <div className="alert-content">
                       <h4>Paint (White)</h4>
@@ -151,7 +161,7 @@ const Dashboard = () => {
                   </div>
                   <div className="alert-item warning">
                     <div className="alert-icon">
-                      <i className="material-icons-round">warning</i>
+                      <WarningIcon />
                     </div>
                     <div className="alert-content">
                       <h4>Nails (2 inches)</h4>
@@ -163,7 +173,7 @@ const Dashboard = () => {
                   </div>
                   <div className="alert-item warning">
                     <div className="alert-icon">
-                      <i className="material-icons-round">warning</i>
+                      <WarningIcon />
                     </div>
                     <div className="alert-content">
                       <h4>PVC Pipes (4 inches)</h4>

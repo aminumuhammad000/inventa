@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import "./App.css";
 
 // Pages
-// import Home from "./pages/Home";
+import Home from "./pages/Home";
 import DashboardPage from "./pages/DashboardPage";
 import Customers from "./pages/Customers";
 import Inventory from "./pages/Inventory";
@@ -20,7 +20,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/inventory" element={<Inventory />} />
@@ -30,7 +30,6 @@ function App() {
         <Route path="/credit" element={<Credit />} />
         <Route path="/profile-settings" element={<ProfileSettings />} />
         <Route path="/sales" element={<Sales />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/storefront" element={<Storefront />} />
       </Routes>
     </Router>

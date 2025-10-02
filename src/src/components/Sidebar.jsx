@@ -1,7 +1,15 @@
 
+
 import styles from '../styles/Sidebar.module.css';
-import "../styles/global-style.css"
+import "../styles/global-style.css";
 import { Link } from 'react-router-dom';
+import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+import HistoryIcon from '@mui/icons-material/History';
+import PeopleIcon from '@mui/icons-material/People';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const Sidebar = () => (
   <aside className={styles.sidebar} id="sidebar">
@@ -12,7 +20,7 @@ const Sidebar = () => (
         <div className={styles['logo-text']}>Inventa</div>
       </div>
       <button className={styles['sidebar-toggle']} id="sidebarToggle" onClick={() => window.toggleSidebar && window.toggleSidebar()}>
-        <i className="material-icons-round">menu</i>
+        <MenuIcon />
       </button>
     </div>
 
@@ -21,7 +29,7 @@ const Sidebar = () => (
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Dashboard</div>
         <Link to="/" className={styles['nav-item']} data-page="home">
-          <i className="material-icons-round">home</i>
+          <HomeIcon />
           <span>Dashboard</span>
         </Link>
       </div>
@@ -29,19 +37,19 @@ const Sidebar = () => (
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Your Shop</div>
         <Link to="/inventory" className={styles['nav-item']} data-page="inventory">
-          <i className="material-icons-round">inventory_2</i>
+          <Inventory2Icon />
           <span>Stock Items</span>
         </Link>
         <Link to="/sales" className={styles['nav-item']} data-page="sales">
-          <i className="material-icons-round">point_of_sale</i>
+          <PointOfSaleIcon />
           <span>Sell Items</span>
         </Link>
         <Link to="/credit" className={styles['nav-item']} data-page="credit">
-          <i className="material-icons-round">history</i>
+          <HistoryIcon />
           <span>Sale History</span>
         </Link>
         <Link to="/customers" className={styles['nav-item']} data-page="customers">
-          <i className="material-icons-round">people</i>
+          <PeopleIcon />
           <span>Customers</span>
         </Link>
       </div>
@@ -49,7 +57,7 @@ const Sidebar = () => (
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Reports</div>
         <Link to="/reports" className={styles['nav-item']} data-page="reports">
-          <i className="material-icons-round">assessment</i>
+          <AssessmentIcon />
           <span>View Reports</span>
         </Link>
       </div>

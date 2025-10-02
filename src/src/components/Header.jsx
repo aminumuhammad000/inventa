@@ -1,4 +1,8 @@
-import "../styles/global-style.css"
+import "../styles/global-style.css";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Header = () => (
   <header className="header">
@@ -17,7 +21,7 @@ const Header = () => (
         </div>
         <div className="user-dropdown">
           <button className="dropdown-toggle" onClick={() => window.toggleUserDropdown && window.toggleUserDropdown()}>
-            <i className="material-icons-round">keyboard_arrow_down</i>
+            <KeyboardArrowDownIcon />
           </button>
           <div className="dropdown-menu" id="userDropdown">
             <div className="dropdown-header">
@@ -28,15 +32,15 @@ const Header = () => (
             </div>
             <div className="dropdown-divider"></div>
             <a href="#" className="dropdown-item" onClick={() => window.openShopSettings && window.openShopSettings()}>
-              <i className="material-icons-round">settings</i>
+              <SettingsIcon />
               <span>Change Shop Info</span>
             </a>
             <a href="#" className="dropdown-item" onClick={() => window.openProfileSettings && window.openProfileSettings()}>
-              <i className="material-icons-round">person</i>
+              <PersonIcon />
               <span>Change My Info</span>
             </a>
             <a href="#" className="dropdown-item logout" onClick={() => window.logout && window.logout()}>
-              <i className="material-icons-round">logout</i>
+              <LogoutIcon />
               <span>Logout</span>
             </a>
           </div>
