@@ -21,6 +21,23 @@ import Sales from "./pages/Sales";
 import Storefront from "./pages/Storefront";
 import Login from "./components/Login";
 import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
+import { Outlet } from "react-router-dom";
+
+// Layout wrapper for all main pages
+function MainLayout() {
+  return (
+    <div className="app-container">
+      <Sidebar />
+      <div className="main-content">
+        <Header />
+        <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const Router =
@@ -29,21 +46,23 @@ function App() {
       : BrowserRouter;
 
   return (
-    
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/customers" element={<Customers />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/product-details" element={<ProductDetails />} />
-        <Route path="/shop-settings" element={<ShopSettings />} />
-        <Route path="/credit" element={<Credit />} />
-        <Route path="/profile-settings" element={<ProfileSettings />} />
-        <Route path="/sales" element={<Sales />} />
-        <Route path="/storefront" element={<Storefront />} />
+        <Route
+          element={<MainLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/product-details" element={<ProductDetails />} />
+          <Route path="/shop-settings" element={<ShopSettings />} />
+          <Route path="/credit" element={<Credit />} />
+          <Route path="/profile-settings" element={<ProfileSettings />} />
+          <Route path="/sales" element={<Sales />} />
+          <Route path="/storefront" element={<Storefront />} />
+        </Route>
       </Routes>
     </Router>
   );

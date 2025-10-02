@@ -92,10 +92,8 @@ const Dashboard = () => {
     <div className="app-container">
       
       {/* Sidebar Container */}
-      <Sidbar />
       <main className="main-content" id="mainContent">
         {/* Header Container */}
-        <Header />
         {/* Content */}
         <div className="content">
           {/* Stats Grid */}
