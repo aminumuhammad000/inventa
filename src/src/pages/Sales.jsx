@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import UndoIcon from '@mui/icons-material/Undo';
@@ -12,17 +12,139 @@ import ShareIcon from '@mui/icons-material/Share';
 import EmailIcon from '@mui/icons-material/Email';
 
 const Sales = () => {
-  useEffect(() => {
-    // Load sidebar and header components after DOM is ready
-    (async function() {
-      if (window.SidebarComponent) {
-        window.sidebarComponent = await window.SidebarComponent.loadSidebar('sidebar-container');
+  // State management
+  const [saleType, setSaleType] = useState('normal');
+  const [search, setSearch] = useState('');
+  const [brand, setBrand] = useState('all');
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [tax, setTax] = useState(0);
+  const [qtyInputs, setQtyInputs] = useState({});
+  const [lastSale, setLastSale] = useState(null);
+
+  // Sample products data
+  const [products, setProducts] = useState([
+    {
+      id: 1,
+      name: "Cement",
+      brand: "Dangote",
+      category: "Building Materials",
+      stock: 50,
+      unit: "bags",
+      price: 3000,
+      image: ""
+    },
+    {
+      id: 2,
+      name: "Iron Rod",
+      brand: "Steel Works",
+      category: "Metals",
+      stock: 20,
+      unit: "pieces",
+      price: 6000,
+      image: ""
+    },
+    {
+      id: 3,
+      name: "Paint",
+      brand: "Dulux",
+      category: "Paints",
+      stock: 30,
+      unit: "liters",
+      price: 4500,
+      image: ""
+    }
+  ]);
+
+  const brands = [
+    "Dangote", "Lafarge", "Steel Works", "Dulux", "Berger", "Premium Sand", "Hardware Pro", "AquaFlow"
+  ];
+
+  // Filter products based on search and brand
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase()) ||
+                         product.brand.toLowerCase().includes(search.toLowerCase()) ||
+                         product.category.toLowerCase().includes(search.toLowerCase());
+    const matchesBrand = brand === 'all' || product.brand === brand;
+    return matchesSearch && matchesBrand;
+  });
+
+  // Handle adding product to cart
+  const handleAddToCart = (product) => {
+    let qty = Number(qtyInputs[product.id]);
+    if (!qty || qty < 1) qty = 1;
+    if (qty > product.stock) qty = product.stock;
+    const existingItem = cart.find(item => item.productId === product.id);
+    if (existingItem) {
+      setCart(cart.map(item =>
+        item.productId === product.id
+          ? { ...item, qty: Math.min(item.qty + qty, product.stock) }
+          : item
+      ));
+    } else {
+      setCart([...cart, { productId: product.id, qty }]);
+    }
+    setQtyInputs(inputs => ({ ...inputs, [product.id]: '' }));
+  };
+
+  // Handle editing cart quantity
+  const handleEditCartQty = (productId, newQty) => {
+    if (newQty <= 0) {
+      handleRemoveFromCart(productId);
+    } else {
+      setCart(cart.map(item => 
+        item.productId === productId 
+          ? { ...item, qty: newQty }
+          : item
+      ));
+    }
+  };
+
+  // Handle removing from cart
+  const handleRemoveFromCart = (productId) => {
+    setCart(cart.filter(item => item.productId !== productId));
+  };
+
+  // Handle marking as sold
+  const handleMarkSold = () => {
+    const saleItems = cart.map(item => {
+      const product = products.find(p => p.id === item.productId);
+      return {
+        name: product.name,
+        qty: item.qty,
+        price: product.price,
+        total: item.qty * product.price
+      };
+    });
+    const sale = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString(),
+      items: saleItems,
+      customer: customerName,
+      discount,
+      tax,
+      invoiceNumber: `INV-${Date.now()}`
+    };
+    setLastSale(sale);
+    setShowCart(false);
+    setShowInvoice(true);
+    setCart([]);
+    setProducts(prev => prev.map(prod => {
+      const cartItem = cart.find(item => item.productId === prod.id);
+      if (cartItem) {
+        return { ...prod, stock: Math.max(0, prod.stock - cartItem.qty) };
       }
-      if (window.HeaderComponent) {
-        window.headerComponent = await window.HeaderComponent.loadHeader('header-container');
-      }
-    })();
-  }, []);
+      return prod;
+    }));
+    setCustomerName('');
+    setDiscount(0);
+    setTax(0);
+  };
+
 
   return (
     <div className="app-container">
@@ -30,17 +152,18 @@ const Sales = () => {
       <main className="main-content" id="mainContent">
         <div id="header-container"></div>
         <div className="content">
-          <div className="tabs-container">
-            <div className="tabs">
-              <button className="tab-button active" onClick={() => window.switchSaleType('normal')} id="normalSaleBtn">
+          {/* Sale Type Tabs */}
+          <div className="sale-type-tabs">
+            <div className="tabs-container">
+              <button className={`tab-button${saleType === 'normal' ? ' active' : ''}`} onClick={() => setSaleType('normal')} id="normalSaleBtn">
                 <PointOfSaleIcon />
                 <span>Normal Sell</span>
               </button>
-              <button className="tab-button" onClick={() => window.switchSaleType('credit')} id="creditSaleBtn">
+              <button className={`tab-button${saleType === 'credit' ? ' active' : ''}`} onClick={() => setSaleType('credit')} id="creditSaleBtn">
                 <CreditCardIcon />
                 <span>Sell on Credit</span>
               </button>
-              <button className="tab-button" onClick={() => window.switchSaleType('return')} id="returnSaleBtn">
+              <button className={`tab-button${saleType === 'return' ? ' active' : ''}`} onClick={() => setSaleType('return')} id="returnSaleBtn">
                 <UndoIcon />
                 <span>Return Sells</span>
               </button>
@@ -53,29 +176,29 @@ const Sales = () => {
                 <h3 id="saleTypeTitle">Select Products to Sell</h3>
                 <div className="header-actions">
                   <div className="search-box">
-                    <input type="text" id="productSearch" placeholder="Search products..." onKeyUp={() => window.filterProducts()} />
+                    <input type="text" id="productSearch" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
                     <SearchIcon />
                   </div>
                   <div className="filter-actions">
-                    <select id="brandFilter" onChange={() => window.filterProducts()}>
+                    <select id="brandFilter" value={brand} onChange={e => setBrand(e.target.value)}>
                       <option value="all">All Brands</option>
-                      <option value="Dangote">Dangote</option>
-                      <option value="Lafarge">Lafarge</option>
-                      <option value="Steel Works">Steel Works</option>
-                      <option value="Dulux">Dulux</option>
-                      <option value="Berger">Berger</option>
-                      <option value="Premium Sand">Premium Sand</option>
-                      <option value="Hardware Pro">Hardware Pro</option>
-                      <option value="AquaFlow">AquaFlow</option>
+                      {brands.map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="cart-info">
-                    <span className="cart-count" id="cartCount">0</span>
-                    <button className="mark-sold-btn" onClick={() => window.openCartModal()} id="markSoldBtn" disabled>
+                    <span className="cart-count" id="cartCount">{cart.reduce((sum, item) => sum + item.qty, 0)}</span>
+                    <button className="mark-sold-btn" onClick={() => setShowCart(true)} disabled={cart.length === 0}>
                       <ShoppingCartIcon />
                       <span id="markSoldText">Mark as Sold</span>
                     </button>
-                    <button className="btn-secondary" onClick={() => window.showInvoiceModalDirectly()} title="Generate Invoice from Recent Sale">
+                    <button
+                      className="btn-secondary"
+                      title="Generate Invoice from Recent Sale"
+                      onClick={() => setShowInvoice(true)}
+                      disabled={!lastSale}
+                    >
                       <ReceiptLongIcon />
                       <span>Invoice</span>
                     </button>
@@ -99,8 +222,49 @@ const Sales = () => {
                         <th>Actions</th>
                       </tr>
                     </thead>
-                    <tbody id="productsTableBody">
-                      {/* Products will be loaded here */}
+                    <tbody>
+                      {filteredProducts.map(product => (
+                        <tr key={product.id}>
+                          <td>
+                            <img src={product.image || 'https://via.placeholder.com/60x60?text=No+Image'} alt={product.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8 }} />
+                          </td>
+                          <td>{product.name}</td>
+                          <td>{product.brand}</td>
+                          <td>{product.category}</td>
+                          <td>{product.stock}</td>
+                          <td>{product.unit}</td>
+                          <td>₦{parseFloat(product.price).toFixed(2)}</td>
+                          <td>
+                            <span className={`status-badge ${product.stock === 0 ? 'out-of-stock' : product.stock < 10 ? 'low-stock' : 'normal-stock'}`}>
+                              {product.stock === 0 ? 'Out of Stock' : product.stock < 10 ? 'Low Stock' : 'In Stock'}
+                            </span>
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="1"
+                              max={product.stock}
+                              style={{ width: 60 }}
+                              disabled={product.stock === 0}
+                              value={qtyInputs[product.id] || ''}
+                              onChange={e => {
+                                const val = e.target.value;
+                                setQtyInputs(inputs => ({ ...inputs, [product.id]: val }));
+                              }}
+                            />
+                          </td>
+                          <td>
+                            <button
+                              className="btn-primary"
+                              style={{ padding: '6px 12px', fontSize: 13 }}
+                              disabled={product.stock === 0}
+                              onClick={() => handleAddToCart(product)}
+                            >
+                              Add
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -108,368 +272,193 @@ const Sales = () => {
             </div>
           </div>
 
-          <div className="sale-details-section" id="saleDetailsSection" style={{display: 'none'}}>
-            <div className="form-card">
-              <div className="form-header">
-                <h3>Sale Details</h3>
-                <button className="btn-close" onClick={() => window.closeSaleDetailsForm()}>
-                  <CloseIcon />
-                </button>
-              </div>
-              <div className="sale-details-content">
-                <div className="details-section">
-                  <h4>Sale Information</h4>
-                  <div className="details-grid">
-                    <div className="detail-item">
-                      <label>Sale ID:</label>
-                      <span id="detailsSaleId">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Date:</label>
-                      <span id="detailsSaleDate">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Time:</label>
-                      <span id="detailsSaleTime">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Customer:</label>
-                      <span id="detailsCustomer">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Cashier:</label>
-                      <span id="detailsCashier">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Payment Method:</label>
-                      <span id="detailsPaymentMethod">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Subtotal:</label>
-                      <span id="detailsSubtotal">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Discount:</label>
-                      <span id="detailsDiscount">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Total Amount:</label>
-                      <span id="detailsTotalAmount">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Status:</label>
-                      <span id="detailsStatus">-</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="details-section">
-                  <h4>Items Sold</h4>
-                  <div className="items-table-container">
-                    <table className="items-table" id="detailsItemsTable">
-                      <thead>
-                        <tr>
-                          <th>Product</th>
-                          <th>Quantity</th>
-                          <th>Unit Price</th>
-                          <th>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody id="detailsItemsTableBody">
-                        {/* Items will be loaded here */}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div className="details-section">
-                  <h4>Sale Summary</h4>
-                  <div className="summary-grid">
-                    <div className="summary-item">
-                      <label>Total Items:</label>
-                      <span id="detailsTotalItems">-</span>
-                    </div>
-                    <div className="summary-item">
-                      <label>Total Quantity:</label>
-                      <span id="detailsTotalQuantity">-</span>
-                    </div>
-                    <div className="summary-item">
-                      <label>Discount Applied:</label>
-                      <span id="detailsDiscountApplied">-</span>
-                    </div>
-                    <div className="summary-item">
-                      <label>Final Total:</label>
-                      <span id="detailsFinalTotal">-</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="details-actions">
-                  <button type="button" className="btn-secondary" onClick={() => window.closeSaleDetailsForm()}>Close</button>
-                  <button type="button" className="btn-primary" onClick={() => window.printReceiptFromDetails()}>Print Receipt</button>
-                  <button type="button" className="btn-primary" onClick={() => window.showReceiptFromDetails()}>View Receipt</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="return-details-section" id="returnDetailsSection" style={{display: 'none'}}>
-            <div className="form-card">
-              <div className="form-header">
-                <h3>Return Details</h3>
-                <button className="btn-close" onClick={() => window.closeReturnDetailsForm()}>
-                  <CloseIcon />
-                </button>
-              </div>
-              <div className="return-details-content">
-                <div className="details-section">
-                  <h4>Return Information</h4>
-                  <div className="details-grid">
-                    <div className="detail-item">
-                      <label>Return ID:</label>
-                      <span id="detailsReturnId">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Original Sale ID:</label>
-                      <span id="detailsOriginalSaleId">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Return Date:</label>
-                      <span id="detailsReturnDate">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Return Time:</label>
-                      <span id="detailsReturnTime">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Processed By:</label>
-                      <span id="detailsProcessedBy">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Refund Method:</label>
-                      <span id="detailsRefundMethod">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Refund Amount:</label>
-                      <span id="detailsRefundAmount">-</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Status:</label>
-                      <span id="detailsReturnStatus">-</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="details-section">
-                  <h4>Return Reason</h4>
-                  <div className="reason-display">
-                    <span id="detailsReturnReason">-</span>
-                  </div>
-                </div>
-                <div className="details-section">
-                  <h4>Items Returned</h4>
-                  <div className="items-table-container">
-                    <table className="items-table" id="detailsReturnItemsTable">
-                      <thead>
-                        <tr>
-                          <th>Product</th>
-                          <th>Quantity</th>
-                          <th>Unit Price</th>
-                          <th>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody id="detailsReturnItemsTableBody">
-                        {/* Items will be loaded here */}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div className="details-section">
-                  <h4>Return Summary</h4>
-                  <div className="summary-grid">
-                    <div className="summary-item">
-                      <label>Total Items:</label>
-                      <span id="detailsReturnTotalItems">-</span>
-                    </div>
-                    <div className="summary-item">
-                      <label>Total Quantity:</label>
-                      <span id="detailsReturnTotalQuantity">-</span>
-                    </div>
-                    <div className="summary-item">
-                      <label>Refund Amount:</label>
-                      <span id="detailsReturnRefundTotal">-</span>
-                    </div>
-                    <div className="summary-item">
-                      <label>Processing Status:</label>
-                      <span id="detailsReturnProcessingStatus">-</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="details-actions">
-                  <button type="button" className="btn-secondary" onClick={() => window.closeReturnDetailsForm()}>Close</button>
-                  <button type="button" className="btn-primary" onClick={() => window.printReturnReceiptFromDetails()}>Print Return Receipt</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div id="addReturnModal" className="modal">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h3>Add Return</h3>
-                <button className="modal-close" onClick={() => window.closeAddReturnModal()}>
-                  <CloseIcon />
-                </button>
-              </div>
-              <div className="modal-body">
-                <form id="addReturnForm">
-                  <div className="form-group">
-                    <label htmlFor="returnDate">Return Date:</label>
-                    <input type="date" id="returnDate" required />
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="saleIdInput">Sale ID:</label>
-                      <input type="text" id="saleIdInput" placeholder="Enter Sale ID" onChange={() => window.loadSaleDetails()} />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="productIdInput">Product ID:</label>
-                      <input type="text" id="productIdInput" placeholder="Enter Product ID" onChange={() => window.loadProductDetails()} />
-                    </div>
-                  </div>
-                  <div className="form-group" id="saleDetailsSection" style={{display: 'none'}}>
-                    <label>Sale Details:</label>
-                    <div className="sale-details-card" id="saleDetailsCard">
-                      {/* Sale details will be loaded here */}
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="returnReason">Return Reason:</label>
-                    <select id="returnReason" required>
-                      <option value="">Select Reason</option>
-                      <option value="defective">Defective Product</option>
-                      <option value="wrong-size">Wrong Size</option>
-                      <option value="not-satisfied">Not Satisfied</option>
-                      <option value="damaged">Damaged in Transit</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="returnQuantity">Return Quantity:</label>
-                    <input type="number" id="returnQuantity" placeholder="Enter quantity" min="1" required />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="returnNotes">Notes:</label>
-                    <textarea id="returnNotes" rows="3" placeholder="Additional notes about the return"></textarea>
-                  </div>
-                  <div className="form-actions">
-                    <button type="button" className="btn-secondary" onClick={() => window.closeAddReturnModal()}>Cancel</button>
-                    <button type="button" className="btn-primary" onClick={() => window.processAddReturn()}>Add Return</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <div className="modal" id="receiptModal">
-            <div className="modal-content large">
-              <div className="modal-header">
-                <h3>Sales Receipt</h3>
-                <div className="modal-actions">
-                  <button className="btn-secondary" onClick={() => window.printReceipt()}>
-                    <PrintIcon />
-                    Print
-                  </button>
-                  <button className="btn-secondary" onClick={() => window.downloadReceipt()}>
-                    <DownloadIcon />
-                    Download PDF
-                  </button>
-                  <button className="btn-primary" onClick={() => window.generateInvoice()}>
-                    <ReceiptLongIcon />
-                    Generate Invoice
-                  </button>
-                  <button className="btn-secondary" onClick={() => window.shareInvoice()}>
-                    <ShareIcon />
-                    Share
-                  </button>
-                  <button className="modal-close" onClick={() => window.closeReceiptModal()}>
+        {/* Cart Modal */}
+        {showCart && (
+          <>
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(30,41,59,0.25)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 1000
+            }} onClick={() => setShowCart(false)} />
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1001
+            }}>
+              <div className="form-card" style={{ maxWidth: 480, width: '100%', margin: '0 auto', boxShadow: '0 12px 48px rgba(0,0,0,0.18)', maxHeight: '90vh', overflowY: 'auto' }}>
+                <div className="form-header">
+                  <h3 style={{ margin: 0 }}>Cart</h3>
+                  <button className="btn-close" onClick={() => setShowCart(false)} style={{ marginLeft: 16 }}>
                     <CloseIcon />
                   </button>
                 </div>
-              </div>
-              <div className="modal-body">
-                <div className="receipt" id="receiptContent">
-                  {/* Receipt content will be generated here */}
+                <div style={{ padding: 24 }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <input
+                      type="text"
+                      placeholder="Customer Name (optional)"
+                      value={customerName}
+                      onChange={e => setCustomerName(e.target.value)}
+                      style={{ width: '100%', marginBottom: 8, padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
+                    />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="Discount %"
+                        value={discount}
+                        onChange={e => setDiscount(Number(e.target.value))}
+                        style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="Tax %"
+                        value={tax}
+                        onChange={e => setTax(Number(e.target.value))}
+                        style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
+                      />
+                    </div>
+                  </div>
+                  {cart.length === 0 ? (
+                    <div style={{ textAlign: 'center', color: '#888' }}>Cart is empty.</div>
+                  ) : (
+                    <table style={{ width: '100%', marginBottom: 16 }}>
+                      <thead>
+                        <tr>
+                          <th>Product</th>
+                          <th>Qty</th>
+                          <th>Edit</th>
+                          <th>Remove</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cart.map(item => {
+                          const prod = products.find(p => p.id === item.productId);
+                          return (
+                            <tr key={item.productId}>
+                              <td>{prod ? prod.name : 'Unknown'}</td>
+                              <td>{item.qty}</td>
+                              <td>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max={prod ? prod.stock + item.qty : 1000}
+                                  value={item.qty}
+                                  onChange={e => handleEditCartQty(item.productId, Number(e.target.value))}
+                                  style={{ width: 60 }}
+                                />
+                              </td>
+                              <td>
+                                <button className="btn-close" onClick={() => handleRemoveFromCart(item.productId)}><CloseIcon /></button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
+                  <button className="btn-primary" style={{ width: '100%' }} onClick={handleMarkSold} disabled={cart.length === 0}>Mark as Sold</button>
                 </div>
               </div>
             </div>
-          </div>
+          </>
+        )}
 
-          <div className="modal" id="invoiceModal">
-            <div className="modal-content large">
-              <div className="modal-header">
-                <h3>Invoice Generator</h3>
-                <div className="modal-actions">
-                  <button className="btn-secondary" onClick={() => window.printInvoice()}>
-                    <PrintIcon />
-                    Print Invoice
-                  </button>
-                  <button className="btn-secondary" onClick={() => window.downloadInvoice()}>
-                    <DownloadIcon />
-                    Download PDF
-                  </button>
-                  <button className="btn-primary" onClick={() => window.shareInvoiceLink()}>
-                    <ShareIcon />
-                    Share Invoice
-                  </button>
-                  <button className="btn-secondary" onClick={() => window.emailInvoice()}>
-                    <EmailIcon />
-                    Email Invoice
-                  </button>
-                  <button className="modal-close" onClick={() => window.closeInvoiceModal()}>
-                    <CloseIcon />
-                  </button>
-                </div>
-              </div>
-              <div className="modal-body">
-                <div className="invoice-form">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="invoiceNumber">Invoice Number:</label>
-                      <input type="text" id="invoiceNumber" readOnly />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="invoiceDate">Invoice Date:</label>
-                      <input type="date" id="invoiceDate" />
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="dueDate">Due Date:</label>
-                      <input type="date" id="dueDate" />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="paymentTerms">Payment Terms:</label>
-                      <select id="paymentTerms">
-                        <option value="net15">Net 15</option>
-                        <option value="net30" selected>Net 30</option>
-                        <option value="net45">Net 45</option>
-                        <option value="net60">Net 60</option>
-                        <option value="due_on_receipt">Due on Receipt</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="customerEmail">Customer Email (for sharing):</label>
-                    <input type="email" id="customerEmail" placeholder="customer@example.com" />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="invoiceNotes">Notes:</label>
-                    <textarea id="invoiceNotes" rows="3" placeholder="Additional notes for the invoice"></textarea>
-                  </div>
-                </div>
-                <div className="invoice-preview" id="invoicePreview">
-                  {/* Invoice preview will be generated here */}
-                </div>
-              </div>
-            </div>
-          </div>
+                      {/* Invoice Modal */}
+                      {showInvoice && lastSale && (
+                        <>
+                          <div style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            background: 'rgba(30,41,59,0.25)',
+                            backdropFilter: 'blur(6px)',
+                            zIndex: 1100
+                          }} onClick={() => setShowInvoice(false)} />
+                          <div style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1101
+                          }}>
+                            <div className="form-card" style={{ maxWidth: 520, width: '100%', margin: '0 auto', boxShadow: '0 12px 48px rgba(0,0,0,0.18)', maxHeight: '90vh', overflowY: 'auto', background: '#fff' }}>
+                              <div className="form-header">
+                                <h3 style={{ margin: 0 }}>Invoice</h3>
+                                <button className="btn-close" onClick={() => setShowInvoice(false)} style={{ marginLeft: 16 }}>
+                                  <CloseIcon />
+                                </button>
+                              </div>
+                              <div style={{ padding: 24 }}>
+                                <div style={{ marginBottom: 8, color: '#555' }}>Invoice #: {lastSale.invoiceNumber}</div>
+                                <div style={{ marginBottom: 8, color: '#555' }}>Date: {lastSale.date}</div>
+                                {lastSale.customer && <div style={{ marginBottom: 8, color: '#555' }}>Customer: {lastSale.customer}</div>}
+                                <table style={{ width: '100%', marginBottom: 16 }}>
+                                  <thead>
+                                    <tr>
+                                      <th>Product</th>
+                                      <th>Qty</th>
+                                      <th>Price</th>
+                                      <th>Total</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {lastSale.items.map((item, idx) => (
+                                      <tr key={idx}>
+                                        <td>{item.name}</td>
+                                        <td>{item.qty}</td>
+                                        <td>₦{parseFloat(item.price).toFixed(2)}</td>
+                                        <td>₦{parseFloat(item.total).toFixed(2)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                                <div style={{ textAlign: 'right', marginBottom: 8 }}>
+                                  <div>Subtotal: ₦{lastSale.items.reduce((sum, item) => sum + item.total, 0).toFixed(2)}</div>
+                                  {lastSale.discount > 0 && <div>Discount: {lastSale.discount}%</div>}
+                                  {lastSale.tax > 0 && <div>Tax: {lastSale.tax}%</div>}
+                                  <div style={{ fontWeight: 600, fontSize: 18, marginTop: 8 }}>
+                                    Total: ₦{(() => {
+                                      let subtotal = lastSale.items.reduce((sum, item) => sum + item.total, 0);
+                                      let afterDiscount = subtotal * (1 - (lastSale.discount || 0) / 100);
+                                      let afterTax = afterDiscount * (1 + (lastSale.tax || 0) / 100);
+                                      return afterTax.toFixed(2);
+                                    })()}
+                                  </div>
+                                </div>
+                                <button
+                                  className="btn-primary"
+                                  style={{ width: '100%', marginBottom: 8 }}
+                                  onClick={() => {
+                                    window.print();
+                                  }}
+                                >Print Invoice</button>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
         </div>
       </main>
     </div>

@@ -402,9 +402,9 @@ body.theme-teal {
 }
 
 .main-content > .header {
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     box-sizing: border-box;
     padding-left: 24px;
     padding-right: 24px;
@@ -412,13 +412,13 @@ body.theme-teal {
 
 .main-content > div {
     flex: 1 1 0%;
-    max-width: 1200px;
+    width: 95%;
     margin: 0 auto;
-    width: 100%;
     box-sizing: border-box;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 0;
+    padding-right: 0;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 

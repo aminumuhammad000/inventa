@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/global-style.css";
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -13,125 +13,156 @@ import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SaveIcon from '@mui/icons-material/Save';
 
+
+const themeColors = {
+  green: { primary: '#10b981', secondary: '#059669' },
+  blue: { primary: '#3b82f6', secondary: '#2563eb' },
+  purple: { primary: '#8b5cf6', secondary: '#7c3aed' },
+  red: { primary: '#ef4444', secondary: '#b91c1c' },
+  orange: { primary: '#f97316', secondary: '#ea580c' },
+  teal: { primary: '#14b8a6', secondary: '#0d9488' }
+};
+
+const defaultShop = {
+  name: '',
+  address: '',
+  phone: '',
+  email: '',
+  logo: '', // base64 or url
+};
+
 const ShopSettings = () => {
-  // Placeholder handlers for demo; replace with real logic as needed
+  // State for shop info
+  const [shop, setShop] = useState(defaultShop);
+  const [theme, setTheme] = useState('green');
+  const [customColor, setCustomColor] = useState('#10b981');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [logoPreview, setLogoPreview] = useState('');
+  const customColorRef = useRef(null);
+
+  // Load settings from localStorage (or replace with API/db as needed)
+  useEffect(() => {
+    const savedShop = JSON.parse(localStorage.getItem('shopSettings')) || defaultShop;
+    setShop(savedShop);
+    if (savedShop.logo) setLogoPreview(savedShop.logo);
+    const savedTheme = localStorage.getItem('globalTheme') || 'green';
+    setTheme(savedTheme);
+    if (savedTheme === 'custom') {
+      const custom = localStorage.getItem('customThemeColor') || '#10b981';
+      setCustomColor(custom);
+    }
+  }, []);
+
+  // Apply theme to body/html and preview
+  useEffect(() => {
+    const themes = ['green', 'blue', 'purple', 'red', 'orange', 'teal', 'custom'];
+    const body = document.body;
+    const html = document.documentElement;
+    themes.forEach(t => {
+      body.classList.remove(`theme-${t}`);
+      html.classList.remove(`theme-${t}`);
+    });
+    body.classList.add(`theme-${theme}`);
+    html.classList.add(`theme-${theme}`);
+    localStorage.setItem('globalTheme', theme);
+    // For custom theme, set CSS vars
+    if (theme === 'custom') {
+      body.style.setProperty('--theme-primary', customColor);
+      html.style.setProperty('--theme-primary', customColor);
+      localStorage.setItem('customThemeColor', customColor);
+    } else {
+      const colors = themeColors[theme] || themeColors.green;
+      body.style.setProperty('--theme-primary', colors.primary);
+      html.style.setProperty('--theme-primary', colors.primary);
+    }
+  }, [theme, customColor]);
+
+  // Handlers
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setShop(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setShop(prev => ({ ...prev, logo: ev.target.result }));
+        setLogoPreview(ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
+  const selectTheme = async (themeName) => {
+    if (themeName === 'custom') {
+      setTheme('custom');
+      if (customColorRef.current) {
+        setCustomColor(customColorRef.current.value);
+      }
+      // For custom, update CSS immediately
+      if (window.updateCSSVariables) {
+        window.updateCSSVariables('custom');
+      }
+    } else {
+      setTheme(themeName);
+      // Apply and save theme globally (DB and all pages)
+      if (window.saveGlobalTheme) {
+        await window.saveGlobalTheme(themeName);
+      }
+      if (window.applyGlobalTheme) {
+        window.applyGlobalTheme(themeName);
+      }
+    }
+  };
+
+  const handleCustomColor = (e) => {
+    setCustomColor(e.target.value);
+    setTheme('custom');
+    // For custom, update CSS immediately
+    if (window.updateCSSVariables) {
+      window.updateCSSVariables('custom');
+    }
+  };
+
+  const saveSettings = async () => {
+    localStorage.setItem('shopSettings', JSON.stringify(shop));
+    localStorage.setItem('globalTheme', theme);
+    if (theme === 'custom') {
+      localStorage.setItem('customThemeColor', customColor);
+      if (window.saveGlobalTheme) {
+        await window.saveGlobalTheme('custom');
+      }
+      if (window.updateCSSVariables) {
+        window.updateCSSVariables('custom');
+      }
+    } else {
+      if (window.saveGlobalTheme) {
+        await window.saveGlobalTheme(theme);
+      }
+      if (window.applyGlobalTheme) {
+        window.applyGlobalTheme(theme);
+      }
+    }
+    alert('Settings saved!');
+  };
+
+  // Dropdown and navigation handlers (stubbed)
   const toggleSidebar = () => {};
-  const toggleUserDropdown = () => {};
+  const toggleUserDropdown = () => setDropdownOpen(d => !d);
   const openShopSettings = () => {};
   const openProfileSettings = () => {};
   const logout = () => {};
-  const selectTheme = () => {};
-  const saveSettings = () => {};
 
   return (
     <div className="app-container">
       {/* Sidebar */}
-      <aside className="sidebar" id="sidebar">
-        {/* Sidebar Header */}
-        <div className="sidebar-header">
-          <div className="logo">
-            <div className="logo-icon">🏗️</div>
-            <div className="logo-text">Inventa</div>
-          </div>
-          <button className="sidebar-toggle" onClick={toggleSidebar}>
-            <MenuIcon />
-          </button>
-        </div>
-        {/* Navigation */}
-        <nav className="sidebar-nav">
-          <div className="nav-section">
-            <div className="nav-section-title">Home</div>
-            <a href="index.html" className="nav-item">
-              <HomeIcon />
-              <span>Home</span>
-            </a>
-          </div>
-          <div className="nav-section">
-            <div className="nav-section-title">Your Shop</div>
-            <a href="inventory.html" className="nav-item">
-              <Inventory2Icon />
-              <span>Stock Items</span>
-            </a>
-            <a href="sales.html" className="nav-item">
-              <PointOfSaleIcon />
-              <span>Sell Items</span>
-            </a>
-            <a href="credit.html" className="nav-item">
-              <CreditCardIcon />
-              <span>Sell on Credit</span>
-            </a>
-            <a href="customers.html" className="nav-item">
-              <PeopleIcon />
-              <span>Customer List</span>
-            </a>
-          </div>
-          <div className="nav-section">
-            <div className="nav-section-title">Reports</div>
-            <a href="reports.html" className="nav-item">
-              <AssessmentIcon />
-              <span>View Reports</span>
-            </a>
-          </div>
-          <div className="nav-section">
-            <div className="nav-section-title">Settings</div>
-            <a href="shop-settings.html" className="nav-item active">
-              <SettingsIcon />
-              <span>Shop Settings</span>
-            </a>
-          </div>
-        </nav>
-        {/* Footer */}
-        <div className="sidebar-footer">
-          <div className="powered-by">
-            <span>Powered By</span>
-            <span className="company-name">PioneerICT</span>
-          </div>
-        </div>
-      </aside>
+     
       {/* Main Content */}
       <main className="main-content" id="mainContent">
-        {/* Header */}
-        <header className="header">
-          <div className="header-left">
-            <h1 className="page-title">Shop Settings</h1>
-            <p className="page-subtitle">Configure your shop preferences and settings</p>
-          </div>
-          <div className="header-right">
-            <div className="user-info">
-              <div className="user-avatar">JD</div>
-              <div className="user-details">
-                <span className="user-name">John Doe</span>
-                <span className="user-role">Shop Manager</span>
-              </div>
-              <div className="user-dropdown">
-                <button className="dropdown-toggle" onClick={toggleUserDropdown}>
-                  <KeyboardArrowDownIcon />
-                </button>
-                <div className="dropdown-menu" id="userDropdown">
-                  <div className="dropdown-header">
-                    <div className="shop-info">
-                      <div className="shop-name">My Construction Shop</div>
-                      <div className="shop-location">Your Location</div>
-                    </div>
-                  </div>
-                  <div className="dropdown-divider"></div>
-                  <a href="#" className="dropdown-item" onClick={openShopSettings}>
-                    <SettingsIcon />
-                    <span>Change Shop Info</span>
-                  </a>
-                  <a href="#" className="dropdown-item" onClick={openProfileSettings}>
-                    <PersonIcon />
-                    <span>Change My Info</span>
-                  </a>
-                  <a href="#" className="dropdown-item logout" onClick={logout}>
-                    <LogoutIcon />
-                    <span>Logout</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+       
         {/* Content */}
         <div className="content">
           {/* Settings Sections */}
@@ -145,23 +176,26 @@ const ShopSettings = () => {
               <div className="settings-content">
                 <div className="setting-item">
                   <label htmlFor="shopName">Shop Name</label>
-                  <input type="text" id="shopName" placeholder="Enter shop name" />
+                  <input type="text" id="name" placeholder="Enter shop name" value={shop.name} onChange={handleInputChange} />
                 </div>
                 <div className="setting-item">
                   <label htmlFor="logo">Upload Logo</label>
-                  <input type="file" id="logo" />
+                  <input type="file" id="logo" accept="image/*" onChange={handleLogoChange} />
+                  {logoPreview && (
+                    <img src={logoPreview} alt="Logo Preview" style={{ maxWidth: 80, marginTop: 8 }} />
+                  )}
                 </div>
                 <div className="setting-item">
                   <label htmlFor="shopAddress">Shop Address</label>
-                  <textarea id="shopAddress" placeholder="Enter shop address"></textarea>
+                  <textarea id="address" placeholder="Enter shop address" value={shop.address} onChange={handleInputChange}></textarea>
                 </div>
                 <div className="setting-item">
                   <label htmlFor="shopPhone">Phone Number</label>
-                  <input type="tel" id="shopPhone" placeholder="Enter phone number" />
+                  <input type="tel" id="phone" placeholder="Enter phone number" value={shop.phone} onChange={handleInputChange} />
                 </div>
                 <div className="setting-item">
                   <label htmlFor="shopEmail">Email Address</label>
-                  <input type="email" id="shopEmail" placeholder="Enter email address" />
+                  <input type="email" id="email" placeholder="Enter email address" value={shop.email} onChange={handleInputChange} />
                 </div>
               </div>
             </div>
@@ -173,63 +207,56 @@ const ShopSettings = () => {
               </div>
               <div className="settings-content">
                 <div className="theme-settings">
-                  <div className="theme-preview">
-                    <h4>Live Preview</h4>
-                    <div className="preview-card" id="themePreview">
-                      <div className="preview-header">
-                        <div className="preview-avatar">JD</div>
-                        <div className="preview-text">
-                          <div className="preview-title">John Doe</div>
-                          <div className="preview-subtitle">Shop Owner</div>
-                        </div>
-                      </div>
-                      <div className="preview-content">
-                        <div className="preview-button">Sample Button</div>
-                      </div>
-                    </div>
-                  </div>
                   <div className="theme-colors">
                     <h4>Choose Theme Color</h4>
                     <div className="color-options">
-                      <div className="color-option selected" data-theme="green" onClick={() => selectTheme('green')}>
+                      <div className={`color-option${theme === 'green' ? ' selected' : ''}`} data-theme="green" onClick={() => selectTheme('green')}>
                         <div className="color-preview" style={{ background: '#10b981' }}></div>
                         <span>Green</span>
                       </div>
-                      <div className="color-option" data-theme="blue" onClick={() => selectTheme('blue')}>
+                      <div className={`color-option${theme === 'blue' ? ' selected' : ''}`} data-theme="blue" onClick={() => selectTheme('blue')}>
                         <div className="color-preview" style={{ background: '#3b82f6' }}></div>
                         <span>Blue</span>
                       </div>
-                      <div className="color-option" data-theme="purple" onClick={() => selectTheme('purple')}>
+                      <div className={`color-option${theme === 'purple' ? ' selected' : ''}`} data-theme="purple" onClick={() => selectTheme('purple')}>
                         <div className="color-preview" style={{ background: '#8b5cf6' }}></div>
                         <span>Purple</span>
                       </div>
-                      <div className="color-option" data-theme="orange" onClick={() => selectTheme('orange')}>
+                      <div className={`color-option${theme === 'orange' ? ' selected' : ''}`} data-theme="orange" onClick={() => selectTheme('orange')}>
                         <div className="color-preview" style={{ background: '#f97316' }}></div>
                         <span>Orange</span>
                       </div>
-                      <div className="color-option" data-theme="teal" onClick={() => selectTheme('teal')}>
+                      <div className={`color-option${theme === 'teal' ? ' selected' : ''}`} data-theme="teal" onClick={() => selectTheme('teal')}>
                         <div className="color-preview" style={{ background: '#14b8a6' }}></div>
                         <span>Teal</span>
                       </div>
-                      <div className="color-option" data-theme="custom" onClick={() => selectTheme(document.getElementById('custom').value)}>
+                      <div className={`color-option${theme === 'custom' ? ' selected' : ''}`} data-theme="custom" onClick={() => selectTheme('custom')}>
                         <div className="color-preview">
-                          <input type="color" id="custom" style={{ borderRadius: '50%', border: 'none', width: '50px', height: '50px', marginLeft: '-10px', marginTop: '-10px' }} />
+                          <input
+                            type="color"
+                            id="custom"
+                            ref={customColorRef}
+                            value={customColor}
+                            onChange={handleCustomColor}
+                            style={{ borderRadius: '50%', border: 'none', width: '50px', height: '50px', marginLeft: '-10px', marginTop: '-10px', cursor: 'pointer' }}
+                          />
                         </div>
                         <span>Custom</span>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Action Buttons */}
-          <div className="settings-actions">
-            <button className="btn-primary" onClick={saveSettings}>
+                                    <button className="btn-primary" onClick={saveSettings}>
               <SaveIcon />
               Save Settings
             </button>
+                  </div>
+                  
+                </div>
+                
+              </div>
+
+            </div>
           </div>
+          {/* Action Buttons */}
         </div>
       </main>
     </div>

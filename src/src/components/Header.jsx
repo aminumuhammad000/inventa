@@ -6,6 +6,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -30,6 +31,7 @@ const Header = () => {
   const user = { name: "John Doe", initials: "JD", role: "Shop Owner" };
   const shop = { name: "My Construction Shop", location: "Your Location" };
 
+  const navigate = useNavigate();
   return (
     <header className="header">
       <div className="header-left">
@@ -57,11 +59,11 @@ const Header = () => {
                 </div>
               </div>
               <div className="dropdown-divider"></div>
-              <a href="#" className="dropdown-item" onClick={() => {/* openShopSettings logic */}}>
+              <a href="#" className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/shop-settings'); }}>
                 <SettingsIcon />
                 <span>Change Shop Info</span>
               </a>
-              <a href="#" className="dropdown-item" onClick={() => {/* openProfileSettings logic */}}>
+              <a href="#" className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/profile-settings'); }}>
                 <PersonIcon />
                 <span>Change My Info</span>
               </a>
