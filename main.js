@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain  } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const db = require("./database/db");
 require("./ipc/userIPC");
@@ -14,29 +14,35 @@ try {
   console.log("electron-reload not available - running in production mode");
 }
 
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
     icon: path.join(__dirname, "assets", "icon.png"),
     title: "Inventa Store - React App",
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    // Load Vite dev server
-    win.loadURL('http://localhost:5173/');
-    win.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development") {
+    // Development -> load Vite server
+    win.loadURL("http://localhost:5173/");
+    console.log("Loading Dev Server: http://localhost:5173/");
   } else {
-    // Load React build output
-    win.loadFile(path.join(__dirname, 'src', 'dist', 'index.html'));
-  }
-}
+    // Production -> load built React files
+    // In production mode
+win.loadFile(path.join(__dirname, "src", "dist", "index.html"));
+console.log("Loading File:", path.join(__dirname, "src", "dist", "index.html"));
 
+  }
+
+  win.webContents.openDevTools();
+}
 
 app.whenReady().then(() => {
   createWindow();
@@ -45,8 +51,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
-
-
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
