@@ -1,7 +1,28 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Sidbar from "../components/Sidebar";
 import Header from "../components/Header";
 import "../styles/global-style.css";
+
+// Sample/mock data functions
+const getSampleInventoryData = () => ([
+  { id: 1, name: "Cement", stock: 1247 },
+  { id: 2, name: "Bricks", stock: 500 },
+  { id: 3, name: "Iron Rods", stock: 300 },
+]);
+const getSampleSalesData = () => ([
+  { id: 1, amount: 50000 },
+  { id: 2, amount: 75000 },
+]);
+const getSampleCreditSalesData = () => ([
+  { id: 1, amount: 30000 },
+]);
+const getSampleCustomers = () => ([
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Acme Corp" },
+]);
+const getSamplePayments = () => ([
+  { id: 1, amount: 10000 },
+]);
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import WarningIcon from '@mui/icons-material/Warning';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
@@ -9,16 +30,62 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ErrorIcon from '@mui/icons-material/Error';
 
+
 const Dashboard = () => {
+  // State for dashboard data
+  const [inventoryData, setInventoryData] = useState([]);
+  const [salesData, setSalesData] = useState([]);
+  const [creditSalesData, setCreditSalesData] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [payments, setPayments] = useState([]);
+
+  // Load data from localStorage or use sample data
   useEffect(() => {
-    (async function() {
-      if (window.SidebarComponent) {
-        window.sidebarComponent = await window.SidebarComponent.loadSidebar('sidebar-container');
-      }
-      if (window.HeaderComponent) {
-        window.headerComponent = await window.HeaderComponent.loadHeader('header-container');
-      }
-    })();
+    // Inventory
+    const savedInventory = localStorage.getItem('inventoryData');
+    if (savedInventory) {
+      setInventoryData(JSON.parse(savedInventory));
+    } else {
+      const sample = getSampleInventoryData();
+      setInventoryData(sample);
+      localStorage.setItem('inventoryData', JSON.stringify(sample));
+    }
+    // Sales
+    const savedSales = localStorage.getItem('salesData');
+    if (savedSales) {
+      setSalesData(JSON.parse(savedSales));
+    } else {
+      const sample = getSampleSalesData();
+      setSalesData(sample);
+      localStorage.setItem('salesData', JSON.stringify(sample));
+    }
+    // Credit Sales
+    const savedCreditSales = localStorage.getItem('creditSalesData');
+    if (savedCreditSales) {
+      setCreditSalesData(JSON.parse(savedCreditSales));
+    } else {
+      const sample = getSampleCreditSalesData();
+      setCreditSalesData(sample);
+      localStorage.setItem('creditSalesData', JSON.stringify(sample));
+    }
+    // Customers
+    const savedCustomers = localStorage.getItem('customersData');
+    if (savedCustomers) {
+      setCustomers(JSON.parse(savedCustomers));
+    } else {
+      const sample = getSampleCustomers();
+      setCustomers(sample);
+      localStorage.setItem('customersData', JSON.stringify(sample));
+    }
+    // Payments
+    const savedPayments = localStorage.getItem('paymentsData');
+    if (savedPayments) {
+      setPayments(JSON.parse(savedPayments));
+    } else {
+      const sample = getSamplePayments();
+      setPayments(sample);
+      localStorage.setItem('paymentsData', JSON.stringify(sample));
+    }
   }, []);
 
   return (
