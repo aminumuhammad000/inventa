@@ -28,7 +28,7 @@ const Sidebar = () => (
     <nav className={styles['sidebar-nav']}>
       <div className={styles['nav-section']}>
         <div className={styles['nav-section-title']}>Dashboard</div>
-        <Link to="/" className={styles['nav-item']} data-page="home">
+        <Link to="/Dashboard" className={styles['nav-item']} data-page="home">
           <HomeIcon />
           <span>Dashboard</span>
         </Link>

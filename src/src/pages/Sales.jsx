@@ -1,4 +1,15 @@
 import React, { useEffect } from "react";
+import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import UndoIcon from '@mui/icons-material/Undo';
+import SearchIcon from '@mui/icons-material/Search';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import CloseIcon from '@mui/icons-material/Close';
+import PrintIcon from '@mui/icons-material/Print';
+import DownloadIcon from '@mui/icons-material/Download';
+import ShareIcon from '@mui/icons-material/Share';
+import EmailIcon from '@mui/icons-material/Email';
 
 const Sales = () => {
   useEffect(() => {
@@ -22,15 +33,15 @@ const Sales = () => {
           <div className="tabs-container">
             <div className="tabs">
               <button className="tab-button active" onClick={() => window.switchSaleType('normal')} id="normalSaleBtn">
-                <i className="material-icons-round">point_of_sale</i>
+                <PointOfSaleIcon />
                 <span>Normal Sell</span>
               </button>
               <button className="tab-button" onClick={() => window.switchSaleType('credit')} id="creditSaleBtn">
-                <i className="material-icons-round">credit_card</i>
+                <CreditCardIcon />
                 <span>Sell on Credit</span>
               </button>
               <button className="tab-button" onClick={() => window.switchSaleType('return')} id="returnSaleBtn">
-                <i className="material-icons-round">undo</i>
+                <UndoIcon />
                 <span>Return Sells</span>
               </button>
             </div>
@@ -43,7 +54,7 @@ const Sales = () => {
                 <div className="header-actions">
                   <div className="search-box">
                     <input type="text" id="productSearch" placeholder="Search products..." onKeyUp={() => window.filterProducts()} />
-                    <i className="material-icons-round">search</i>
+                    <SearchIcon />
                   </div>
                   <div className="filter-actions">
                     <select id="brandFilter" onChange={() => window.filterProducts()}>
@@ -61,11 +72,11 @@ const Sales = () => {
                   <div className="cart-info">
                     <span className="cart-count" id="cartCount">0</span>
                     <button className="mark-sold-btn" onClick={() => window.openCartModal()} id="markSoldBtn" disabled>
-                      <i className="material-icons-round">shopping_cart</i>
+                      <ShoppingCartIcon />
                       <span id="markSoldText">Mark as Sold</span>
                     </button>
                     <button className="btn-secondary" onClick={() => window.showInvoiceModalDirectly()} title="Generate Invoice from Recent Sale">
-                      <i className="material-icons-round">receipt_long</i>
+                      <ReceiptLongIcon />
                       <span>Invoice</span>
                     </button>
                   </div>
@@ -102,7 +113,7 @@ const Sales = () => {
               <div className="form-header">
                 <h3>Sale Details</h3>
                 <button className="btn-close" onClick={() => window.closeSaleDetailsForm()}>
-                  <i className="material-icons-round">close</i>
+                  <CloseIcon />
                 </button>
               </div>
               <div className="sale-details-content">
@@ -204,7 +215,7 @@ const Sales = () => {
               <div className="form-header">
                 <h3>Return Details</h3>
                 <button className="btn-close" onClick={() => window.closeReturnDetailsForm()}>
-                  <i className="material-icons-round">close</i>
+                  <CloseIcon />
                 </button>
               </div>
               <div className="return-details-content">
@@ -303,7 +314,7 @@ const Sales = () => {
               <div className="modal-header">
                 <h3>Add Return</h3>
                 <button className="modal-close" onClick={() => window.closeAddReturnModal()}>
-                  <i className="material-icons-round">close</i>
+                  <CloseIcon />
                 </button>
               </div>
               <div className="modal-body">
@@ -362,23 +373,23 @@ const Sales = () => {
                 <h3>Sales Receipt</h3>
                 <div className="modal-actions">
                   <button className="btn-secondary" onClick={() => window.printReceipt()}>
-                    <i className="material-icons-round">print</i>
+                    <PrintIcon />
                     Print
                   </button>
                   <button className="btn-secondary" onClick={() => window.downloadReceipt()}>
-                    <i className="material-icons-round">download</i>
+                    <DownloadIcon />
                     Download PDF
                   </button>
                   <button className="btn-primary" onClick={() => window.generateInvoice()}>
-                    <i className="material-icons-round">receipt_long</i>
+                    <ReceiptLongIcon />
                     Generate Invoice
                   </button>
                   <button className="btn-secondary" onClick={() => window.shareInvoice()}>
-                    <i className="material-icons-round">share</i>
+                    <ShareIcon />
                     Share
                   </button>
                   <button className="modal-close" onClick={() => window.closeReceiptModal()}>
-                    <i className="material-icons-round">close</i>
+                    <CloseIcon />
                   </button>
                 </div>
               </div>
@@ -396,23 +407,23 @@ const Sales = () => {
                 <h3>Invoice Generator</h3>
                 <div className="modal-actions">
                   <button className="btn-secondary" onClick={() => window.printInvoice()}>
-                    <i className="material-icons-round">print</i>
+                    <PrintIcon />
                     Print Invoice
                   </button>
                   <button className="btn-secondary" onClick={() => window.downloadInvoice()}>
-                    <i className="material-icons-round">download</i>
+                    <DownloadIcon />
                     Download PDF
                   </button>
                   <button className="btn-primary" onClick={() => window.shareInvoiceLink()}>
-                    <i className="material-icons-round">share</i>
+                    <ShareIcon />
                     Share Invoice
                   </button>
                   <button className="btn-secondary" onClick={() => window.emailInvoice()}>
-                    <i className="material-icons-round">email</i>
+                    <EmailIcon />
                     Email Invoice
                   </button>
                   <button className="modal-close" onClick={() => window.closeInvoiceModal()}>
-                    <i className="material-icons-round">close</i>
+                    <CloseIcon />
                   </button>
                 </div>
               </div>
