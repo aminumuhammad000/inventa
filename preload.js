@@ -1,10 +1,23 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('api', {
-  login: (email, password) => ipcRenderer.invoke('login', { email, password }),
+contextBridge.exposeInMainWorld("api", {
+  // ✅ Add user
+  addUser: async (user) => {
+    return await ipcRenderer.invoke("add-user", user);
+  },
 
-  // shop
-  getShop: () => ipcRenderer.invoke('get-shop'),
-  addShop: (shop) => ipcRenderer.invoke('add-shop', shop),
-  updateShop: (shop) => ipcRenderer.invoke('update-shop', shop),
+  // ✅ Update user
+  updateUser: async (id, user) => {
+    return await ipcRenderer.invoke("update-user", { id, user });
+  },
+
+  // ✅ Delete user
+  deleteUser: async (id) => {
+    return await ipcRenderer.invoke("delete-user", id);
+  },
+
+  // ✅ Login user
+  login: async (email, password) => {
+    return await ipcRenderer.invoke("login", { email, password });
+  },
 });

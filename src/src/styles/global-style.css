@@ -421,9 +421,6 @@ body.theme-teal {
     overflow-y: auto;
 }
 
-.main-content.sidebar-collapsed {
-    /* No margin needed since sidebar is now relative positioned */
-}
 
 /* Header */
 .header {

@@ -1,7 +1,10 @@
+
 import React, { useState } from 'react';
-import "../styles/Login.css"
+import { useNavigate } from 'react-router-dom';
+import "../styles/Login.css";
+import "../styles/global-style.css";
 import TargetIcon from '@mui/icons-material/CenterFocusStrong';
-import StorefrontIcon from '@mui/icons-material/Storefront';
+import StorefrontIcon from "@mui/icons-material/Storefront";
 import Alert from './Alert';
 
 const isElectron = Boolean(window && window.electron && window.electron.ipcRenderer);
@@ -10,37 +13,57 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [toast, setToast] = useState({ show: false, message: "", icon: null });
+  const navigate = useNavigate();
 
   const showToast = (message, icon) => {
     setToast({ show: true, message, icon });
     setTimeout(() => setToast({ show: false, message: "", icon: null }), 3000);
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      // Helper to set user info and expiry in localStorage
+      const setUserSession = (userName) => {
+        const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000; // 1 week in ms
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', userName);
+        localStorage.setItem('userSession', JSON.stringify({ userName, expiresAt }));
+      };
+
       if (isElectron) {
+        // Example: use Electron IPC for login
         const result = await window.electron.ipcRenderer.invoke('login', { email, password });
         if (result.success) {
           showToast(`Welcome ${result.user.name}`, 'check_circle');
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('currentUser', result.user.name);
+          setUserSession(result.user.name);
           setTimeout(() => {
             window.electron.ipcRenderer.send('load-dashboard');
           }, 1000);
         } else {
           showToast(result.message, 'error');
         }
+      } else if (window.api?.login) {
+        // Fallback: use exposed API (for browser or preload)
+        const result = await window.api.login(email, password);
+        if (result && result.success) {
+          showToast(`✅ Login successful! Welcome ${result.user.email}`, 'check_circle');
+          setUserSession(result.user.email);
+          navigate('/dashboard');
+        } else {
+          showToast(`❌ Login failed: ${result?.message || 'Unknown error'}`, 'error');
+        }
       } else {
         // Fallback for browser: just show success
         showToast(`Welcome ${email}`, 'check_circle');
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('currentUser', email);
+        setUserSession(email);
+        setTimeout(() => navigate('/dashboard'), 1000);
       }
     } catch (err) {
       showToast(err.message || String(err), 'error');
     }
   };
+
 
   return (
     <div className="login-container">
@@ -100,12 +123,28 @@ const Login = () => {
             <h2>Shop Login</h2>
             <p>offline on your computer.</p>
           </div>
-          <form id="loginForm" className="form" onSubmit={handleSubmit}>
+          <form id="loginForm" className="form" onSubmit={handleLogin}>
             <div className="input-group">
-              <input type="email" id="email" className="form-input" placeholder="Email ID" required value={email} onChange={e => setEmail(e.target.value)} />
+              <input
+                type="email"
+                id="email"
+                className="form-input"
+                placeholder="Email ID"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
             </div>
             <div className="input-group">
-              <input type="password" id="password" className="form-input" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} />
+              <input
+                type="password"
+                id="password"
+                className="form-input"
+                placeholder="Password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              />
             </div>
             <div className="form-options">
               <label className="checkbox-wrapper">
@@ -125,5 +164,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;
