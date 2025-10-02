@@ -16,11 +16,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import TodayIcon from '@mui/icons-material/Today';
 import PeopleIcon from '@mui/icons-material/People';
 import SearchIcon from '@mui/icons-material/Search';
-<<<<<<< HEAD
-=======
-
->>>>>>> 577b63f7c2227cf90c4943c5c6b15caf40512929
-
 const Credit = () => {
   // Inject modal styles once
   useEffect(() => {
