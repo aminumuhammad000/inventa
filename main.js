@@ -30,7 +30,7 @@ function createWindow() {
   if (process.env.NODE_ENV === 'development') {
     // Load Vite dev server
     win.loadURL('http://localhost:5173/');
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
   } else {
     // Load React build output
     win.loadFile(path.join(__dirname, 'src', 'dist', 'index.html'));

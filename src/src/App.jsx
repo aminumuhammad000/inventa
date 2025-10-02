@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import "./App.css";
 
 // Pages
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 import DashboardPage from "./pages/DashboardPage";
 import Customers from "./pages/Customers";
 import Inventory from "./pages/Inventory";
@@ -14,12 +14,13 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Sales from "./pages/Sales";
 import Storefront from "./pages/Storefront";
 import Login from "./components/Login";
+import Dashboard from "./pages/DashboardPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/inventory" element={<Inventory />} />
