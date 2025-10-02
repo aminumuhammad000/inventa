@@ -20,4 +20,9 @@ contextBridge.exposeInMainWorld("api", {
   login: async (email, password) => {
     return await ipcRenderer.invoke("login", { email, password });
   },
+
+  // ✅ Get user by id
+  getUser: async (id) => {
+    return await ipcRenderer.invoke("get-user", id);
+  },
 });
