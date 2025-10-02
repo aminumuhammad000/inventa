@@ -47,11 +47,11 @@ const Login = () => {
         // Fallback: use exposed API (for browser or preload)
         const result = await window.api.login(email, password);
         if (result && result.success) {
-          showToast(`✅ Login successful! Welcome ${result.user.email}`, 'check_circle');
+          showToast(`Login successful! Welcome ${result.user.email}`, 'check_circle');
           setUserSession(result.user.email);
           navigate('/dashboard');
         } else {
-          showToast(`❌ Login failed: ${result?.message || 'Unknown error'}`, 'error');
+          showToast(`Login failed: ${result?.message || 'Unknown error'}`, 'error');
         }
       } else {
         // Fallback for browser: just show success
@@ -161,6 +161,7 @@ const Login = () => {
       </div>
       {/* Notification Toast */}
       <Alert show={toast.show} message={toast.message} icon={toast.icon} onClose={() => setToast({ show: false, message: "", icon: null })} />
+    
     </div>
   );
 };

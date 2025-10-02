@@ -24,6 +24,9 @@ function getUserSession() {
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
+  // const [shop, setShop] = useState(null);
+  const [shop, setShop] = useState({ name: "", location: "" });
+
   const dropdownRef = useRef(null);
 
   // Fetch user info on mount
@@ -92,8 +95,18 @@ useEffect(() => {
     window.location.replace('/login');
   };
 
-  // Example shop info (replace with real data as needed)
-  const shop = { name: "My Construction Shop", location: "Your Location" };
+useEffect(() => {
+  if (window.api?.getShopById) {
+    window.api.getShopById(1)
+      .then((shopObj) => shopObj && setShop(shopObj))
+      .catch(() => setShop({ name: "My Construction Shop", location: "Your Location" }));
+  } else {
+    const savedShop = JSON.parse(localStorage.getItem('shopSettings'));
+    setShop(savedShop || { name: "My Construction Shop", location: "Your Location" });
+  }
+}, []);
+
+
 
   const navigate = useNavigate();
   return (
@@ -118,8 +131,8 @@ useEffect(() => {
             <div className={`dropdown-menu${dropdownOpen ? ' show' : ''}`} id="userDropdown">
               <div className="dropdown-header">
                 <div className="shop-info">
-                  <div className="shop-name">{shop.name}</div>
-                  <div className="shop-location">{shop.location}</div>
+                  <div className="shop-name">{shop?.shop_name || "My Construction Shop"}</div>
+                  <div className="shop-location">{shop?.address || "Your Location"}</div>
                 </div>
               </div>
               <div className="dropdown-divider"></div>

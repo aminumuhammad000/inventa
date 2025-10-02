@@ -1,33 +1,33 @@
-const shopDB = require('../database/db');
+const db = require("../database/db");
 
 module.exports = {
-  addShop: (shop, callback) => {
-    const sql = `INSERT INTO shops (shop_name, logo_url, address, theme_color, email, phone) 
-                 VALUES (?, ?, ?, ?, ?, ?)`;
-    db.run(sql, [
+  addShop: (shop) => {
+    const stmt = db.prepare(`
+      INSERT INTO shops (shop_name, logo_url, address, theme_color, email, phone) 
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    const info = stmt.run(
       shop.shop_name,
       shop.logo_url,
       shop.address,
       shop.theme_color,
       shop.email,
       shop.phone
-    ], function (err) {
-      if (err) callback(err);
-      else callback(null, { id: this.lastID });
-    });
+    );
+    return { id: info.lastInsertRowid };
   },
 
-  getShops: (callback) => {
-    db.all(`SELECT * FROM shops`, [], (err, rows) => callback(err, rows));
+  getShopById: (id) => {
+    return db.prepare(`SELECT * FROM shops WHERE id = ?`).get(id);
   },
 
-  getShopById: (id, callback) => {
-    db.get(`SELECT * FROM shops WHERE id = ?`, [id], (err, row) => callback(err, row));
-  },
-
-  updateShop: (id, shop, callback) => {
-    const sql = `UPDATE shops SET shop_name=?, logo_url=?, address=?, theme_color=?, email=?, phone=? WHERE id=?`;
-    db.run(sql, [
+  updateShop: (id, shop) => {
+    const stmt = db.prepare(`
+      UPDATE shops 
+      SET shop_name=?, logo_url=?, address=?, theme_color=?, email=?, phone=? 
+      WHERE id=?
+    `);
+    const info = stmt.run(
       shop.shop_name,
       shop.logo_url,
       shop.address,
@@ -35,20 +35,12 @@ module.exports = {
       shop.email,
       shop.phone,
       id
-    ], function (err) {
-      if (err) callback(err);
-      else callback(null, { changes: this.changes });
-    });
+    );
+    return { changes: info.changes };
   },
 
-  deleteShop: (id, callback) => {
-    db.run(`DELETE FROM shops WHERE id=?`, [id], function (err) {
-      if (err) callback(err);
-      else callback(null, { changes: this.changes });
-    });
-  },
-
-  getThemeColor: (callback) => {
-    db.get(`SELECT theme_color FROM shops LIMIT 1`, [], (err, row) => callback(err, row?.theme_color));
+  getThemeColor: () => {
+    const row = db.prepare(`SELECT theme_color FROM shops LIMIT 1`).get();
+    return row ? row.theme_color : null;
   }
 };

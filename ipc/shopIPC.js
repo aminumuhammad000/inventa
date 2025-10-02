@@ -1,32 +1,43 @@
-const { ipcMain } = require('electron');
-const shopDB = require('../database/shop');
+// ipc/shopIPC.js
+const { ipcMain } = require("electron");
+const shopDB = require("../database/shop"); // adjust path if needed
 
-// Add shop
-ipcMain.handle('add-shop', (event, shop) => new Promise((resolve, reject) => {
-  shopDB.addShop(shop, (err, result) => err ? reject(err) : resolve(result));
-}));
+// Add Shop
+ipcMain.handle("shop:add", (event, shop) => {
+  try {
+    return shopDB.addShop(shop);
+  } catch (err) {
+    console.error("Error adding shop:", err);
+    return { error: err.message };
+  }
+});
 
-// Get all shops
-ipcMain.handle('get-shops', () => new Promise((resolve, reject) => {
-  shopDB.getShops((err, rows) => err ? reject(err) : resolve(rows));
-}));
+// Get Shop by ID
+ipcMain.handle("shop:getById", (event, id) => {
+  try {
+    return shopDB.getShopById(id);
+  } catch (err) {
+    console.error("Error getting shop by ID:", err);
+    return { error: err.message };
+  }
+});
 
-// Get one shop
-ipcMain.handle('get-shop', (event, id) => new Promise((resolve, reject) => {
-  shopDB.getShopById(id, (err, row) => err ? reject(err) : resolve(row));
-}));
+// Update Shop
+ipcMain.handle("shop:update", (event, { id, shop }) => {
+  try {
+    return shopDB.updateShop(id, shop);
+  } catch (err) {
+    console.error("Error updating shop:", err);
+    return { error: err.message };
+  }
+});
 
-// Update shop
-ipcMain.handle('update-shop', (event, shop) => new Promise((resolve, reject) => {
-  shopDB.updateShop(shop.id, shop, (err, result) => err ? reject(err) : resolve(result));
-}));
-
-// Delete shop
-ipcMain.handle('delete-shop', (event, id) => new Promise((resolve, reject) => {
-  shopDB.deleteShop(id, (err, result) => err ? reject(err) : resolve(result));
-}));
-
-// Get theme color
-ipcMain.handle('get-theme-color', () => new Promise((resolve, reject) => {
-  shopDB.getThemeColor((err, color) => err ? reject(err) : resolve(color));
-}));
+// Get Theme Color
+ipcMain.handle("shop:getThemeColor", () => {
+  try {
+    return shopDB.getThemeColor();
+  } catch (err) {
+    console.error("Error fetching theme color:", err);
+    return { error: err.message };
+  }
+});

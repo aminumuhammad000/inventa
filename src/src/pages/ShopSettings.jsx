@@ -12,6 +12,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SaveIcon from '@mui/icons-material/Save';
+import Alert from "../components/Alert";
 
 
 const themeColors = {
@@ -36,9 +37,16 @@ const ShopSettings = () => {
   const [shop, setShop] = useState(defaultShop);
   const [theme, setTheme] = useState('green');
   const [customColor, setCustomColor] = useState('#10b981');
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [logoPreview, setLogoPreview] = useState('');
   const customColorRef = useRef(null);
+   const [toast, setToast] = useState({ show: false, message: "", icon: null });
+
+
+
+    const showToast = (message, icon) => {
+    setToast({ show: true, message, icon });
+    setTimeout(() => setToast({ show: false, message: "", icon: null }), 3000);
+  };
 
   // Load settings from localStorage (or replace with API/db as needed)
   useEffect(() => {
@@ -127,34 +135,30 @@ const ShopSettings = () => {
     }
   };
 
-  const saveSettings = async () => {
-    localStorage.setItem('shopSettings', JSON.stringify(shop));
-    localStorage.setItem('globalTheme', theme);
-    if (theme === 'custom') {
-      localStorage.setItem('customThemeColor', customColor);
-      if (window.saveGlobalTheme) {
-        await window.saveGlobalTheme('custom');
-      }
-      if (window.updateCSSVariables) {
-        window.updateCSSVariables('custom');
-      }
-    } else {
-      if (window.saveGlobalTheme) {
-        await window.saveGlobalTheme(theme);
-      }
-      if (window.applyGlobalTheme) {
-        window.applyGlobalTheme(theme);
-      }
-    }
-    alert('Settings saved!');
-  };
+ const saveSettings = async () => {
+  try {
+    // Save in DB
+    const saved = await window.api.addShop({
+      shop_name: shop.name,
+      logo_url: shop.logo,
+      address: shop.address,
+      theme_color: theme === "custom" ? customColor : themeColors[theme]?.primary,
+      email: shop.email,
+      phone: shop.phone,
+    });
 
-  // Dropdown and navigation handlers (stubbed)
-  const toggleSidebar = () => {};
-  const toggleUserDropdown = () => setDropdownOpen(d => !d);
-  const openShopSettings = () => {};
-  const openProfileSettings = () => {};
-  const logout = () => {};
+    localStorage.setItem("shopSettings", JSON.stringify(shop));
+    localStorage.setItem("globalTheme", theme);
+
+    if (theme === "custom") {
+      localStorage.setItem("customThemeColor", customColor);
+    }
+     showToast(`Shop settings saved successfully!`, 'check_circle');
+  } catch (err) {    
+    showToast(`Failed to save shop settings.'}`, 'error');
+  }
+};
+
 
   return (
     <div className="app-container">
@@ -256,9 +260,11 @@ const ShopSettings = () => {
 
             </div>
           </div>
-          {/* Action Buttons */}
         </div>
       </main>
+     {/* Notification Toast */}
+      <Alert show={toast.show} message={toast.message} icon={toast.icon} onClose={() => setToast({ show: false, message: "", icon: null })} />
+    
     </div>
   );
 };

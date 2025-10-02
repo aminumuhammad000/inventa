@@ -1,5 +1,3 @@
-
-
 import styles from '../styles/Sidebar.module.css';
 import "../styles/global-style.css";
 import { Link } from 'react-router-dom';
@@ -10,67 +8,93 @@ import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import HistoryIcon from '@mui/icons-material/History';
 import PeopleIcon from '@mui/icons-material/People';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import React, { useEffect, useState } from 'react';
 
-const Sidebar = () => (
-  <aside className={styles.sidebar} id="sidebar">
-    {/* Sidebar Header */}
-    <div className={styles['sidebar-header']}>
-      <div className={styles.logo}>
-        <div className={styles['logo-icon']}>🏗️</div>
-        <div className={styles['logo-text']}>Inventa</div>
-      </div>
-      <button className={styles['sidebar-toggle']} id="sidebarToggle" onClick={() => window.toggleSidebar && window.toggleSidebar()}>
-        <MenuIcon />
-      </button>
-    </div>
+const Sidebar = () => {
+  const [shop, setShop] = useState({ name: ""});
 
-    {/* Navigation */}
-    <nav className={styles['sidebar-nav']}>
-      <div className={styles['nav-section']}>
-        <div className={styles['nav-section-title']}>Dashboard</div>
-        <Link to="/Dashboard" className={styles['nav-item']} data-page="home">
-          <HomeIcon />
-          <span>Dashboard</span>
-        </Link>
-      </div>
+  useEffect(() => {
+    if (window.api?.getShopById) {
+      window.api.getShopById(1)
+        .then((shopObj) => {
+          if (shopObj) {
+            setShop(shopObj);
+          } else {
+            setShop({ name: "My Construction Shop", location: "Your Location" });
+          }
+        })
+        .catch(() => setShop({ name: "My Construction Shop", location: "Your Location" }));
+    } else {
+      const savedShop = JSON.parse(localStorage.getItem('shopSettings'));
+      setShop(savedShop || { name: "My Construction Shop", location: "Your Location" });
+    }
+  }, []);
 
-      <div className={styles['nav-section']}>
-        <div className={styles['nav-section-title']}>Your Shop</div>
-        <Link to="/inventory" className={styles['nav-item']} data-page="inventory">
-          <Inventory2Icon />
-          <span>Stock Items</span>
-        </Link>
-        <Link to="/sales" className={styles['nav-item']} data-page="sales">
-          <PointOfSaleIcon />
-          <span>Sell Items</span>
-        </Link>
-        <Link to="/credit" className={styles['nav-item']} data-page="credit">
-          <HistoryIcon />
-          <span>Sale History</span>
-        </Link>
-        <Link to="/customers" className={styles['nav-item']} data-page="customers">
-          <PeopleIcon />
-          <span>Customers</span>
-        </Link>
+  return (
+    <aside className={styles.sidebar} id="sidebar">
+      {/* Sidebar Header */}
+      <div className={styles['sidebar-header']}>
+        <div className={styles.logo}>
+          <div className={styles['logo-icon']}>🏗️</div>
+          <div className={styles['logo-text']}>{shop?.shop_name || "Inventa"}</div>
+        </div>
+        <button
+          className={styles['sidebar-toggle']}
+          id="sidebarToggle"
+          onClick={() => window.toggleSidebar && window.toggleSidebar()}
+        >
+          <MenuIcon />
+        </button>
       </div>
 
-      <div className={styles['nav-section']}>
-        <div className={styles['nav-section-title']}>Reports</div>
-        <Link to="/reports" className={styles['nav-item']} data-page="reports">
-          <AssessmentIcon />
-          <span>View Reports</span>
-        </Link>
-      </div>
-    </nav>
+      {/* Navigation */}
+      <nav className={styles['sidebar-nav']}>
+        <div className={styles['nav-section']}>
+          <div className={styles['nav-section-title']}>Dashboard</div>
+          <Link to="/Dashboard" className={styles['nav-item']} data-page="home">
+            <HomeIcon />
+            <span>Dashboard</span>
+          </Link>
+        </div>
 
-    {/* Sidebar Footer */}
-    <div className={styles['sidebar-footer']}>
-      <div className={styles['powered-by']}>
-        <span>Powered By</span>
-        <span className={styles['company-name']}>PioneerICT</span>
+        <div className={styles['nav-section']}>
+          <div className={styles['nav-section-title']}>Your Shop</div>
+          <Link to="/inventory" className={styles['nav-item']} data-page="inventory">
+            <Inventory2Icon />
+            <span>Stock Items</span>
+          </Link>
+          <Link to="/sales" className={styles['nav-item']} data-page="sales">
+            <PointOfSaleIcon />
+            <span>Sell Items</span>
+          </Link>
+          <Link to="/credit" className={styles['nav-item']} data-page="credit">
+            <HistoryIcon />
+            <span>Sale History</span>
+          </Link>
+          <Link to="/customers" className={styles['nav-item']} data-page="customers">
+            <PeopleIcon />
+            <span>Customers</span>
+          </Link>
+        </div>
+
+        <div className={styles['nav-section']}>
+          <div className={styles['nav-section-title']}>Reports</div>
+          <Link to="/reports" className={styles['nav-item']} data-page="reports">
+            <AssessmentIcon />
+            <span>View Reports</span>
+          </Link>
+        </div>
+      </nav>
+
+      {/* Sidebar Footer */}
+      <div className={styles['sidebar-footer']}>
+        <div className={styles['powered-by']}>
+          <span>Powered By</span>
+          <span className={styles['company-name']}>PioneerICT</span>
+        </div>
       </div>
-    </div>
-  </aside>
-);
+    </aside>
+  );
+};
 
 export default Sidebar;

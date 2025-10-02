@@ -25,4 +25,29 @@ contextBridge.exposeInMainWorld("api", {
   getUser: async (id) => {
     return await ipcRenderer.invoke("get-user", id);
   },
+
+
+
+  // ============================
+  // SHOP API (ipcShop)
+  // ============================
+  addShop: async (shop) => {
+    return await ipcRenderer.invoke("shop:add", shop);
+  },
+
+  getShopById: async (id) => {
+    return await ipcRenderer.invoke("shop:getById", id);
+  },
+
+  updateShop: async (id, shop) => {
+    return await ipcRenderer.invoke("shop:update", { id, shop });
+  },
+
+  deleteShop: async (id) => {
+    return await ipcRenderer.invoke("shop:delete", id);
+  },
+
+  getThemeColor: async () => {
+    return await ipcRenderer.invoke("shop:getThemeColor");
+  },
 });
