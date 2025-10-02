@@ -1,46 +1,45 @@
-const db = require('./db');
+// user.js
+const db = require("./db");
 
 // ✅ Add new user
-function addUser(user, callback) {
+function addUser(user) {
   const { name, role, email, password } = user;
-  const sql = `INSERT INTO admins (name, role, email, password) VALUES (?, ?, ?, ?)`;
-  db.run(sql, [name, role, email, password], function (err) {
-    if (err) return callback(err);
-    callback(null, { id: this.lastID }); // return new user's id
-  });
+  const stmt = db.prepare(
+    `INSERT INTO admins (name, role, email, password) VALUES (?, ?, ?, ?)`
+  );
+  const result = stmt.run(name, role, email, password);
+  return { id: result.lastInsertRowid };
 }
 
 // ✅ Update user
-function updateUser(id, user, callback) {
+function updateUser(id, user) {
   const { name, role, email, password } = user;
-  const sql = `UPDATE admins SET name = ?, role = ?, email = ?, password = ? WHERE id = ?`;
-  db.run(sql, [name, role, email, password, id], function (err) {
-    if (err) return callback(err);
-    callback(null, { changes: this.changes }); // how many rows updated
-  });
+  const stmt = db.prepare(
+    `UPDATE admins SET name = ?, role = ?, email = ?, password = ? WHERE id = ?`
+  );
+  const result = stmt.run(name, role, email, password, id);
+  return { changes: result.changes }; // number of rows updated
 }
 
 // ✅ Delete user
-function deleteUser(id, callback) {
-  const sql = `DELETE FROM admins WHERE id = ?`;
-  db.run(sql, [id], function (err) {
-    if (err) return callback(err);
-    callback(null, { changes: this.changes }); // how many rows deleted
-  });
+function deleteUser(id) {
+  const stmt = db.prepare(`DELETE FROM admins WHERE id = ?`);
+  const result = stmt.run(id);
+  return { changes: result.changes }; // number of rows deleted
 }
 
 // ✅ Check login (email + password)
-function checkLogin(email, password, callback) {
-  const sql = `SELECT * FROM admins WHERE email = ? AND password = ?`;
-  db.get(sql, [email, password], (err, row) => {
-    if (err) return callback("error", err);
-    callback(null, row);
-  });
+function checkLogin(email, password) {
+  const stmt = db.prepare(
+    `SELECT * FROM admins WHERE email = ? AND password = ?`
+  );
+  const row = stmt.get(email, password);
+  return row || null; // return user object or null
 }
 
 module.exports = {
   addUser,
   updateUser,
   deleteUser,
-  checkLogin
+  checkLogin,
 };

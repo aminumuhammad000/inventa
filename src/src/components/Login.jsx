@@ -1,12 +1,36 @@
 import React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import "../styles/Login.css"
-// import "../styles/global-style.css"
+import "../styles/global-style.css"
 import TargetIcon from '@mui/icons-material/CenterFocusStrong';
-import StorefrontIcon from '@mui/icons-material/Storefront';
-import CloseIcon from '@mui/icons-material/Close';
+import StorefrontIcon from "@mui/icons-material/Storefront"
 
-const Login = () => (
-  <div className="login-container">
+
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      // Replace with your actual login logic
+      const result = await window.api?.login?.(email, password);
+      if (result && result.success) {
+        alert(`✅ Login successful! Welcome ${result.user.email}`);
+        navigate('/dashboard');
+      } else {
+        alert(`❌ Login failed: ${result?.message || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("⚠️ Something went wrong. Please try again.");
+    }
+  };
+
+  return (
+    <div className="login-container">
     {/* Left Column - Welcome Section */}
     <div className="welcome-section">
       {/* Background Pattern */}
@@ -63,12 +87,29 @@ const Login = () => (
           <h2>Shop Login</h2>
           <p>offline on your computer.</p>
         </div>
-        <form id="loginForm" className="form">
+
+        <form id="loginForm" className="form" onSubmit={handleLogin}>
           <div className="input-group">
-            <input type="email" id="email" className="form-input" placeholder="Email ID" required />
+            <input
+              type="email"
+              id="email"
+              className="form-input"
+              placeholder="Email ID"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
           </div>
           <div className="input-group">
-            <input type="password" id="password" className="form-input" placeholder="Password" required />
+            <input
+              type="password"
+              id="password"
+              className="form-input"
+              placeholder="Password"
+              required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
           </div>
           <div className="form-options">
             <label className="checkbox-wrapper">
@@ -82,20 +123,10 @@ const Login = () => (
             LOGIN
           </button>
         </form>
-       
       </div>
     </div>
-    {/* Notification Toast */}
-    <div id="toast" className="toast">
-      <div className="toast-content">
-        {/* You can dynamically render the icon here if needed */}
-        <span className="toast-message"></span>
-      </div>
-      <button className="toast-close" onClick={() => window.hideToast && window.hideToast()}>
-        <CloseIcon style={{ fontSize: 24 }} />
-      </button>
     </div>
-  </div>
-);
+  );
+};
 
 export default Login;

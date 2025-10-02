@@ -398,9 +398,6 @@ body.theme-teal {
     margin-left: 0;
 }
 
-.main-content.sidebar-collapsed {
-    /* No margin needed since sidebar is now relative positioned */
-}
 
 /* Header */
 .header {

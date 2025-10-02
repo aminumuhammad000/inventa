@@ -1,43 +1,28 @@
-const { ipcMain } = require('electron');
-const userDB = require('../database/user');
+// ipc/userIPC.js
+const { ipcMain } = require("electron");
+const userDB = require("../database/user");
 
 // ✅ Add user
-ipcMain.handle('add-user', (event, user) => {
-  return new Promise((resolve, reject) => {
-    userDB.addUser(user, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
-    });
-  });
+ipcMain.handle("add-user", (event, user) => {
+  return userDB.addUser(user); // returns { id: ... }
 });
 
 // ✅ Update user
-ipcMain.handle('update-user', (event, { id, user }) => {
-  return new Promise((resolve, reject) => {
-    userDB.updateUser(id, user, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
-    });
-  });
+ipcMain.handle("update-user", (event, { id, user }) => {
+  return userDB.updateUser(id, user); // returns { changes: ... }
 });
 
 // ✅ Delete user
-ipcMain.handle('delete-user', (event, id) => {
-  return new Promise((resolve, reject) => {
-    userDB.deleteUser(id, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
-    });
-  });
+ipcMain.handle("delete-user", (event, id) => {
+  return userDB.deleteUser(id); // returns { changes: ... }
 });
 
 // ✅ Check login
-ipcMain.handle('login', (event, { email, password }) => {
-  return new Promise((resolve, reject) => {
-    userDB.checkLogin(email, password, (err, user) => {
-      if (err) reject(err);
-      else if (user) resolve({ success: true, user });
-      else resolve({ success: false, message: 'Invalid credentials' });
-    });
-  });
+ipcMain.handle("login", (event, { email, password }) => {
+  const user = userDB.checkLogin(email, password);
+  if (user) {
+    return { success: true, user };
+  } else {
+    return { success: false, message: "Invalid credentials" };
+  }
 });
