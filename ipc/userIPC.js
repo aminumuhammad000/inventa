@@ -2,6 +2,11 @@
 const { ipcMain } = require("electron");
 const userDB = require("../database/user");
 
+// ✅ Get user by id
+ipcMain.handle("get-user", (event, id) => {
+  return userDB.getUser(id); // returns user object or null
+});
+
 // ✅ Add user
 ipcMain.handle("add-user", (event, user) => {
   return userDB.addUser(user); // returns { id: ... }

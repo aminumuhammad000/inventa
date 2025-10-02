@@ -8,9 +8,66 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
+// Helper to get session info from localStorage
+function getUserSession() {
+  const sessionStr = localStorage.getItem('userSession');
+  if (!sessionStr) return null;
+  try {
+    const session = JSON.parse(sessionStr);
+    if (session.expiresAt && Date.now() < session.expiresAt) {
+      return session;
+    }
+  } catch {}
+  return null;
+}
+
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const dropdownRef = useRef(null);
+
+  // Fetch user info on mount
+useEffect(() => {
+  const session = getUserSession();
+  if (!session) {
+    setUser(null);
+    return;
+  }
+
+  // Prefer preload API if available
+  if (window.api?.getUser) {
+    window.api.getUser(session.userId || session.userName)
+      .then((userObj) => {
+        if (userObj) {
+          setUser(userObj);
+        } 
+        else {
+          // fallback: just use session info
+          setUser({
+            name: session.userName,
+            initials: (session.userName || '?').slice(0, 2).toUpperCase(),
+            role: ''
+          });
+        }
+      })
+      .catch(() => {
+        // fallback in case of error
+        setUser({
+          name: session.userName,
+          initials: (session.userName || '?').slice(0, 2).toUpperCase(),
+          role: ''
+        });
+      });
+  } else {
+    // Browser mode fallback
+    setUser({
+      name: session.userName,
+      initials: (session.userName || '?').slice(0, 2).toUpperCase(),
+      role: ''
+    });
+  }
+}, []);
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -27,8 +84,15 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
-  // Example user/shop info (replace with real data as needed)
-  const user = { name: "John Doe", initials: "JD", role: "Shop Owner" };
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem('userSession');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+    window.location.replace('/login');
+  };
+
+  // Example shop info (replace with real data as needed)
   const shop = { name: "My Construction Shop", location: "Your Location" };
 
   const navigate = useNavigate();
@@ -42,10 +106,10 @@ const Header = () => {
       </div>
       <div className="header-right">
         <div className="user-info">
-          <div className="user-avatar">{user.initials}</div>
+          <div className="user-avatar">{user ? (user.initials || (user.name || '?').slice(0,2).toUpperCase()) : '?'}</div>
           <div className="user-details">
-            <span className="user-name">{user.name}</span>
-            <span className="user-role">{user.role}</span>
+            <span className="user-name">{user ? user.name : 'Guest'}</span>
+            <span className="user-role">{user ? user.role : ''}</span>
           </div>
           <div className="user-dropdown" ref={dropdownRef}>
             <button className="dropdown-toggle" onClick={() => setDropdownOpen((open) => !open)}>
@@ -67,7 +131,7 @@ const Header = () => {
                 <PersonIcon />
                 <span>Change My Info</span>
               </a>
-              <a href="#" className="dropdown-item logout" onClick={() => {/* logout logic */}}>
+              <a href="#" className="dropdown-item logout" onClick={handleLogout}>
                 <LogoutIcon />
                 <span>Logout</span>
               </a>

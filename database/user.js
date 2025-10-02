@@ -37,9 +37,17 @@ function checkLogin(email, password) {
   return row || null; // return user object or null
 }
 
+// ✅ Get user by id
+function getUser(id) {
+  const stmt = db.prepare(`SELECT * FROM admins WHERE id = ?`);
+  const row = stmt.get(id);
+  return row || null;
+}
+
 module.exports = {
   addUser,
   updateUser,
   deleteUser,
   checkLogin,
+  getUser,
 };
