@@ -9,32 +9,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SearchIcon from '@mui/icons-material/Search';
 
 
-const getSampleInventoryData = () => ([
-  {
-    id: 1,
-    name: "Cement",
-    sku: "CEM-001",
-    category_name: "Building Materials",
-    current_stock: 50,
-    min_stock_level: 10,
-    unit: "bags",
-    cost_price: 2500,
-    selling_price: 3000,
-    image: ""
-  },
-  {
-    id: 2,
-    name: "Iron Rod",
-    sku: "IRON-002",
-    category_name: "Metals",
-    current_stock: 20,
-    min_stock_level: 5,
-    unit: "pieces",
-    cost_price: 5000,
-    selling_price: 6000,
-    image: ""
-  }
-]);
+// At the top of your component
+const { productAPI } = window;
 
 const Inventory = () => {
   const [inventory, setInventory] = useState([]);
@@ -42,10 +18,9 @@ const Inventory = () => {
   const [editItem, setEditItem] = useState(null); // item being edited
   const [formFields, setFormFields] = useState({
     name: '',
-    sku: '',
+    discount: '',
     category_name: '',
     current_stock: '',
-    min_stock_level: '',
     unit: '',
     cost_price: '',
     selling_price: '',
@@ -55,30 +30,31 @@ const Inventory = () => {
   const [stockFilter, setStockFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    // Load inventory from localStorage or use sample
-    const saved = localStorage.getItem('inventoryData');
-    if (saved) {
-      setInventory(JSON.parse(saved));
-    } else {
-      const sample = getSampleInventoryData();
-      setInventory(sample);
-      localStorage.setItem('inventoryData', JSON.stringify(sample));
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const products = await productAPI.getAllProducts();
+      setInventory(products);
+    } catch (err) {
+      console.error("Failed to load inventory:", err);
     }
-  }, []);
+  };
+  fetchProducts();
+}, []);
+
 
   const togglePurchaseForm = () => {
     setShowPurchaseForm(v => !v);
     setEditItem(null);
     setFormFields({
-      name: '', sku: '', category_name: '', current_stock: '', min_stock_level: '', unit: '', cost_price: '', selling_price: '', image: ''
+      name: '', discount: '', category_name: '', current_stock: '', unit: '', cost_price: '', selling_price: '', image: ''
     });
   };
   const closePurchaseForm = () => {
     setShowPurchaseForm(false);
     setEditItem(null);
     setFormFields({
-      name: '', sku: '', category_name: '', current_stock: '', min_stock_level: '', unit: '', cost_price: '', selling_price: '', image: ''
+      name: '', discount: '', category_name: '', current_stock: '',  unit: '', cost_price: '', selling_price: '', image: ''
     });
   };
 
@@ -89,52 +65,59 @@ const Inventory = () => {
   };
 
   // Add or update product
-  const handleFormSubmit = e => {
-    e.preventDefault();
+const handleFormSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
     if (editItem) {
-      // Edit existing
-      setInventory(inv => {
-        const updated = inv.map(item =>
-          item.id === editItem.id ? { ...item, ...formFields, current_stock: Number(formFields.current_stock), min_stock_level: Number(formFields.min_stock_level), cost_price: Number(formFields.cost_price), selling_price: Number(formFields.selling_price) } : item
-        );
-        localStorage.setItem('inventoryData', JSON.stringify(updated));
-        return updated;
-      });
-    } else {
-      // Add new
-      const newItem = {
+      // Update existing
+      await productAPI.updateProduct(editItem.id, {
         ...formFields,
-        id: Date.now(),
         current_stock: Number(formFields.current_stock),
         min_stock_level: Number(formFields.min_stock_level),
         cost_price: Number(formFields.cost_price),
         selling_price: Number(formFields.selling_price)
-      };
-      setInventory(inv => {
-        const updated = [...inv, newItem];
-        localStorage.setItem('inventoryData', JSON.stringify(updated));
-        return updated;
+      });
+    } else {
+      // Add new
+      await productAPI.addProduct({
+        ...formFields,
+        current_stock: Number(formFields.current_stock),
+        min_stock_level: Number(formFields.min_stock_level),
+        cost_price: Number(formFields.cost_price),
+        selling_price: Number(formFields.selling_price)
       });
     }
-    closePurchaseForm();
-  };
 
-  // Edit button handler
-  const handleEdit = item => {
-    setEditItem(item);
-    setShowPurchaseForm(true);
-    setFormFields({
-      name: item.name || '',
-      sku: item.sku || '',
-      category_name: item.category_name || '',
-      current_stock: item.current_stock,
-      min_stock_level: item.min_stock_level,
-      unit: item.unit || '',
-      cost_price: item.cost_price,
-      selling_price: item.selling_price,
-      image: item.image || ''
-    });
-  };
+    // Refresh inventory from DB
+    const products = await productAPI.getAllProducts();
+    setInventory(products);
+    closePurchaseForm();
+  } catch (err) {
+    console.error("Failed to save product:", err);
+  }
+};
+
+const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this product?")) return;
+
+  try {
+    await productAPI.deleteProduct(id);
+    const products = await productAPI.getAllProducts();
+    setInventory(products);
+  } catch (err) {
+    console.error("Failed to delete product:", err);
+  }
+};
+
+const searchInventory = async (keyword) => {
+  try {
+    const results = await productAPI.searchProducts(keyword);
+    setInventory(results);
+  } catch (err) {
+    console.error("Search failed:", err);
+  }
+};
 
   // Table rendering helpers
   const getStockStatusClass = (current, min) => {
@@ -174,14 +157,9 @@ const Inventory = () => {
   });
 
   return (
-    <div className="app-container" style={{ justifyContent: 'center', alignItems: 'flex-start', minHeight: '100vh', background: '#f8fafc' }}>
-      {/* Sidebar Container */}
-      <div id="sidebar-container"></div>
-      {/* Main Content */}
-      <main className="main-content" id="mainContent" style={{ width: '100%', display: 'flex', justifyContent: 'center', background: 'transparent', minHeight: '100vh' }}>
-        {/* Header Container */}
-        <div id="header-container"></div>
-        {/* Content */}
+    <>
+      <main>
+  
         <div className="content" style={{ maxWidth: 1100, width: '100%', margin: '32px auto', padding: '0 24px 48px 24px', background: 'white', borderRadius: 20, boxShadow: '0 8px 32px rgba(0,0,0,0.06)' }}>
           {/* Actions */}
           <div className="actions-bar">
@@ -211,8 +189,11 @@ const Inventory = () => {
                 placeholder="Search by name, SKU, or category..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
+                className="search-input"
               />
-              <button className="btn-search" tabIndex={-1}>
+              <button className="btn-search" 
+              tabIndex={-1}
+              onClick={() => searchInventory(searchTerm)}>
                 <SearchIcon />
               </button>
             </div>
@@ -220,38 +201,17 @@ const Inventory = () => {
           {/* Add/Edit Products Form (Inline) */}
           {showPurchaseForm && (
             <>
-              <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                background: 'rgba(30,41,59,0.25)',
-                backdropFilter: 'blur(6px)',
-                zIndex: 1000
-              }}
-                onClick={closePurchaseForm}
-              />
-              <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1001
-              }}>
-                <div className="form-card" style={{ maxWidth: 480, width: '100%', margin: '0 auto', boxShadow: '0 12px 48px rgba(0,0,0,0.18)', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div className="" onClick={closePurchaseForm} />
+              <div className="main-container">
+                <div className="form-card">
                   <div className="form-header">
-                    <h3 style={{ margin: 0 }}>{editItem ? 'Edit Product' : 'Add New Products'}</h3>
-                    <button className="btn-close" onClick={closePurchaseForm} style={{ marginLeft: 16 }}>
+                    <h3>{editItem ? 'Edit Product' : 'Add New Products'}</h3>
+                    <button className="btn-close" onClick={closePurchaseForm}>
                       <CloseIcon />
                     </button>
                   </div>
-                  <form id="addProductForm" onSubmit={handleFormSubmit} style={{ padding: 24 }}>
-                    <div className="form-group" style={{ textAlign: 'center' }}>
+                  <form onSubmit={handleFormSubmit}>
+                    <div className="form-group">
                       <label>Product Image</label>
                       <input type="file" accept="image/*" onChange={e => {
                         const file = e.target.files[0];
@@ -262,58 +222,55 @@ const Inventory = () => {
                         }
                       }} />
                       {formFields.image && (
-                        <img src={formFields.image} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, marginTop: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }} />
+                        <img src={formFields.image} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, marginTop: 8 }} />
                       )}
                     </div>
+
+                    <div className="form-group-container">
                     <div className="form-group">
                       <label>Name</label>
-                      <input name="name" value={formFields.name} onChange={handleFormChange} required />
-                    </div>
-                    <div className="form-group">
-                      <label>SKU</label>
-                      <input name="sku" value={formFields.sku} onChange={handleFormChange} />
+                      <input name="name" value={formFields.name} onChange={handleFormChange} required placeholder="Product Name"/>
                     </div>
                     <div className="form-group">
                       <label>Category</label>
-                      <input name="category_name" value={formFields.category_name} onChange={handleFormChange} />
+                      <input name="category_name" value={formFields.category_name} onChange={handleFormChange} placeholder="Product Category" />
                     </div>
-                    <div className="form-row" style={{ display: 'flex', gap: 12 }}>
-                      <div className="form-group" style={{ flex: 1 }}>
-                        <label>Stock</label>
-                        <input name="current_stock" type="number" value={formFields.current_stock} onChange={handleFormChange} required />
-                      </div>
-                      <div className="form-group" style={{ flex: 1 }}>
-                        <label>Min Stock Level</label>
-                        <input name="min_stock_level" type="number" value={formFields.min_stock_level} onChange={handleFormChange} required />
+                    
+                      <div className="form-group">
+                        <label>Quantity</label>
+                        <input name="current_stock" type="number" value={formFields.current_stock} onChange={handleFormChange} required placeholder="Quantity of Product" />
                       </div>
                     </div>
-                    <div className="form-row" style={{ display: 'flex', gap: 12 }}>
+ 
+                    <div className="form-group-container">
                       <div className="form-group" style={{ flex: 1 }}>
-                        <label>Unit</label>
-                        <input name="unit" value={formFields.unit} onChange={handleFormChange} />
+                        <label>Discount</label>
+                        <input name="unit" value={formFields.unit} onChange={handleFormChange} placeholder="Discount Price"/>
                       </div>
-                      <div className="form-group" style={{ flex: 1 }}>
-                        <label>Cost Price</label>
-                        <input name="cost_price" type="number" value={formFields.cost_price} onChange={handleFormChange} required />
-                      </div>
-                    </div>
-                    <div className="form-row" style={{ display: 'flex', gap: 12 }}>
+
                       <div className="form-group" style={{ flex: 1 }}>
                         <label>Selling Price</label>
                         <input name="selling_price" type="number" value={formFields.selling_price} onChange={handleFormChange} required />
                       </div>
-                    </div>
-                    <button className="btn-primary" type="submit" style={{ width: '100%', marginTop: 12 }}>{editItem ? 'Update Product' : 'Add Product'}</button>
+
+                        <div className="form-group" style={{ flex: 1 }}>
+                        <label>Cost Price</label>
+                        <input name="cost_price" type="number" value={formFields.cost_price} onChange={handleFormChange} required placeholder="Cost Price"/>
+                      </div>
+
+                      </div>
+                  
+                    <button className="btn-primary" type="submit">{editItem ? 'Update Product' : 'Add Product'}</button>
                   </form>
                 </div>
               </div>
             </>
           )}
           {/* Inventory Table */}
-          <div className="table-container" style={{ background: 'white', borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.08)', padding: 24, marginTop: 24 }}>
+          <div className="table-container" style={{ background: 'white', borderRadius: 16, padding: 24, marginTop: 24 }}>
             <table className="inventory-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: 'rgba(16,185,129,0.08)' }}>
+                <tr>
                   <th>Image</th>
                   <th>Name</th>
                   <th>SKU</th>
@@ -333,7 +290,7 @@ const Inventory = () => {
                     onMouseOut={e => e.currentTarget.style.background = ''}
                   >
                     <td className="product-image-cell">
-                      <div className="product-image" style={{ width: 48, height: 48, borderRadius: 8, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                      <div className="product-image" style={{ width: 48, height: 48, borderRadius: 8, overflow: 'hidden' }}>
                         <img src={item.image || 'https://via.placeholder.com/80x80?text=No+Image'} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.src = 'https://via.placeholder.com/80x80?text=No+Image'} />
                       </div>
                     </td>
@@ -356,17 +313,16 @@ const Inventory = () => {
                       >
                         <EditIcon />
                       </button>
-                      {/* More actions (history, etc.) can be added here */}
+                    
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {/* ...rest of the JSX structure as in HTML... */}
         </div>
       </main>
-    </div>
+    </>
   );
 };
 

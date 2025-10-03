@@ -4,7 +4,7 @@ module.exports = {
   // Add new product
   addProduct: (product) => {
     const stmt = db.prepare(`
-      INSERT INTO products (name, image, price, quantity, category, status, unit_price, discount)
+      INSERT INTO products (name, image, price, quantity, category, status, unit_price, discount, cost_price)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const info = stmt.run(
@@ -15,7 +15,8 @@ module.exports = {
       product.category || null,
       product.status || "active",
       product.unit_price || null,
-      product.discount || null
+      product.discount || null,
+      product.cost_price || null
     );
     return { id: info.lastInsertRowid };
   },

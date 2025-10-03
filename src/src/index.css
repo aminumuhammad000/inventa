@@ -31,3 +31,11 @@ body::before {
     z-index: -1;
     pointer-events: none;
 }
+input,
+select,
+textarea,
+button,
+div {
+    border: none;
+    outline: none;
+}
