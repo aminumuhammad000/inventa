@@ -4,20 +4,24 @@ module.exports = {
   // Add new product
 addProduct: (product) => {
   const stmt = db.prepare(`
-    INSERT INTO products (name, image, price, quantity, category, status, unit_price, discount, cost_price)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO products
+      (name, image, selling_price, current_stock, category_name, status, min_stock_level, discount, cost_price, unit)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
+
   const info = stmt.run(
     product.name,
     product.image || null,
-    product.selling_price,            // map selling_price -> price
-    product.current_stock,            // map current_stock -> quantity
-    product.category_name || null,    // map category_name -> category
+    Number(product.selling_price),
+    Number(product.current_stock),
+    product.category_name || null,
     product.status || "active",
-    product.unit || null,             // map unit -> unit_price (⚠️ maybe wrong meaning)
-    product.discount || null,
-    product.cost_price || null
+    Number(product.min_stock_level) || 0,
+    Number(product.discount) || 0,
+    Number(product.cost_price) || 0,
+    product.unit || null
   );
+
   return { id: info.lastInsertRowid };
 },
 

@@ -1098,6 +1098,7 @@ body.theme-teal {
     font-size: 14px;
     color: #2d3748;
     transition: all 0.3s ease;
+    border: none;
 }
 
 .form-group input:focus,
@@ -2317,15 +2318,7 @@ body.theme-teal {
     resize: vertical;
 }
 
-.setting-item input[type="number"] {
-    -moz-appearance: textfield;
-}
 
-.setting-item input[type="number"]::-webkit-outer-spin-button,
-.setting-item input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
 
 /* Hours Input */
 .hours-input {

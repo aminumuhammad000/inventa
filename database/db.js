@@ -43,7 +43,8 @@ db.prepare(`
     status TEXT DEFAULT 'active' CHECK(status IN ('sold','active','returned')),
     date_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     unit_price REAL,
-    discount REAL
+    discount REAL,
+    cost_price REAL
   )
 `).run();
 

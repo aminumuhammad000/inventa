@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Inventory.css";
-// import "../styles/global-style.css";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import EditIcon from "@mui/icons-material/Edit";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -8,6 +7,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SearchIcon from "@mui/icons-material/Search";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "../components/Alert"
 
 // ✅ Use window.api methods directly
@@ -231,19 +231,14 @@ const Inventory = () => {
 
       <main>
         <div className="content">
-          {/* Actions */}
-          <div className="actions-bar">
-            <button className="btn-primary" onClick={togglePurchaseForm}>
-              <AddBoxIcon />
-              Add Products
-            </button>
-          </div>
 
           {/* Filters Bar */}
           <div className="filters-bar">
+          <div className="select-container">
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
+              className="select-category"
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
@@ -255,28 +250,33 @@ const Inventory = () => {
             <select
               value={stockFilter}
               onChange={(e) => setStockFilter(e.target.value)}
+              className="select-stock"
             >
               <option value="">All Stock</option>
               <option value="normal">In Stock</option>
               <option value="low">Low Stock</option>
               <option value="out">Out of Stock</option>
             </select>
+
             <div className="search-box">
               <input
                 type="text"
-                placeholder="Search by name, SKU, or category..."
+                placeholder="Search Product"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
               />
-              <button
-                className="btn-search"
-                tabIndex={-1}
-                onClick={() => searchInventory(searchTerm)}
-              >
-                <SearchIcon />
-              </button>
+                {/* <SearchIcon /> */}
+            
             </div>
+            </div>
+
+
+
+             <button className="btn-primary" onClick={togglePurchaseForm}>
+              <AddBoxIcon />
+              Add Products
+            </button>
           </div>
 
           {/* Add/Edit Products Form */}
@@ -297,6 +297,7 @@ const Inventory = () => {
                       <input
                         type="file"
                         accept="image/*"
+                        required
                         onChange={(e) => {
                           const file = e.target.files[0];
                           if (file) {
@@ -315,7 +316,7 @@ const Inventory = () => {
                           src={formFields.image}
                           alt="Preview"
                           style={{
-                            width: 80,
+                            width: 180,
                             height: 80,
                             objectFit: "cover",
                             borderRadius: 8,
@@ -437,9 +438,8 @@ const Inventory = () => {
                 <tr>
                   <th>Image</th>
                   <th>Name</th>
-                  <th>SKU</th>
                   <th>Category</th>
-                  <th>Stock</th>
+                  <th>Quantity</th>
                   <th>Unit</th>
                   <th>Cost Price</th>
                   <th>Selling Price</th>
@@ -487,7 +487,6 @@ const Inventory = () => {
                       </div>
                     </td>
                     <td>{item.name}</td>
-                    <td>{item.sku || "N/A"}</td>
                     <td>{item.category_name || "Uncategorized"}</td>
                     <td
                       className={`stock-cell ${getStockStatusClass(
@@ -535,6 +534,32 @@ const Inventory = () => {
                         }
                       >
                         <EditIcon />
+                      </button>
+                    </td>
+
+                               <td>
+                      <button
+                        className="btn-icon"
+                        title="Edit"
+                        onClick={() => handleDelete(item.id)}
+                        style={{
+                          border: "none",
+                          background: "none",
+                          cursor: "pointer",
+                          padding: 6,
+                          borderRadius: 6,
+                          transition: "background 0.2s",
+                        }}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.background =
+                            "rgba(230, 43, 19, 0.34)")
+                        }
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.background = "none")
+                        }
+                      >
+                        <DeleteIcon color="error" fontSize="small" />
+
                       </button>
                     </td>
                   </tr>
