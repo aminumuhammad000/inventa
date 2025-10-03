@@ -211,13 +211,11 @@ const Credit = () => {
   return (
     <div className="app-container">
       {/* Sidebar Container */}
-      <div id="sidebar-container"></div>
       {/* Main Content */}
       <main className="main-content" id="mainContent">
         {/* Header Container */}
-        <div id="header-container"></div>
         {/* Content */}
-        <div className="content">
+        <div className="content" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
           {/* Actions */}
           <div className="actions-bar">
             <button className="btn-secondary" onClick={exportSaleHistory}>
@@ -309,78 +307,78 @@ const Credit = () => {
           <div className="table-container" style={{ marginTop: 32, width: '100%' }}>
             <h3>Credit Sales</h3>
             <table className="data-table" style={{ width: '100%' }}>
-              <thead>
-                <tr>
-                  <th>Sale ID</th>
-                  <th>Date</th>
-                  <th>Customer</th>
+                  <thead>
+                    <tr>
+                      <th>Sale ID</th>
+                      <th>Date</th>
+                      <th>Customer</th>
                   <th>Product Image</th>
-                  <th>Total Amount</th>
+                      <th>Total Amount</th>
                   <th>Paid Amount</th>
-                  <th>Payment Method</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
+                      <th>Payment Method</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
               <tbody>
                 {creditSales.length === 0 ? (
                   <tr><td colSpan={8} style={{ textAlign: 'center' }}>No sales</td></tr>
                 ) : creditSales.map(sale => {
-                  const status = getCreditSaleStatus(sale);
+                      const status = getCreditSaleStatus(sale);
                   // Mock product image (use a placeholder or from sale.items[0])
                   const productImg = sale.items && sale.items.length > 0 && sale.items[0].image
                     ? sale.items[0].image
                     : 'https://via.placeholder.com/40x40?text=Img';
                   // Payment method (from sale or fallback)
                   const paymentMethod = sale.paymentMethod || 'Credit';
-                  return (
-                    <tr key={sale.id}>
-                      <td>#{sale.id}</td>
-                      <td>{sale.saleDate}</td>
-                      <td>{getCustomerName(sale.customerId)}</td>
+                      return (
+                        <tr key={sale.id}>
+                          <td>#{sale.id}</td>
+                          <td>{sale.saleDate}</td>
+                          <td>{getCustomerName(sale.customerId)}</td>
                       <td><img src={productImg} alt="Product" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} /></td>
-                      <td>₦{parseFloat(sale.totalAmount).toFixed(2)}</td>
+                          <td>₦{parseFloat(sale.totalAmount).toFixed(2)}</td>
                       <td>₦{parseFloat(sale.paidAmount).toFixed(2)}</td>
                       <td>{paymentMethod}</td>
-                      <td><span className={`status-badge ${status.class}`}>{status.text}</span></td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                          <td><span className={`status-badge ${status.class}`}>{status.text}</span></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
           {/* Payments Table */}
           <div className="table-container" style={{ marginTop: 32 }}>
             <h3>Payments</h3>
             <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Payment ID</th>
-                  <th>Customer</th>
-                  <th>Credit Sale ID</th>
-                  <th>Payment Date</th>
-                  <th>Amount</th>
-                  <th>Method</th>
-                </tr>
-              </thead>
+                  <thead>
+                    <tr>
+                      <th>Payment ID</th>
+                      <th>Customer</th>
+                      <th>Credit Sale ID</th>
+                      <th>Payment Date</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                    </tr>
+                  </thead>
               <tbody>
                 {payments.length === 0 ? (
                   <tr><td colSpan={6} style={{ textAlign: 'center' }}>No payments</td></tr>
                 ) : payments.map(payment => {
-                  const customer = customers.find(c => c.id === payment.customerId);
-                  return (
-                    <tr key={payment.id}>
-                      <td>#{payment.id}</td>
-                      <td>{customer ? customer.name : 'Unknown Customer'}</td>
-                      <td>#{payment.creditSaleId}</td>
-                      <td>{payment.paymentDate}</td>
-                      <td>₦{parseFloat(payment.amount).toFixed(2)}</td>
+                      const customer = customers.find(c => c.id === payment.customerId);
+                      return (
+                        <tr key={payment.id}>
+                          <td>#{payment.id}</td>
+                          <td>{customer ? customer.name : 'Unknown Customer'}</td>
+                          <td>#{payment.creditSaleId}</td>
+                          <td>{payment.paymentDate}</td>
+                          <td>₦{parseFloat(payment.amount).toFixed(2)}</td>
                       <td>{payment.paymentMethod}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
         </div>
       </main>
     </div>

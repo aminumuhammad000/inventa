@@ -410,7 +410,7 @@ function handleDrop(e) {
 
 // Navigate to login page
 function goToLogin() {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
 }
 
 // Global functions

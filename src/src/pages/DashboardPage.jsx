@@ -87,19 +87,32 @@ const Dashboard = () => {
               </div>
               <div className="card-content">
                 <div className="stock-list">
-                  {someProducts.map((p) => (
-                    <div className="stock-item" key={p.id}>
-                      <div className="stock-info">
-                        <h4>{p.name}</h4>
-                        <p>{p.category || "Uncategorized"}</p>
-                      </div>
-                      <div className="stock-balance">
-                        <span className="balance-value">{p.quantity}</span>
-                        <span className="balance-unit">units</span>
-                      </div>
+                  {someProducts.length === 0 ? (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '180px',
+                      width: '100%'
+                    }}>
+                      <Inventory2Icon style={{ fontSize: 72, color: '#cbd5e1', marginBottom: 16 }} />
+                      <div style={{ fontSize: 15, color: '#64748b', fontWeight: 500, textAlign: 'center' }}>No products yet</div>
                     </div>
-                  ))}
-                  {someProducts.length === 0 && <p>No products yet</p>}
+                  ) : (
+                    someProducts.map((p) => (
+                      <div className="stock-item" key={p.id}>
+                        <div className="stock-info">
+                          <h4>{p.name}</h4>
+                          <p>{p.category || "Uncategorized"}</p>
+                        </div>
+                        <div className="stock-balance">
+                          <span className="balance-value">{p.quantity}</span>
+                          <span className="balance-unit">units</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -115,21 +128,34 @@ const Dashboard = () => {
               </div>
               <div className="card-content">
                 <div className="alert-list">
-                  {lowStockItems.map((p) => (
-                    <div className="alert-item warning" key={p.id}>
-                      <div className="alert-icon">
-                        <ErrorIcon />
-                      </div>
-                      <div className="alert-content">
-                        <h4>{p.name}</h4>
-                        <p>Only {p.quantity} left - Need to buy more!</p>
-                      </div>
-                      <div className="alert-action">
-                        <button className="btn-small">Buy More</button>
-                      </div>
+                  {lowStockItems.length === 0 ? (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '180px',
+                      width: '100%'
+                    }}>
+                      <Inventory2Icon style={{ fontSize: 72, color: '#cbd5e1', marginBottom: 16 }} />
+                      <div style={{ fontSize: 15, color: '#64748b', fontWeight: 500, textAlign: 'center' }}>No low stock items </div>
                     </div>
-                  ))}
-                  {lowStockItems.length === 0 && <p>No low stock items 🎉</p>}
+                  ) : (
+                    lowStockItems.map((p) => (
+                      <div className="alert-item warning" key={p.id}>
+                        <div className="alert-icon">
+                          <ErrorIcon />
+                        </div>
+                        <div className="alert-content">
+                          <h4>{p.name}</h4>
+                          <p>Only {p.quantity} left - Need to buy more!</p>
+                        </div>
+                        <div className="alert-action">
+                          <button className="btn-small">Buy More</button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>

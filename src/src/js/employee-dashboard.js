@@ -26,7 +26,7 @@ let sidebarCollapsed = false;
 document.addEventListener('DOMContentLoaded', function() {
     // Check authentication and role
     if (!checkEmployeeAuthentication()) {
-        window.location.href = 'login.html';
+    window.location.href = '/login';
         return;
     }
 
@@ -948,7 +948,7 @@ function logoutEmployee() {
         localStorage.removeItem('shopName');
         
         // Redirect to login page
-        window.location.href = 'login.html';
+    window.location.href = '/login';
     }
     closeUserDropdown();
 }
@@ -1704,7 +1704,7 @@ function logout() {
         localStorage.removeItem('userRole');
         localStorage.removeItem('userId');
         localStorage.removeItem('userName');
-        window.location.href = 'login.html';
+    window.location.href = '/login';
     }
 }
 

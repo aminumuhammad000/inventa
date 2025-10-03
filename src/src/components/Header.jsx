@@ -112,9 +112,9 @@ useEffect(() => {
   return (
     <header className="header">
       <div className="header-left">
-        <h1 className="page-title" id="pageTitle">Sale History</h1>
+        <h1 className="page-title" id="pageTitle">Welcome!</h1>
         <p className="page-subtitle" id="pageSubtitle">
-          View and manage all your sales history, track payments, and monitor customer transactions
+          View and manage all your sales, track payments, and monitor customer transactions
         </p>
       </div>
       <div className="header-right">

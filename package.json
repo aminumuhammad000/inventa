@@ -32,7 +32,6 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.3",
     "@mui/material": "^7.3.3",
-    "better-sqlite3": "^12.4.1",
-    "sqlite3": "^5.1.7"
+    "better-sqlite3": "^12.4.1"
   }
 }

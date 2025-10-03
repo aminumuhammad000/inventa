@@ -12,7 +12,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
-import "../js/reports.js";
+
 const Reports = () => {
   // Placeholder handlers for demo; replace with real logic as needed
   const generateReport = (type) => {};

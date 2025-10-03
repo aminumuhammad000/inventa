@@ -34,7 +34,7 @@ function checkAuthentication() {
     
     if (!isLoggedIn || !currentUser) {
         console.log('User not authenticated, redirecting to login...');
-        window.location.href = 'login.html';
+    window.location.href = '/login';
         return;
     }
     
@@ -1662,7 +1662,7 @@ function logout() {
     localStorage.removeItem('currentUser');
     showToast('Logged out successfully', 'success');
     setTimeout(() => {
-        window.location.href = 'login.html';
+    window.location.href = '/login';
     }, 1500);
 }
 

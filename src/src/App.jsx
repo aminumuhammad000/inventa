@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   HashRouter,
   BrowserRouter,
@@ -40,43 +41,52 @@ function MainLayout() {
   );
 }
 
-function App() {
-  const Router = window.location.protocol === "file:" ? HashRouter : BrowserRouter;
 
-  // Session check and redirect logic
+
+// Session redirector component (must be inside Router)
+function SessionRedirector() {
+  const navigate = useNavigate();
+  const location = useLocation();
   useEffect(() => {
     const sessionStr = localStorage.getItem("userSession");
     let isValid = false;
-
     if (sessionStr) {
       try {
         const session = JSON.parse(sessionStr);
         if (session.expiresAt && Date.now() < session.expiresAt) {
           isValid = true;
         } else {
-          // Expired, clear session
           localStorage.removeItem("userSession");
           localStorage.removeItem("isLoggedIn");
           localStorage.removeItem("currentUser");
         }
       } catch (e) {
-        // Invalid session, clear
         localStorage.removeItem("userSession");
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("currentUser");
       }
     }
-
-    const path = window.location.pathname;
-    if (isValid && (path === "/" || path === "/login")) {
-      window.location.replace("/dashboard");
-    } else if (!isValid && path !== "/login" && path !== "/") {
-      window.location.replace("/login");
+    const path = location.pathname.toLowerCase();
+    if (isValid) {
+      if (path === "/" || path === "/login") {
+        navigate("/dashboard", { replace: true });
+      }
+    } else {
+      // Only redirect if not already on login
+      if (path !== "/login") {
+        navigate("/login", { replace: true });
+      }
     }
-  }, []);
+  }, [navigate, location]);
+  return null;
+}
+
+function App() {
+  const Router = window.location.protocol === "file:" ? HashRouter : BrowserRouter;
 
   return (
     <Router>
+      <SessionRedirector />
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Login />} />
