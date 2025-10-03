@@ -2,6 +2,7 @@ import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import "../styles/global-style.css"
 
 const Alert = ({ show, message, icon, onClose }) => {
   if (!show) return null;
