@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import "../styles/global-style.css";
+import "../styles/DashboardPage.css"
 
-import Inventory2Icon from '@mui/icons-material/Inventory2';
-import WarningIcon from '@mui/icons-material/Warning';
-import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ErrorIcon from '@mui/icons-material/Error';
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import WarningIcon from "@mui/icons-material/Warning";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const Dashboard = () => {
   // State for dashboard data
@@ -34,7 +34,6 @@ const Dashboard = () => {
         // Low stock products (<= 5)
         const lowItems = await window.api.getLowStock(5);
         setLowStockItems(lowItems);
-
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       }
@@ -83,7 +82,6 @@ const Dashboard = () => {
                   <Inventory2Icon />
                   What's in Your Shop
                 </h2>
-        
               </div>
               <div className="card-content">
                 <div className="stock-list">
@@ -91,11 +89,15 @@ const Dashboard = () => {
                     <div className="stock-item" key={p.id}>
                       <div className="stock-info">
                         <h4>{p.name}</h4>
-                        <p>{p.category || "Uncategorized"}</p>
+                        <p>{p.category_name || "Uncategorized"}</p>{" "}
+                        {/* was p.category */}
                       </div>
                       <div className="stock-balance">
-                        <span className="balance-value">{p.quantity}</span>
-                        <span className="balance-unit">units</span>
+                        <span className="balance-value">{p.current_stock}</span>{" "}
+                        {/* was p.quantity */}
+                        <span className="balance-unit">
+                          {p.unit || "units"}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -111,7 +113,6 @@ const Dashboard = () => {
                   <WarningIcon />
                   Items Running Out
                 </h2>
-        
               </div>
               <div className="card-content">
                 <div className="alert-list">
@@ -122,13 +123,18 @@ const Dashboard = () => {
                       </div>
                       <div className="alert-content">
                         <h4>{p.name}</h4>
-                        <p>Only {p.quantity} left - Need to buy more!</p>
+                        <p>
+                          Only {p.current_stock} left - Need to buy more!
+                        </p>{" "}
+                        {/* was p.quantity */}
                       </div>
                       <div className="alert-action">
                         <button className="btn-small">Buy More</button>
                       </div>
                     </div>
                   ))}
+
+
                   {lowStockItems.length === 0 && <p>No low stock items 🎉</p>}
                 </div>
               </div>

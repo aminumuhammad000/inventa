@@ -2,29 +2,28 @@ const db = require("../database/db");
 
 module.exports = {
   // Add new product
-addProduct: (product) => {
-  const stmt = db.prepare(`
-    INSERT INTO products
-      (name, image, selling_price, current_stock, category_name, status, min_stock_level, discount, cost_price, unit)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
+  addProduct: (product) => {
+    const stmt = db.prepare(`
+      INSERT INTO products
+        (name, image, selling_price, current_stock, category_name, status, min_stock_level, discount, cost_price, unit)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
 
-  const info = stmt.run(
-    product.name,
-    product.image || null,
-    Number(product.selling_price),
-    Number(product.current_stock),
-    product.category_name || null,
-    product.status || "active",
-    Number(product.min_stock_level) || 0,
-    Number(product.discount) || 0,
-    Number(product.cost_price) || 0,
-    product.unit || null
-  );
+    const info = stmt.run(
+      product.name,
+      product.image || null,
+      Number(product.selling_price),
+      Number(product.current_stock),
+      product.category_name || null,
+      product.status || "active",
+      Number(product.min_stock_level) || 0,
+      Number(product.discount) || 0,
+      Number(product.cost_price) || 0,
+      product.unit || null
+    );
 
-  return { id: info.lastInsertRowid };
-},
-
+    return { id: info.lastInsertRowid };
+  },
 
   // Get product by ID
   getProductById: (id) => {
@@ -40,18 +39,19 @@ addProduct: (product) => {
   updateProduct: (id, product) => {
     const stmt = db.prepare(`
       UPDATE products
-      SET name=?, image=?, price=?, quantity=?, category=?, status=?, unit_price=?, discount=?
+      SET name=?, image=?, selling_price=?, current_stock=?, category_name=?, status=?, cost_price=?, unit=?, discount=?
       WHERE id=?
     `);
     const info = stmt.run(
       product.name,
       product.image || null,
-      product.price,
-      product.quantity,
-      product.category || null,
+      Number(product.selling_price),
+      Number(product.current_stock),
+      product.category_name || null,
       product.status || "active",
-      product.unit_price || null,
-      product.discount || null,
+      Number(product.cost_price) || 0,
+      product.unit || null,
+      Number(product.discount) || 0,
       id
     );
     return { changes: info.changes };
@@ -69,7 +69,7 @@ addProduct: (product) => {
     return db
       .prepare(
         `SELECT * FROM products 
-         WHERE name LIKE ? OR category LIKE ?
+         WHERE name LIKE ? OR category_name LIKE ?
          ORDER BY date_time DESC`
       )
       .all(`%${keyword}%`, `%${keyword}%`);
@@ -84,19 +84,18 @@ addProduct: (product) => {
 
   // Get low stock products
   getLowStock: (threshold = 5) => {
-    return db.prepare(`SELECT * FROM products WHERE quantity <= ?`).all(threshold);
+    return db.prepare(`SELECT * FROM products WHERE current_stock <= ?`).all(threshold);
   },
 
-    // Count how many products are low stock
+  // Count how many products are low stock
   countLowStock: (threshold = 5) => {
     const row = db.prepare(`
       SELECT COUNT(*) as total 
       FROM products 
-      WHERE quantity <= ?
+      WHERE current_stock <= ?
     `).get(threshold);
     return row ? row.total : 0;
   },
-
 
   // Get total products count
   getTotalProducts: () => {
@@ -104,7 +103,7 @@ addProduct: (product) => {
     return row ? row.total : 0;
   },
 
-    // Get a limited list of products (default 3, or user choice)
+  // Get a limited list of products (default 3, or user choice)
   getSomeProducts: (limit = 3) => {
     return db.prepare(`
       SELECT * FROM products 
@@ -112,5 +111,4 @@ addProduct: (product) => {
       LIMIT ?
     `).all(limit);
   },
-
 };
