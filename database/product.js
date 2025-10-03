@@ -2,24 +2,25 @@ const db = require("../database/db");
 
 module.exports = {
   // Add new product
-  addProduct: (product) => {
-    const stmt = db.prepare(`
-      INSERT INTO products (name, image, price, quantity, category, status, unit_price, discount, cost_price)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    const info = stmt.run(
-      product.name,
-      product.image || null,
-      product.price,
-      product.quantity,
-      product.category || null,
-      product.status || "active",
-      product.unit_price || null,
-      product.discount || null,
-      product.cost_price || null
-    );
-    return { id: info.lastInsertRowid };
-  },
+addProduct: (product) => {
+  const stmt = db.prepare(`
+    INSERT INTO products (name, image, price, quantity, category, status, unit_price, discount, cost_price)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  const info = stmt.run(
+    product.name,
+    product.image || null,
+    product.selling_price,            // map selling_price -> price
+    product.current_stock,            // map current_stock -> quantity
+    product.category_name || null,    // map category_name -> category
+    product.status || "active",
+    product.unit || null,             // map unit -> unit_price (⚠️ maybe wrong meaning)
+    product.discount || null,
+    product.cost_price || null
+  );
+  return { id: info.lastInsertRowid };
+},
+
 
   // Get product by ID
   getProductById: (id) => {
